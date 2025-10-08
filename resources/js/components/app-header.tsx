@@ -37,11 +37,11 @@ import AppLogo from './app-logo';
 import AppLogoIcon from './app-logo-icon';
 
 const mainNavItems: NavItem[] = [
-    {
-        title: 'Dashboard',
-        href: dashboard(),
-        icon: LayoutGrid,
-    },
+    // {
+    //     title: 'Dashboard',
+    //     href: dashboard(),
+    //     icon: LayoutGrid,
+    // },
 ];
 
 const rightNavItems: NavItem[] = [
@@ -71,7 +71,7 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
     return (
         <>
             <div className="border-b border-sidebar-border/80">
-                <div className="mx-auto flex h-16 items-center px-4 md:max-w-7xl">
+                <div className="mx-auto flex h-16 items-center px-4 md:max-w-10xl">
                     {/* Mobile Menu */}
                     <div className="lg:hidden">
                         <Sheet>
