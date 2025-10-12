@@ -2,7 +2,7 @@ import { Input } from '@/components/ui/input';
 import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
 import { Separator } from '@/components/ui/separator';
 import AppLayout from '@/layouts/app-layout';
-import { dashboard } from '@/routes';
+import { home } from '@/routes';
 import { type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 import { SearchIcon, XIcon } from 'lucide-react';
@@ -11,7 +11,7 @@ import { useState } from 'react';
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Dashboard',
-        href: dashboard().url,
+        href: home().url,
     },
 ];
 
@@ -26,7 +26,7 @@ export default function Dashboard() {
             <Head title="Dashboard" />
             <div className="flex h-full flex-1 flex-col justify-center gap-4 overflow-x-auto rounded-xl p-4">
                 
-                <div className="h-full md:h-[450px] flex justify-between rounded-xl border-sidebar-border/70 dark:border-sidebar-border">
+                <div className="h-full md:h-[450px] flex gap-4 justify-between rounded-xl border-sidebar-border/70 dark:border-sidebar-border">
                     <div className="w-full lg:w-1/2 flex gap-6 flex-col justify-center border-sidebar-border/70 dark:border-sidebar-border">
                         <p className="text-6xl md:text-6xl font-bold">Find passionate people <br className="hidden md:inline" /> to build games with <br className="hidden md:inline" /> in 3 clicks.</p>
                         <form className="w-full relative">
