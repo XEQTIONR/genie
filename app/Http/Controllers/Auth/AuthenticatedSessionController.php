@@ -45,6 +45,12 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
+        $request->session()->flash('notification', [
+            'type' => 'info',
+            'message' => 'Logged in',
+            'button' => null
+        ]);
+
         return redirect()->intended(route('home', absolute: false));
     }
 
@@ -58,6 +64,10 @@ class AuthenticatedSessionController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect('/');
+        return redirect('/')->with('notification', [
+            'type' => 'info',
+            'message' => 'Logged out',
+            'button' => null
+        ]);
     }
 }

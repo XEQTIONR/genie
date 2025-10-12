@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { router } from '@inertiajs/react'
 import { create } from '@/actions/App/Http/Controllers/Auth/AuthenticatedSessionController';
 import { login } from '@/routes';
+import { toast } from "sonner"
 
 import {
     DropdownMenu,
@@ -39,6 +40,7 @@ import { Link, usePage } from '@inertiajs/react';
 import { BookOpen, Folder, LayoutGrid, LogIn, Menu, Search } from 'lucide-react';
 import AppLogo from './app-logo';
 import AppLogoIcon from './app-logo-icon';
+import { useEffect } from 'react';
 
 const mainNavItems: NavItem[] = [
     // {
@@ -71,8 +73,19 @@ interface AppHeaderProps {
 
 export function AppHeader({ breadcrumbs = [], maxWidth }: AppHeaderProps) {
     const page = usePage<SharedData>();
-    const { auth } = page.props;
+    const { auth, notification } = page.props;
     const getInitials = useInitials();
+
+    useEffect(() => {
+        if (notification) {
+            setTimeout(() => {
+                toast(notification.message,  {
+                    type: notification.type
+                })
+            }, 500)
+        }
+    }, [notification]);
+
     return (
         <>
             <div className="border-b border-sidebar-border/80 sticky top-0 bg-background z-50">
