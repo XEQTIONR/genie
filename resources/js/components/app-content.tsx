@@ -1,13 +1,16 @@
 import { SidebarInset } from '@/components/ui/sidebar';
+import { cn } from '@/lib/utils';
 import * as React from 'react';
 
 interface AppContentProps extends React.ComponentProps<'main'> {
     variant?: 'header' | 'sidebar';
+    maxWidth: string
 }
 
 export function AppContent({
     variant = 'header',
     children,
+    maxWidth,
     ...props
 }: AppContentProps) {
     if (variant === 'sidebar') {
@@ -16,7 +19,10 @@ export function AppContent({
 
     return (
         <main
-            className="mx-auto flex h-full w-full max-w-10xl flex-1 flex-col gap-4 rounded-xl"
+            className={cn(
+                "mx-auto flex h-full w-full flex-1 flex-col gap-4 rounded-xl",
+                maxWidth
+            )}
             {...props}
         >
             {children}

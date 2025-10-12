@@ -18,16 +18,16 @@ const breadcrumbs: BreadcrumbItem[] = [
 const items: Array<string> = []//(new Array(50)).fill(0)
 
 
-export default function Dashboard() {
+export default function Profile() {
     const [q, setQ] = useState("")
     
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Dashboard" />
+            <Head title="Profile" />
             <div className="flex h-full flex-1 flex-col justify-center gap-4 overflow-x-auto rounded-xl p-4">
                 
                 <div className="h-full md:h-[450px] flex justify-between rounded-xl border-sidebar-border/70 dark:border-sidebar-border">
-                    <div className="w-full lg:w-1/2 flex gap-6 flex-col justify-center border-sidebar-border/70 dark:border-sidebar-border">
+                    <div className="w-full md:w-1/2 flex gap-6 flex-col justify-center border-sidebar-border/70 dark:border-sidebar-border">
                         <p className="text-6xl md:text-6xl font-bold">Find passionate people <br className="hidden md:inline" /> to build games with <br className="hidden md:inline" /> in 3 clicks.</p>
                         <form className="w-full relative">
                             <SearchIcon className="absolute left-2.5 top-1/2 transform -translate-y-1/2 text-ring" />
@@ -48,7 +48,7 @@ export default function Dashboard() {
                             
                         </form>
                     </div>
-                    <div className="hidden lg:flex w-1/2 justify-end border-sidebar-border/70 dark:border-sidebar-border">
+                    <div className="hidden md:flex w-1/2 justify-end border-sidebar-border/70 dark:border-sidebar-border">
                         <div className="relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
                             <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
                         </div>
