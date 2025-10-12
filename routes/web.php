@@ -10,7 +10,7 @@ use Inertia\Inertia;
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('profile', function() {
         return Inertia::render('profile');
-    });
+    })->name('profile');
 });
 
 Route::get('/', function () {
