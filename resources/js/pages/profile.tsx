@@ -2,9 +2,9 @@ import { Button } from '@/components/ui/button'
 import { PlaceholderPattern } from '@/components/ui/placeholder-pattern'
 import AppLayout from '@/layouts/app-layout'
 import { profile } from '@/routes'
-import { User, type BreadcrumbItem } from '@/types'
+import { NavItem, User, type BreadcrumbItem } from '@/types'
 import { Head } from '@inertiajs/react'
-import { EllipsisVertical, MapPin } from 'lucide-react'
+import { EllipsisVertical, Mail, MapPin, UserPlus } from 'lucide-react'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,18 +14,21 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { TabbedSectionHeaders } from '@/components/ui/tabbed-sections'
+import { type SharedData } from '@/types'
+import { usePage } from '@inertiajs/react'
 
-
-
+type ProfileTab = NavItem & {key: string, className?: string}
 
 export default function Profile({ user } : { user: User }) {
 
+    const { auth } = usePage<SharedData>().props
+
     const breadcrumbs: BreadcrumbItem[] = [
-    {
-        title: 'Profile',
-        href: profile({ user: user.username }).url,
-    },
-];
+        {
+            title: 'Profile',
+            href: profile({ user: user.username }).url,
+        },
+    ];
 
     const titles = [
         'Software Engineer',
@@ -33,7 +36,22 @@ export default function Profile({ user } : { user: User }) {
         'Backend Developer'
     ]
 
+    const tabs: ProfileTab[] = [
+        { title: "Showcase", href: "/", key: "showcase"},
+        { title: "Activity", href: "/", key: "activity"},
+        { title: "Teams / Studios", href: "/", key: "teams"},
+        { title: "About", href: "/", key: "about" },
+    ]
+
+    if ( auth.user?.id === user.id ) {
+        tabs.push({ title: "Invite", href: "/", key: "invite", icon: Mail, className: "ml-2 border" })
+    } else {
+        tabs.push({ title: "Add to team", href: "/", key: "invite", icon: UserPlus, className: "ml-2 border" })
+    }
+
     const currentTab = 'showcase'
+
+    const isPro = true
 
     return (
         <AppLayout maxWidth='md:max-w-7xl' breadcrumbs={breadcrumbs}>
@@ -44,13 +62,16 @@ export default function Profile({ user } : { user: User }) {
                             <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
                         </div>
                 </div>
-                <div className="w-full relative -top-14 md:-top-28 flex flex-col gap-8">
+                <div className="w-full relative -top-14 md:-top-28 -mb-14 md:-mb-28 flex flex-col gap-8">
                     <div className="w-24 md:w-48 ml-4 md:ml-12 rounded-full aspect-square relative border border-sidebar-border/70 dark:border-sidebar-border">
                         <PlaceholderPattern className="absolute rounded-full inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
                     </div>
                     <div className="md:mx-8">
                         <div className="w-full flex justify-between items-center">
-                            <div className="text-2xl md:text-5xl font-bold flex items-center gap-4 max-w-4/5">{user.name}<span className="text-sm bg-primary text-background px-2 py-0.5 rounded">PRO</span></div>
+                            <div className="text-2xl md:text-5xl font-bold flex items-center gap-4 max-w-4/5">
+                                {user.name}
+                                {isPro && <span className="text-sm bg-primary text-background px-2 py-0.5 rounded">PRO</span>}
+                            </div>
                             <div className="flex gap-1 items-center">
                                 <span className="hidden lg:inline mr-3 text-sm">Let's build something together</span>
                                 <Button className="hidden lg:inline cursor-pointer">Get in touch</Button>
@@ -85,13 +106,13 @@ export default function Profile({ user } : { user: User }) {
                     </div>
                     <TabbedSectionHeaders
                         current={currentTab}
-                        headers={[
-                            { title: "Showcase", href: "/", key: "showcase"},
-                            { title: "Activity", href: "/", key: "activity"},
-                            { title: "Teams / Studios", href: "/", key: "teams"},
-                            { title: "About", href: "/", key: "about" },
-                        ]}
+                        headers={tabs}
                     />
+                </div>
+                <div className="h-full md:h-[400px] flex gap-4 justify-between rounded-xl border-sidebar-border/70 dark:border-sidebar-border">
+                    <div className="w-full relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
+                        <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
+                    </div>
                 </div>
                 
             </div>
