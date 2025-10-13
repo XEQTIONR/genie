@@ -2,16 +2,19 @@
 
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use App\Models\User;
 
 // Route::get('/', function () {
 //     return Inertia::render('welcome');
 // })->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('profile', function() {
-        return Inertia::render('profile');
-    })->name('profile');
+
 });
+
+Route::get('/profile/{user:username}', function(User $user) {
+    return Inertia::render('profile', compact('user'));
+})->name('profile');
 
 Route::get('/', function () {
         return Inertia::render('dashboard');

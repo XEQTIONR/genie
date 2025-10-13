@@ -36,13 +36,12 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                                 <Label htmlFor="email">Email address</Label>
                                 <Input
                                     id="email"
-                                    type="email"
+                                    type="string"
                                     name="email"
                                     required
                                     autoFocus
                                     tabIndex={1}
-                                    autoComplete="email"
-                                    placeholder="email@example.com"
+                                    placeholder="Username or Email"
                                 />
                                 <InputError message={errors.email} />
                             </div>

@@ -27,7 +27,7 @@ export function UserMenuContent({ user }: UserMenuContentProps) {
     return (
         <>
             <DropdownMenuLabel className="p-0 font-normal">
-                <Link href={profile()} className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
+                <Link href={profile({ username: user.username })} className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                     <UserInfo user={user} showEmail={true} />
                 </Link>
             </DropdownMenuLabel>

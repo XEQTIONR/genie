@@ -2,7 +2,7 @@ import { Button } from '@/components/ui/button'
 import { PlaceholderPattern } from '@/components/ui/placeholder-pattern'
 import AppLayout from '@/layouts/app-layout'
 import { profile } from '@/routes'
-import { type BreadcrumbItem } from '@/types'
+import { User, type BreadcrumbItem } from '@/types'
 import { Head } from '@inertiajs/react'
 import { EllipsisVertical, MapPin } from 'lucide-react'
 import {
@@ -15,15 +15,17 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { TabbedSectionHeaders } from '@/components/ui/tabbed-sections'
 
-const breadcrumbs: BreadcrumbItem[] = [
+
+
+
+export default function Profile({ user } : { user: User }) {
+
+    const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Profile',
-        href: profile().url,
+        href: profile({ user: user.username }).url,
     },
 ];
-
-
-export default function Home() {
 
     const titles = [
         'Software Engineer',
@@ -48,7 +50,7 @@ export default function Home() {
                     </div>
                     <div className="md:mx-8">
                         <div className="w-full flex justify-between items-center">
-                            <div className="text-2xl md:text-5xl font-bold flex items-center gap-4 max-w-4/5">Ishtehar Hussain <span className="text-sm bg-primary text-background px-2 py-0.5 rounded">PRO</span></div>
+                            <div className="text-2xl md:text-5xl font-bold flex items-center gap-4 max-w-4/5">{user.name}<span className="text-sm bg-primary text-background px-2 py-0.5 rounded">PRO</span></div>
                             <div className="flex gap-1 items-center">
                                 <span className="hidden lg:inline mr-3 text-sm">Let's build something together</span>
                                 <Button className="hidden lg:inline cursor-pointer">Get in touch</Button>

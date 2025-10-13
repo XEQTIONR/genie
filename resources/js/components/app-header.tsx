@@ -25,30 +25,17 @@ import {
     SheetTitle,
     SheetTrigger,
 } from '@/components/ui/sheet';
-import {
-    Tooltip,
-    TooltipContent,
-    TooltipProvider,
-    TooltipTrigger,
-} from '@/components/ui/tooltip';
+
 import { UserMenuContent } from '@/components/user-menu-content';
 import { useInitials } from '@/hooks/use-initials';
 import { cn } from '@/lib/utils';
-import { home } from '@/routes';
+import { home, profile } from '@/routes';
 import { type BreadcrumbItem, type NavItem, type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
 import { BookOpen, Folder, LayoutGrid, LogIn, Menu, Search } from 'lucide-react';
 import AppLogo from './app-logo';
 import AppLogoIcon from './app-logo-icon';
 import { useEffect } from 'react';
-
-const mainNavItems: NavItem[] = [
-    // {
-    //     title: 'Dashboard',
-    //     href: dashboard(),
-    //     icon: LayoutGrid,
-    // },
-];
 
 const rightNavItems: NavItem[] = [
     {
@@ -75,6 +62,22 @@ export function AppHeader({ breadcrumbs = [], maxWidth }: AppHeaderProps) {
     const page = usePage<SharedData>();
     const { auth, notification } = page.props;
     const getInitials = useInitials();
+
+    const mainNavItems: NavItem[] = [
+        {
+            title: 'Home',
+            href: home().url,
+            // icon: BookOpen,
+        },
+    ];
+
+    if (auth.user) {
+        mainNavItems.push({
+            title: 'Profile',
+            href: profile({ user: auth.user.username }).url,
+            // icon: LayoutGrid,
+        })
+    }
 
     useEffect(() => {
         if (notification) {
@@ -120,12 +123,15 @@ export function AppHeader({ breadcrumbs = [], maxWidth }: AppHeaderProps) {
                                     </SheetHeader>
                                     <div className="flex h-full flex-1 flex-col space-y-4 p-4">
                                         <div className="flex h-full flex-col justify-between text-sm">
-                                            <div className="flex flex-col space-y-4">
+                                            <div className="flex flex-col space-y-2">
                                                 {mainNavItems.map((item) => (
                                                     <Link
                                                         key={item.title}
                                                         href={item.href}
-                                                        className="flex items-center space-x-2 font-medium"
+                                                        className={cn(
+                                                            "flex items-center space-x-2 font-medium rounded p-2",
+                                                            page.url === item.href && "bg-accent"
+                                                        )}
                                                     >
                                                         {item.icon && (
                                                             <Icon
@@ -177,42 +183,31 @@ export function AppHeader({ breadcrumbs = [], maxWidth }: AppHeaderProps) {
                         </Link>
 
                         {/* Desktop Navigation */}
-                        <div className="ml-6 hidden h-full items-center space-x-6 lg:flex">
-                            <NavigationMenu className="flex h-full items-stretch">
-                                <NavigationMenuList className="flex h-full items-stretch space-x-2">
-                                    {mainNavItems.map((item, index) => (
-                                        <NavigationMenuItem
-                                            key={index}
-                                            className="relative flex h-full items-center"
-                                        >
-                                            <Link
-                                                href={item.href}
-                                                className={cn(
-                                                    navigationMenuTriggerStyle(),
-                                                    page.url ===
-                                                        (typeof item.href ===
-                                                        'string'
-                                                            ? item.href
-                                                            : item.href.url) &&
-                                                        activeItemStyles,
-                                                    'h-9 cursor-pointer px-3',
-                                                )}
-                                            >
-                                                {item.icon && (
-                                                    <Icon
-                                                        iconNode={item.icon}
-                                                        className="mr-2 h-4 w-4"
-                                                    />
-                                                )}
-                                                {item.title}
-                                            </Link>
-                                            {page.url === item.href && (
-                                                <div className="absolute bottom-0 left-0 h-0.5 w-full translate-y-px bg-black dark:bg-white"></div>
+                        <div className="ml-10 hidden h-full items-center space-x-6 lg:flex">
+                            <ul className="flex gap-2.5">
+                            {
+                                mainNavItems.map((item) => (
+                                    <li key={item.title}>
+                                        <Link
+                                            key={item.title}
+                                            href={item.href}
+                                            className={cn(
+                                                "flex items-center space-x-2 font-medium text-sm rounded-md py-2 px-3 hover:bg-accent",
+                                                page.url === item.href && "bg-accent"
                                             )}
-                                        </NavigationMenuItem>
-                                    ))}
-                                </NavigationMenuList>
-                            </NavigationMenu>
+                                        >
+                                            {item.icon && (
+                                                <Icon
+                                                    iconNode={item.icon}
+                                                    className="h-5 w-5"
+                                                />
+                                            )}
+                                            <span>{item.title}</span>
+                                        </Link>
+                                    </li>
+                                ))
+                            }
+                            </ul>
                         </div>
 
                         <div className="ml-auto flex items-center space-x-2">
