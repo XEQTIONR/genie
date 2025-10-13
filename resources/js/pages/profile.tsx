@@ -13,8 +13,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Separator } from '@/components/ui/separator'
+import { TabbedSectionHeaders } from '@/components/ui/tabbed-sections'
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -32,9 +31,11 @@ export default function Home() {
         'Backend Developer'
     ]
 
+    const currentTab = 'showcase'
+
     return (
         <AppLayout maxWidth='md:max-w-7xl' breadcrumbs={breadcrumbs}>
-            <Head title="Dashboard" />
+            <Head title="Profile" />
             <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
                 <div className="h-full md:h-[400px] flex gap-4 justify-between rounded-xl border-sidebar-border/70 dark:border-sidebar-border">
                         <div className="w-full relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
@@ -74,27 +75,21 @@ export default function Home() {
                         }
                         </div>
                         <div className="w-full mt-8">
-                            <h2 className="font-semibold text-2xl">A little about me</h2>
+                            <h2 className="font-semibold text-2xl">Bio</h2>
                             <p className="mt-4 text-lg">
                                 I'm a full-stack developer and I'm interested in joining a team to start a new project.
                             </p>
                         </div>
                     </div>
-                    <div className="mt-10 md:mx-8">
-                        <Tabs defaultValue="account">
-                            <TabsList>
-                                <TabsTrigger value="account">Account</TabsTrigger>
-                                <TabsTrigger value="password">Password</TabsTrigger>
-                            </TabsList>
-                            <Separator />
-                            <TabsContent className="min-h-[25vh]" value="account">
-                                Account Tab
-                            </TabsContent>
-                            <TabsContent className="min-h-[25vh]" value="password">
-                                Password Tab
-                            </TabsContent>
-                        </Tabs>
-                    </div>
+                    <TabbedSectionHeaders
+                        current={currentTab}
+                        headers={[
+                            { title: "Showcase", href: "/", key: "showcase"},
+                            { title: "Activity", href: "/", key: "activity"},
+                            { title: "Teams / Studios", href: "/", key: "teams"},
+                            { title: "About", href: "/", key: "about" },
+                        ]}
+                    />
                 </div>
                 
             </div>

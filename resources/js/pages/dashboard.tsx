@@ -49,7 +49,7 @@ export default function Dashboard() {
                         </form>
                     </div>
                     <div className="hidden lg:flex w-1/2 justify-end border-sidebar-border/70 dark:border-sidebar-border">
-                        <div className="relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
+                        <div className="w-full relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
                             <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
                         </div>
                     </div>
