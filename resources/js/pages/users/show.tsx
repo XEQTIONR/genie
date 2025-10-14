@@ -29,39 +29,93 @@ import {
 } from "@/components/ui/empty"
 import { Spinner } from '@/components/ui/spinner'
 import { useState } from 'react'
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import {
+  Field,
+  FieldLabel,
+} from "@/components/ui/field"
+import { Input } from "@/components/ui/input"
+import { Textarea } from '@/components/ui/textarea'
 
 type ProfileTab = NavItem & {key: string, className?: string}
 
+function CreateTeamForm () {
+    return (
+        <Dialog>
+            <DialogTrigger asChild>
+                <Button className="cursor-pointer">Create a new team</Button>
+            </DialogTrigger>
+            <form>
+                <DialogContent className="sm:max-w-[425px]">
+                    <DialogHeader>
+                        <DialogTitle>Create New Team</DialogTitle>
+                        <DialogDescription>
+                            Add a name a description for your team. 
+                            You can add more details after creation.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="grid gap-4">
+                        <Field>
+                            <FieldLabel htmlFor="name">Team Name</FieldLabel>
+                            <Input tabIndex={1} id="name" autoComplete="off" />
+                        </Field>
+                        <Field>
+                            <FieldLabel htmlFor="description">Team Description</FieldLabel>
+                            <Textarea tabIndex={2} className="h-28 min-h-28 max-h-28" id="description" placeholder="" />
+                        </Field>
+                    </div>
+                    <DialogFooter>
+                        <DialogClose asChild>
+                            <Button className="cursor-pointer" tabIndex={3} variant="outline">Cancel</Button>
+                        </DialogClose>
+                        <Button className="cursor-pointer" tabIndex={4} type="submit">Save changes</Button>
+                    </DialogFooter>
+                </DialogContent>
+            </form>
+        </Dialog>
+    )
+}
 
 function NoTeams() {
     return (
-        <Empty>
-            <EmptyHeader>
-                <EmptyMedia variant="icon">
-                    <Users />
-                </EmptyMedia>
-                <EmptyTitle>Not on any team</EmptyTitle>
-                <EmptyDescription>
-                    You&apos;re not a part any team. <br /> Create your first team or ask to join a team.
-                </EmptyDescription>
-            </EmptyHeader>
-            <EmptyContent>
-                <div className="flex gap-2">
-                <Button className="cursor-pointer">Create a new team</Button>
-                <Button className="cursor-pointer" variant="outline">Join existing team</Button>
-                </div>
-            </EmptyContent>
-            <Button
-                variant="link"
-                asChild
-                className="text-muted-foreground"
-                size="sm"
-            >
-                <a href="#">
-                Learn More <ArrowUpRightIcon />
-                </a>
-            </Button>
-        </Empty>
+        <>
+            <Empty>
+                <EmptyHeader>
+                    <EmptyMedia variant="icon">
+                        <Users />
+                    </EmptyMedia>
+                    <EmptyTitle>Not on any team</EmptyTitle>
+                    <EmptyDescription>
+                        You&apos;re not a part any team. <br /> Create your first team or ask to join a team.
+                    </EmptyDescription>
+                </EmptyHeader>
+                <EmptyContent>
+                    <div className="flex gap-2"> 
+                        <CreateTeamForm />
+                        <Button className="cursor-pointer" variant="outline">Join existing team</Button>
+                    </div>
+                </EmptyContent>
+                <Button
+                    variant="link"
+                    asChild
+                    className="text-muted-foreground"
+                    size="sm"
+                >
+                    <a href="#">
+                    Learn More <ArrowUpRightIcon />
+                    </a>
+                </Button>
+            </Empty>
+        </>
     )
 }
 
