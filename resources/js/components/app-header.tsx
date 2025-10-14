@@ -22,7 +22,8 @@ import {
 import { UserMenuContent } from '@/components/user-menu-content';
 import { useInitials } from '@/hooks/use-initials';
 import { cn } from '@/lib/utils';
-import { home, profile } from '@/routes';
+import { home } from '@/routes';
+import { show } from '@/routes/users'
 import { type BreadcrumbItem, type NavItem, type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
 import { BookOpen, Folder, LayoutGrid, LogIn, Menu, Search } from 'lucide-react';
@@ -64,7 +65,7 @@ export function AppHeader({ breadcrumbs = [], maxWidth }: AppHeaderProps) {
     if (auth.user) {
         mainNavItems.push({
             title: 'Profile',
-            href: profile({ user: auth.user.username }).url,
+            href: show({ user: auth.user.username }).url,
             // icon: LayoutGrid,
         })
     }

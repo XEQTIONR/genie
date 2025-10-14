@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button'
 import { PlaceholderPattern } from '@/components/ui/placeholder-pattern'
 import AppLayout from '@/layouts/app-layout'
-import { profile } from '@/routes'
+import { show } from '@/routes/users'
 import { NavItem, User, type BreadcrumbItem } from '@/types'
 import { Head } from '@inertiajs/react'
 import { EllipsisVertical, Mail, MapPin, UserPlus } from 'lucide-react'
@@ -26,7 +26,7 @@ export default function Profile({ user } : { user: User }) {
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Profile',
-            href: profile({ user: user.username }).url,
+            href: show({ user: user.username }).url,
         },
     ];
 
