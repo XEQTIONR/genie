@@ -1,7 +1,6 @@
 import { Button } from '@/components/ui/button'
 import { PlaceholderPattern } from '@/components/ui/placeholder-pattern'
 import AppLayout from '@/layouts/app-layout'
-import { show } from '@/routes/users'
 import { NavItem, User, type BreadcrumbItem } from '@/types'
 import { Head } from '@inertiajs/react'
 import { EllipsisVertical, Mail, MapPin, UserPlus } from 'lucide-react'
@@ -19,14 +18,12 @@ import { usePage } from '@inertiajs/react'
 
 type ProfileTab = NavItem & {key: string, className?: string}
 
-export default function Profile({ user } : { user: User }) {
-
-    const { auth } = usePage<SharedData>().props
+export default function Team() {
 
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Profile',
-            href: show({ user: user.username }).url,
+            href: '/'
         },
     ];
 
@@ -39,15 +36,10 @@ export default function Profile({ user } : { user: User }) {
     const tabs: ProfileTab[] = [
         { title: "Showcase", href: "/", key: "showcase"},
         { title: "Activity", href: "/", key: "activity"},
-        { title: "Teams / Studios", href: "/", key: "teams"},
-        { title: "About", href: "/", key: "about" },
+        { title: "Members", href: "/", key: "members"},
+        { title: "Projects", href: "/", key: "projects"},
+        { title: "Released Title", href: "/", key: "releases" },
     ]
-
-    if ( auth.user?.id === user.id ) {
-        tabs.push({ title: "Invite", href: "/", key: "invite", icon: Mail, className: "ml-2 border" })
-    } else {
-        tabs.push({ title: "Add to team", href: "/", key: "invite", icon: UserPlus, className: "ml-2 border" })
-    }
 
     const currentTab = 'showcase'
 
@@ -55,7 +47,7 @@ export default function Profile({ user } : { user: User }) {
 
     return (
         <AppLayout maxWidth='md:max-w-7xl' breadcrumbs={breadcrumbs}>
-            <Head title="Profile" />
+            <Head title="Team" />
             <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
                 <div className="h-full md:h-[400px] flex gap-4 justify-between rounded-xl border-sidebar-border/70 dark:border-sidebar-border">
                         <div className="w-full relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
@@ -69,27 +61,23 @@ export default function Profile({ user } : { user: User }) {
                     <div className="md:mx-8">
                         <div className="w-full flex justify-between items-center">
                             <div className="text-2xl md:text-5xl font-bold flex items-center gap-4 max-w-4/5">
-                                {user.name}
+                                Team name
                                 {isPro && <span className="text-sm bg-primary text-background px-2 py-0.5 rounded">PRO</span>}
                             </div>
                             <div className="flex gap-1 items-center">
-                                <span className="hidden lg:inline mr-3 text-sm">Let's build something together</span>
+                                {/* <span className="hidden lg:inline mr-3 text-sm">Let's build something together</span> */}
                                 <Button className="hidden lg:inline cursor-pointer">Get in touch</Button>
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
                                         <Button className="cursor-pointer" variant="outline" size="icon"><EllipsisVertical /></Button>
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent sideOffset={10} className="dark:bg-neutral-900" align="end">
-                                        <DropdownMenuLabel>Options</DropdownMenuLabel>
-                                        <DropdownMenuSeparator />
                                         <DropdownMenuItem className="cursor-pointer">Contact</DropdownMenuItem>
-                                        <DropdownMenuItem className="cursor-pointer">Add to team</DropdownMenuItem>
-                                        <DropdownMenuItem className="cursor-pointer">Block</DropdownMenuItem>
                                     </DropdownMenuContent>
                                 </DropdownMenu>
                             </div>
                         </div>
-                        <div className="flex items-center gap-2 mt-2 text-neutral-400 font-medium"><MapPin size={16} /> Dhaka, Bangladesh</div>
+                        <div className="flex items-center gap-2 mt-2 text-neutral-400 font-medium"><MapPin size={16} /> San Paulo, Brazil</div>
                         <div className="flex flex-wrap gap-4 mt-4">
                         {
                             titles.map((title) => (
@@ -98,9 +86,9 @@ export default function Profile({ user } : { user: User }) {
                         }
                         </div>
                         <div className="w-full mt-8">
-                            <h2 className="font-semibold text-2xl">Bio</h2>
+                            <h2 className="font-semibold text-2xl">About</h2>
                             <p className="mt-4 text-lg">
-                                I'm a full-stack developer and I'm interested in joining a team to start a new project.
+                                We are a team of passinate developers based in San Paulo, Brazil
                             </p>
                         </div>
                     </div>

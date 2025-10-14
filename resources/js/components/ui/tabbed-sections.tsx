@@ -8,9 +8,11 @@ type TabbedSectionHeaderItem = NavItem & { key: string, className?: string }
 function TabbedSectionHeaders({
     headers,
     current,
+    onTabChange,
 }: {
     headers: TabbedSectionHeaderItem[],
-    current?: string
+    current?: string,
+    onTabChange: () => void
 }) {
     return (
         <section className="mt-10 md:mx-8 flex flex-col">
@@ -21,11 +23,15 @@ function TabbedSectionHeaders({
                     {
                         current == key
                             ? <span className="pt-2 pb-1.5 mx-2 border-b-2 border-foreground">{title}</span>
-                            : <Link className={cn(
-                                className,
-                                "py-2 rounded-md flex items-center text-nowrap",
-                                "hover:bg-accent  px-3 gap-1.5"
-                            )} href={href}>
+                            : <Link
+                                onClick={onTabChange} 
+                                preserveScroll 
+                                className={cn(
+                                    className,
+                                    "py-2 rounded-md flex items-center text-nowrap",
+                                    "hover:bg-accent  px-3 gap-1.5"
+                                )} 
+                                href={href}>
                                 {icon && (
                                     <Icon
                                         iconNode={icon}

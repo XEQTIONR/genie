@@ -13,8 +13,19 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 
 Route::get('/profile/{user:username}', function(User $user) {
-    return Inertia::render('profile', compact('user'));
+    return Inertia::render('users/show', [
+        'user' => $user,
+        'tab' => 'showcase'
+    ]);
 })->name('users.show');
+
+Route::get('/profile/{user:username}/teams', function(User $user) {
+    return Inertia::render('users/show', [
+        'user' => $user,
+        'teams' => [],
+        'tab' => 'teams'
+    ]);
+})->name('users.teams.show');
 
 Route::get('/', function () {
         return Inertia::render('dashboard');
