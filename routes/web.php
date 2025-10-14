@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\TeamController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Models\User;
@@ -26,6 +27,8 @@ Route::get('/profile/{user:username}/teams', function(User $user) {
         'tab' => 'teams'
     ]);
 })->name('users.teams.show');
+
+Route::post('/teams', [TeamController::class, 'store'])->name('teams.store');
 
 Route::get('/', function () {
         return Inertia::render('dashboard');

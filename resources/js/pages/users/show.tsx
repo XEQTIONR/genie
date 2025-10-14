@@ -2,6 +2,7 @@ import { Button } from '@/components/ui/button'
 import { PlaceholderPattern } from '@/components/ui/placeholder-pattern'
 import AppLayout from '@/layouts/app-layout'
 import { show } from '@/routes/users'
+import { store } from '@/actions/App/Http/Controllers/TeamController'
 import { show as showTeams } from '@/routes/users/teams'
 import { NavItem, User, type BreadcrumbItem } from '@/types'
 import { Head } from '@inertiajs/react'
@@ -17,7 +18,7 @@ import {
 import { TabbedSectionHeaders } from '@/components/ui/tabbed-sections'
 import { type SharedData } from '@/types'
 import { usePage } from '@inertiajs/react'
-
+import { Form } from '@inertiajs/react'
 import { ArrowUpRightIcon } from "lucide-react"
 import {
   Empty,
@@ -41,6 +42,7 @@ import {
 } from "@/components/ui/dialog"
 import {
   Field,
+  FieldDescription,
   FieldLabel,
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
@@ -54,33 +56,48 @@ function CreateTeamForm () {
             <DialogTrigger asChild>
                 <Button className="cursor-pointer">Create a new team</Button>
             </DialogTrigger>
-            <form>
+            
                 <DialogContent className="sm:max-w-[425px]">
-                    <DialogHeader>
-                        <DialogTitle>Create New Team</DialogTitle>
-                        <DialogDescription>
-                            Add a name a description for your team. 
-                            You can add more details after creation.
-                        </DialogDescription>
-                    </DialogHeader>
-                    <div className="grid gap-4">
-                        <Field>
-                            <FieldLabel htmlFor="name">Team Name</FieldLabel>
-                            <Input tabIndex={1} id="name" autoComplete="off" />
-                        </Field>
-                        <Field>
-                            <FieldLabel htmlFor="description">Team Description</FieldLabel>
-                            <Textarea tabIndex={2} className="h-28 min-h-28 max-h-28" id="description" placeholder="" />
-                        </Field>
-                    </div>
-                    <DialogFooter>
-                        <DialogClose asChild>
-                            <Button className="cursor-pointer" tabIndex={3} variant="outline">Cancel</Button>
-                        </DialogClose>
-                        <Button className="cursor-pointer" tabIndex={4} type="submit">Save changes</Button>
-                    </DialogFooter>
+                        <DialogHeader>
+                            <DialogTitle>Create New Team</DialogTitle>
+                            <DialogDescription>
+                                Add a name a description for your team. 
+                                You can add more details after creation.
+                            </DialogDescription>
+                        </DialogHeader>
+                        <Form 
+                            className="grid gap-4"
+                            errorBag="newTeam"
+                            action={store()}
+                            options={{
+                                preserveScroll: true,
+                            }}
+                        >
+                            {({ errors }) => (
+                                <>
+                                    <div className="grid gap-4">
+                                        <Field>
+                                            <FieldLabel htmlFor="name">Team Name</FieldLabel>
+                                            <Input tabIndex={1} name="name" id="name" autoComplete="off" />
+                                            { <FieldDescription className="text-destructive-foreground">{errors?.name}</FieldDescription> }
+                                        </Field>
+                                        <Field>
+                                            <FieldLabel htmlFor="description">Team Description</FieldLabel>
+                                            <Textarea tabIndex={2} name="description" className="h-28 min-h-28 max-h-28" id="description" placeholder="" />
+                                            { <FieldDescription className="text-destructive-foreground">{errors?.description}</FieldDescription> }
+                                        </Field>
+                                    </div>
+                                    <DialogFooter>
+                                        <DialogClose asChild>
+                                            <Button className="cursor-pointer" tabIndex={3} variant="outline">Cancel</Button>
+                                        </DialogClose>
+                                        <Button onClick={() => console.log('something')} className="cursor-pointer" tabIndex={4} type="submit">Save changes</Button>
+                                    </DialogFooter>
+                                </>
+                            )}
+                        </Form>
                 </DialogContent>
-            </form>
+            
         </Dialog>
     )
 }
@@ -212,17 +229,13 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
                         }}
                     />
                 </div>
-                {/* <div className="flex justify-between"> */}
-                    <div className="w-full relative h-full md:min-h-[50vh] flex items-center overflow-hidden rounded-xl border-sidebar-border/70 dark:border-sidebar-border">
-                        {/* <NoTeams /> */}
-                        {
-                            loading 
-                                ? <Spinner className="block mx-auto size-6" />
-                                : (tab == 'teams' && teams.length == 0 && <NoTeams />)
-                        }
-                    </div>
-                {/* </div> */}
-                
+                <div className="w-full relative h-full md:min-h-[50vh] flex items-center overflow-hidden rounded-xl border-sidebar-border/70 dark:border-sidebar-border">
+                    {
+                        loading 
+                            ? <Spinner className="block mx-auto size-6" />
+                            : (tab == 'teams' && teams.length == 0 && <NoTeams />)
+                    }
+                </div>
             </div>
         </AppLayout>
     );
