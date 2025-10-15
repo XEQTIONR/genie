@@ -45,6 +45,7 @@ export interface Team {
     description: string
     created_at: string
     updated_at: string
+    user_count?: number
 }
 
 export interface User {

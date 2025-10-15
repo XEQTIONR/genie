@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Team;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -43,16 +44,19 @@ class TeamController extends Controller
             $slug = preg_replace('/[^\w]/', '', Str::lower($validated['name'])) . $number++;
         }
 
-        $user = Auth::user();
-        
+        $userId = Auth::id();
+        $user = User::find($userId);     
+
         $team = new Team([
             ...$validated,
             'slug' => $slug,
-            'creator_id' => $user->id,
-            'owner_id' => $user->id,
+            'creator_id' => $userId,
+            'owner_id' => $userId,
         ]);
 
         $team->save();
+
+        $user->teams()->save($team);
 
         return redirect(route('users.teams.show', [ 'user' => $user ]))->with('notification', [
             'type' => 'info',

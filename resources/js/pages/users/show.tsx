@@ -4,7 +4,7 @@ import AppLayout from '@/layouts/app-layout'
 import { show } from '@/routes/users'
 import { store } from '@/actions/App/Http/Controllers/TeamController'
 import { show as showTeams } from '@/routes/users/teams'
-import { NavItem, User, type BreadcrumbItem } from '@/types'
+import { NavItem, Team, User, type BreadcrumbItem } from '@/types'
 import { Head } from '@inertiajs/react'
 import { EllipsisVertical, Mail, MapPin, UserPlus, Users } from 'lucide-react'
 import {
@@ -144,7 +144,7 @@ function NoTeams() {
     )
 }
 
-export default function Profile({ user, tab = 'showcase', teams } : { user: User, tab: string, teams: Array<string> }) {
+export default function Profile({ user, tab = 'showcase', teams } : { user: User, tab: string, teams: Team[] }) {
 
     const [loading, setLoading] = useState(false)
 
@@ -177,28 +177,7 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
     }
 
     const isPro = true
-
-    const music = [
-        {
-            title: "Midnight City Lights",
-            artist: "Neon Dreams",
-            album: "Electric Nights",
-            duration: "3:45",
-        },
-        {
-            title: "Coffee Shop Conversations",
-            artist: "The Morning Brew",
-            album: "Urban Stories",
-            duration: "4:05",
-        },
-        {
-            title: "Digital Rain",
-            artist: "Cyber Symphony",
-            album: "Binary Beats",
-            duration: "3:30",
-        },
-    ]
-
+    
     return (
         <AppLayout maxWidth='md:max-w-7xl' breadcrumbs={breadcrumbs}>
             <Head title="Profile" />
@@ -208,13 +187,13 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
                             <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
                         </div>
                 </div>
-                <div className="w-full relative -top-14 md:-top-28 -mb-14 md:-mb-28 flex flex-col gap-8">
-                    <div className="w-24 md:w-48 ml-4 md:ml-12 rounded-full aspect-square relative border border-sidebar-border/70 dark:border-sidebar-border">
+                <div className="w-full relative -top-22 md:-top-28 -mb-22 md:-mb-28 flex flex-col gap-8">
+                    <div className="w-36 sm:w-44 md:w-48 ml-[50%] -translate-x-1/2 md:translate-x-0 md:ml-12 rounded-full aspect-square relative border border-sidebar-border/70 dark:border-sidebar-border">
                         <PlaceholderPattern className="absolute rounded-full inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
                     </div>
                     <div className="md:mx-8">
                         <div className="w-full flex justify-between items-center">
-                            <div className="text-2xl md:text-5xl font-bold flex items-center gap-4 max-w-4/5">
+                            <div className="text-2xl sm:text-5xl font-bold flex items-center gap-4 max-w-4/5">
                                 {user.name}
                                 {isPro && <span className="text-sm bg-primary text-background px-2 py-0.5 rounded">PRO</span>}
                             </div>
@@ -282,7 +261,10 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
                                                 <ItemDescription className="text-ellipsis">{team.description ?? "-"}</ItemDescription>
                                             </ItemContent>
                                             <ItemContent className="flex-none text-center">
-                                                <ItemDescription>8 members</ItemDescription>
+                                                <ItemDescription>
+                                                    {team.users_count} 
+                                                    <span className="ml-1.5">{team.users_count > 1 ? "members" : "member"}</span>
+                                                </ItemDescription>
                                             </ItemContent>
                                             </a>
                                         </Item>
