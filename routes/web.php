@@ -10,7 +10,7 @@ use App\Models\User;
 // })->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
-
+    Route::post('/teams', [TeamController::class, 'store'])->name('teams.store');
 });
 
 Route::get('/profile/{user:username}', function(User $user) {
@@ -21,14 +21,13 @@ Route::get('/profile/{user:username}', function(User $user) {
 })->name('users.show');
 
 Route::get('/profile/{user:username}/teams', function(User $user) {
+    $teams = $user->ownedTeams;
     return Inertia::render('users/show', [
         'user' => $user,
-        'teams' => [],
+        'teams' => $teams,
         'tab' => 'teams'
     ]);
 })->name('users.teams.show');
-
-Route::post('/teams', [TeamController::class, 'store'])->name('teams.store');
 
 Route::get('/', function () {
         return Inertia::render('dashboard');

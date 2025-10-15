@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Team;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
@@ -31,9 +32,9 @@ class TeamController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validateWithBag('newTeam', [
-            'name' => 'required|string|regex:/^[a-zA-Z0-9\s]+$/|min:2',
+            'name' => 'required|string|min:2',
             'description' => 'nullable|string',
-        ], ['name.regex' => 'The name field can only contain letters, numbers and spaces']);
+        ]);
 
         $slug = preg_replace('/[^\w]/', '', Str::lower($validated['name']));
         $number = 1;
@@ -41,14 +42,19 @@ class TeamController extends Controller
         while(Team::where('slug', $slug)->first()) {
             $slug = preg_replace('/[^\w]/', '', Str::lower($validated['name'])) . $number++;
         }
+
+        $user = Auth::user();
         
         $team = new Team([
             ...$validated,
             'slug' => $slug,
+            'creator_id' => $user->id,
+            'owner_id' => $user->id,
         ]);
+
         $team->save();
 
-        return redirect(route('home'))->with('notification', [
+        return redirect(route('users.teams.show', [ 'user' => $user ]))->with('notification', [
             'type' => 'info',
             'message' => "New team created - $team->name",
             'button' => null

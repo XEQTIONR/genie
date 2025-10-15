@@ -47,6 +47,14 @@ import {
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { Textarea } from '@/components/ui/textarea'
+import {
+  Item,
+  ItemContent,
+  ItemDescription,
+  ItemGroup,
+  ItemMedia,
+  ItemTitle,
+} from "@/components/ui/item"
 
 type ProfileTab = NavItem & {key: string, className?: string}
 
@@ -170,6 +178,27 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
 
     const isPro = true
 
+    const music = [
+        {
+            title: "Midnight City Lights",
+            artist: "Neon Dreams",
+            album: "Electric Nights",
+            duration: "3:45",
+        },
+        {
+            title: "Coffee Shop Conversations",
+            artist: "The Morning Brew",
+            album: "Urban Stories",
+            duration: "4:05",
+        },
+        {
+            title: "Digital Rain",
+            artist: "Cyber Symphony",
+            album: "Binary Beats",
+            duration: "3:30",
+        },
+    ]
+
     return (
         <AppLayout maxWidth='md:max-w-7xl' breadcrumbs={breadcrumbs}>
             <Head title="Profile" />
@@ -229,11 +258,42 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
                         }}
                     />
                 </div>
-                <div className="w-full relative h-full md:min-h-[50vh] flex items-center overflow-hidden rounded-xl border-sidebar-border/70 dark:border-sidebar-border">
+                <div className="w-full relative h-full md:min-h-[50vh] flex overflow-hidden border-sidebar-border/70 dark:border-sidebar-border">
                     {
                         loading 
                             ? <Spinner className="block mx-auto size-6" />
-                            : (tab == 'teams' && teams.length == 0 && <NoTeams />)
+                            : (tab == 'teams' && (teams.length == 0 
+                                ? <NoTeams />
+                                : <div className="flex w-full h-full flex-col gap-6 mx-2 md:mx-8">
+                                    <ItemGroup className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+                                        {teams.map((team) => (
+                                        <Item key={team.id} variant="outline" asChild role="listitem">
+                                            <a href="#">
+                                            <ItemMedia variant="image">
+                                                <div className="w-16 h-16 relative">
+                                                    <PlaceholderPattern className="absolute rounded-full inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
+                                                </div>
+                                            </ItemMedia>
+                                            <ItemContent className="h-full">
+                                                <ItemTitle className="line-clamp-1">
+                                                    {team.name}
+                                                {/* <span className="text-muted-foreground">STH</span> */}
+                                                </ItemTitle>
+                                                <ItemDescription className="text-ellipsis">{team.description ?? "-"}</ItemDescription>
+                                            </ItemContent>
+                                            <ItemContent className="flex-none text-center">
+                                                <ItemDescription>8 members</ItemDescription>
+                                            </ItemContent>
+                                            </a>
+                                        </Item>
+                                        ))}
+                                    </ItemGroup>
+                                    {/* The teams.length key removes the CreateTeamForm when it changes */}
+                                    <div key={teams.length} className="flex justify-end">
+                                        <CreateTeamForm />
+                                    </div>
+                                </div>
+                            ))
                     }
                 </div>
             </div>

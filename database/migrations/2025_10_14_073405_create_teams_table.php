@@ -19,7 +19,15 @@ return new class extends Migration
             $table->string('location')->nullable();
             $table->text('description')->nullable();
             $table->json('meta')->nullable();
+            $table->foreignId('creator_id');
+            $table->foreignId('owner_id');
             $table->timestamps();
+
+            $table->foreign('creator_id')->references('id')->on('users')
+                ->onDelete('restrict')->onUpdate('cascade');
+
+            $table->foreign('owner_id')->references('id')->on('users')
+                ->onDelete('restrict')->onUpdate('cascade');
         });
     }
 

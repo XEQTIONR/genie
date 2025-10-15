@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Team extends Model
 {
@@ -11,6 +12,8 @@ class Team extends Model
         'name',
         'description',
         'slug',
+        'creator_id',
+        'owner_id',
     ];
 
     protected function casts()
@@ -18,5 +21,15 @@ class Team extends Model
         return [
             'meta' => 'array'
         ];
+    }
+
+    public function creator(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'creator_id');
+    }
+
+    public function owner(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'owner_id');
     }
 }
