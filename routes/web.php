@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\TeamController;
+use App\Models\Team;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Models\User;
@@ -20,6 +21,24 @@ Route::get('/profile/{user:username}', function(User $user) {
     ]);
 })->name('users.show');
 
+Route::get('/teams/{team:slug}', function(Team $team) {
+    return Inertia::render('teams/show', [
+        'team' => $team,
+        'user_count' => $team->users()->count()
+    ]);
+})->name('teams.show');
+
+Route::get('/teams/{team:slug}/members', function(Team $team) {
+    $users = $team->users()->get();
+
+    return Inertia::render('teams/show', [
+        'team' => $team,
+        'users' => $users,
+        'user_count' => $users->count(),
+        'tab' => 'members'
+    ]);
+})->name('teams.users.index');
+
 Route::get('/profile/{user:username}/teams', function(User $user) {
     $teams = $user->teams()->withCount('users')->get();
     return Inertia::render('users/show', [
@@ -27,7 +46,7 @@ Route::get('/profile/{user:username}/teams', function(User $user) {
         'teams' => $teams,
         'tab' => 'teams'
     ]);
-})->name('users.teams.show');
+})->name('users.teams.index');
 
 Route::get('/', function () {
         return Inertia::render('dashboard');

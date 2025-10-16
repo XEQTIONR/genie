@@ -43,9 +43,11 @@ export interface Team {
     id: number
     name: string
     description: string
+    slug: string
     created_at: string
     updated_at: string
     user_count?: number
+    owner_id: number
 }
 
 export interface User {

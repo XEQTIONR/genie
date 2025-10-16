@@ -1,10 +1,9 @@
 import { Button } from '@/components/ui/button'
 import { PlaceholderPattern } from '@/components/ui/placeholder-pattern'
 import AppLayout from '@/layouts/app-layout'
-import { show } from '@/routes/users'
-import { show as showTeam } from '@/routes/teams'
-import { store } from '@/actions/App/Http/Controllers/TeamController'
-import { index as showTeams } from '@/routes/users/teams'
+import { show } from '@/routes/teams'
+import { show as showUser } from '@/routes/users'
+import { index } from '@/routes/teams/users'
 import { NavItem, Team, User, type BreadcrumbItem } from '@/types'
 import { Head, Link } from '@inertiajs/react'
 import { EllipsisVertical, Mail, MapPin, UserPlus, Users } from 'lucide-react'
@@ -59,93 +58,93 @@ import {
 
 type ProfileTab = NavItem & {key: string, className?: string}
 
-function CreateTeamForm () {
-    return (
-        <Dialog>
-            <DialogTrigger asChild>
-                <Button className="cursor-pointer">Create a new team</Button>
-            </DialogTrigger>
+// function CreateTeamForm () {
+//     return (
+//         <Dialog>
+//             <DialogTrigger asChild>
+//                 <Button className="cursor-pointer">Create a new team</Button>
+//             </DialogTrigger>
             
-                <DialogContent className="sm:max-w-[425px]">
-                        <DialogHeader>
-                            <DialogTitle>Create New Team</DialogTitle>
-                            <DialogDescription>
-                                Add a name a description for your team. 
-                                You can add more details after creation.
-                            </DialogDescription>
-                        </DialogHeader>
-                        <Form 
-                            className="grid gap-4"
-                            errorBag="newTeam"
-                            action={store()}
-                            options={{
-                                preserveScroll: true,
-                            }}
-                        >
-                            {({ errors }) => (
-                                <>
-                                    <div className="grid gap-4">
-                                        <Field>
-                                            <FieldLabel htmlFor="name">Team Name</FieldLabel>
-                                            <Input tabIndex={1} name="name" id="name" autoComplete="off" />
-                                            { <FieldDescription className="text-destructive-foreground">{errors?.name}</FieldDescription> }
-                                        </Field>
-                                        <Field>
-                                            <FieldLabel htmlFor="description">Team Description</FieldLabel>
-                                            <Textarea tabIndex={2} name="description" className="h-28 min-h-28 max-h-28" id="description" placeholder="" />
-                                            { <FieldDescription className="text-destructive-foreground">{errors?.description}</FieldDescription> }
-                                        </Field>
-                                    </div>
-                                    <DialogFooter>
-                                        <DialogClose asChild>
-                                            <Button className="cursor-pointer" tabIndex={3} variant="outline">Cancel</Button>
-                                        </DialogClose>
-                                        <Button onClick={() => console.log('something')} className="cursor-pointer" tabIndex={4} type="submit">Save changes</Button>
-                                    </DialogFooter>
-                                </>
-                            )}
-                        </Form>
-                </DialogContent>
+//                 <DialogContent className="sm:max-w-[425px]">
+//                         <DialogHeader>
+//                             <DialogTitle>Create New Team</DialogTitle>
+//                             <DialogDescription>
+//                                 Add a name a description for your team. 
+//                                 You can add more details after creation.
+//                             </DialogDescription>
+//                         </DialogHeader>
+//                         <Form 
+//                             className="grid gap-4"
+//                             errorBag="newTeam"
+//                             action={store()}
+//                             options={{
+//                                 preserveScroll: true,
+//                             }}
+//                         >
+//                             {({ errors }) => (
+//                                 <>
+//                                     <div className="grid gap-4">
+//                                         <Field>
+//                                             <FieldLabel htmlFor="name">Team Name</FieldLabel>
+//                                             <Input tabIndex={1} name="name" id="name" autoComplete="off" />
+//                                             { <FieldDescription className="text-destructive-foreground">{errors?.name}</FieldDescription> }
+//                                         </Field>
+//                                         <Field>
+//                                             <FieldLabel htmlFor="description">Team Description</FieldLabel>
+//                                             <Textarea tabIndex={2} name="description" className="h-28 min-h-28 max-h-28" id="description" placeholder="" />
+//                                             { <FieldDescription className="text-destructive-foreground">{errors?.description}</FieldDescription> }
+//                                         </Field>
+//                                     </div>
+//                                     <DialogFooter>
+//                                         <DialogClose asChild>
+//                                             <Button className="cursor-pointer" tabIndex={3} variant="outline">Cancel</Button>
+//                                         </DialogClose>
+//                                         <Button onClick={() => console.log('something')} className="cursor-pointer" tabIndex={4} type="submit">Save changes</Button>
+//                                     </DialogFooter>
+//                                 </>
+//                             )}
+//                         </Form>
+//                 </DialogContent>
             
-        </Dialog>
-    )
-}
+//         </Dialog>
+//     )
+// }
 
-function NoTeams() {
-    return (
-        <>
-            <Empty>
-                <EmptyHeader>
-                    <EmptyMedia variant="icon">
-                        <Users />
-                    </EmptyMedia>
-                    <EmptyTitle>Not on any team</EmptyTitle>
-                    <EmptyDescription>
-                        You&apos;re not a part any team. <br /> Create your first team or ask to join a team.
-                    </EmptyDescription>
-                </EmptyHeader>
-                <EmptyContent>
-                    <div className="flex gap-2"> 
-                        <CreateTeamForm />
-                        <Button className="cursor-pointer" variant="outline">Join existing team</Button>
-                    </div>
-                </EmptyContent>
-                <Button
-                    variant="link"
-                    asChild
-                    className="text-muted-foreground"
-                    size="sm"
-                >
-                    <a href="#">
-                    Learn More <ArrowUpRightIcon />
-                    </a>
-                </Button>
-            </Empty>
-        </>
-    )
-}
+// function NoTeams() {
+//     return (
+//         <>
+//             <Empty>
+//                 <EmptyHeader>
+//                     <EmptyMedia variant="icon">
+//                         <Users />
+//                     </EmptyMedia>
+//                     <EmptyTitle>Not on any team</EmptyTitle>
+//                     <EmptyDescription>
+//                         You&apos;re not a part any team. <br /> Create your first team or ask to join a team.
+//                     </EmptyDescription>
+//                 </EmptyHeader>
+//                 <EmptyContent>
+//                     <div className="flex gap-2"> 
+//                         <CreateTeamForm />
+//                         <Button className="cursor-pointer" variant="outline">Join existing team</Button>
+//                     </div>
+//                 </EmptyContent>
+//                 <Button
+//                     variant="link"
+//                     asChild
+//                     className="text-muted-foreground"
+//                     size="sm"
+//                 >
+//                     <a href="#">
+//                     Learn More <ArrowUpRightIcon />
+//                     </a>
+//                 </Button>
+//             </Empty>
+//         </>
+//     )
+// }
 
-export default function Profile({ user, tab = 'showcase', teams } : { user: User, tab: string, teams: Team[] }) {
+export default function TeamProfile({ team, tab = 'activity', user_count, users = [] } : { team: Team, tab: string, user_count: number, users?: User[] }) {
 
     const [loading, setLoading] = useState(false)
 
@@ -154,26 +153,26 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Profile',
-            href: show({ user: user.username }).url,
+            href: '/',
         },
     ];
 
-    const titles = [
-        'Software Engineer',
-        'Full Stack Developer',
-        'Backend Developer'
-    ]
+    // const titles = [
+    //     'Software Engineer',
+    //     'Full Stack Developer',
+    //     'Backend Developer'
+    // ]
 
     const tabs: ProfileTab[] = [
-        { title: "Showcase", href: show({ user: user.username }), key: "showcase"},
-        { title: "Activity", href: "/", key: "activity"},
-        { title: "Teams / Studios", href: showTeams({ user: user.username }).url, key: "teams"},
-        { title: "About", href: "/", key: "about" },
+        // { title: "Showcase", href: show({ user: user.username }), key: "showcase"},
+        { title: "Activity", href: show({ team: team.slug }), key: "activity"},
+        { title: "Projects", href: "/", key: "projects" },
+        { title: "Releases", href: "/", key: "releases" },
+        { title: "Members", href: index({ team: team.slug }), key: "members" },
+        { title: "Openings", href: "/", key: "openings" },
     ]
 
-    if ( auth.user?.id === user.id ) {
-        tabs.push({ title: "Invite", href: "/", key: "invite", icon: Mail, className: "ml-2 border" })
-    } else {
+    if ( auth.user?.id === team.owner_id ) {
         tabs.push({ title: "Add to team", href: "/", key: "invite", icon: UserPlus, className: "ml-2 border" })
     }
 
@@ -189,17 +188,17 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
                         </div>
                 </div>
                 <div className="w-full relative -top-22 md:-top-28 -mb-22 md:-mb-28 flex flex-col gap-8">
-                    <div className="w-36 sm:w-44 md:w-48 ml-[50%] -translate-x-1/2 md:translate-x-0 md:ml-12 rounded-full aspect-square relative border border-sidebar-border/70 dark:border-sidebar-border">
-                        <PlaceholderPattern className="absolute rounded-full inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
+                    <div className="w-36 sm:w-44 md:w-48 ml-[50%] -translate-x-1/2 md:translate-x-0 md:ml-12 rounded-xl aspect-square relative border border-sidebar-border/70 dark:border-sidebar-border">
+                        <PlaceholderPattern className="absolute rounded-xl inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
                     </div>
                     <div className="md:mx-8">
                         <div className="w-full flex justify-between items-center">
                             <div className="text-2xl sm:text-5xl font-bold flex items-center gap-4 max-w-4/5">
-                                {user.name}
+                                {team.name}
                                 {isPro && <span className="text-sm bg-primary text-background px-2 py-0.5 rounded">PRO</span>}
                             </div>
                             <div className="flex gap-2 items-center">
-                                <span className="hidden lg:inline mr-3 text-sm">Let's build something together</span>
+                                {/* <span className="hidden lg:inline mr-3 text-sm">Let's build something together</span> */}
                                 <Button className="hidden lg:inline cursor-pointer">Get in touch</Button>
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
@@ -215,18 +214,21 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
                                 </DropdownMenu>
                             </div>
                         </div>
-                        <div className="flex items-center gap-2 mt-2 text-neutral-400 font-medium"><MapPin size={16} /> Dhaka, Bangladesh</div>
+                        <div className="flex items-center gap-6 mt-2 text-neutral-400 font-medium">
+                            <div className="flex items-center gap-2"> <MapPin size={16} /> Dhaka, Bangladesh </div>
+                            <Link preserveScroll href={index({ team: team.slug })} className="flex items-center gap-2 hover:underline"> <Users size={16} /> {user_count} </Link>
+                        </div>
                         <div className="flex flex-wrap gap-4 mt-4">
-                        {
+                        {/* {
                             titles.map((title) => (
                                 <span className="bg-neutral-100 dark:bg-neutral-900 text-neutral-500 px-4 py-2 rounded-full font-semibold">{title}</span>
                             ))
-                        }
+                        } */}
                         </div>
                         <div className="w-full mt-8">
-                            <h2 className="font-semibold text-2xl">Bio</h2>
+                            <h2 className="font-semibold text-2xl">About</h2>
                             <p className="mt-4 text-lg">
-                                I'm a full-stack developer and I'm interested in joining a team to start a new project.
+                                {team.description}
                             </p>
                         </div>
                     </div>
@@ -242,15 +244,12 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
                     {
                         loading 
                             ? <Spinner className="block mx-auto size-6" />
-                            : (tab == 'teams' && (teams.length == 0 
-                                ? <NoTeams />
-                                : <div className="flex w-full h-full flex-col gap-6 mx-2 md:mx-8">
+                            : (tab == 'members' 
+                                && (<div className="flex w-full h-full flex-col gap-6 mx-2 md:mx-8">
                                     <ItemGroup className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-                                        {teams.map((team) => (
-                                        <Item key={team.id} variant="outline" asChild role="listitem">
-                                            <Link href={showTeam({
-                                                team: team.slug
-                                            })}>
+                                        {users.map((member) => (
+                                        <Item key={member.id} variant="outline" asChild role="listitem">
+                                            <Link href={showUser({ user: member.username })}>
                                                 <ItemMedia variant="image">
                                                     <div className="w-16 h-16 relative">
                                                         <PlaceholderPattern className="absolute rounded-full inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
@@ -258,25 +257,21 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
                                                 </ItemMedia>
                                                 <ItemContent className="h-full">
                                                     <ItemTitle className="line-clamp-1">
-                                                        {team.name}
-                                                    {/* <span className="text-muted-foreground">STH</span> */}
+                                                        {member.name}
+                                                
                                                     </ItemTitle>
-                                                    <ItemDescription className="text-ellipsis">{team.description ?? "-"}</ItemDescription>
+                                                    <ItemDescription className="text-ellipsis">{"-"}</ItemDescription>
                                                 </ItemContent>
-                                                <ItemContent className="flex-none text-center">
+                                                {/* <ItemContent className="flex-none text-center">
                                                     <ItemDescription>
                                                         {team.users_count} 
                                                         <span className="ml-1.5">{team.users_count > 1 ? "members" : "member"}</span>
                                                     </ItemDescription>
-                                                </ItemContent>
+                                                </ItemContent> */}
                                             </Link>
                                         </Item>
                                         ))}
                                     </ItemGroup>
-                                    {/* The teams.length key removes the CreateTeamForm when it changes */}
-                                    <div key={teams.length} className="flex justify-end">
-                                        <CreateTeamForm />
-                                    </div>
                                 </div>
                             ))
                     }
