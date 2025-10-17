@@ -21,6 +21,7 @@ function TabbedSectionHeaders({
     const div = useRef<HTMLUListElement>(null)
     const [scrollLeft, setScrollLeft] = useState<number|undefined>(0)
     const [scrollLength, setScrollLength] = useState(0)
+    const scrollThresh = 2
 
     const fn = useDebouncedCallback(() => setScrollLeft(div.current?.scrollLeft), 100)
 
@@ -35,24 +36,24 @@ function TabbedSectionHeaders({
             document.querySelector("#tabbedSectionHeaderContent")?.removeEventListener('scroll', fn)
             window.removeEventListener("resize", updateScrollLength)
         }
-    }, [div, fn, scrollLeft])
+    }, [div, fn])
 
     return (
-        <section className="mt-10 md:mx-8 max-w-full">
+        <section className="mt-10 mr-2 md:mx-8 max-w-full">
             {
-                (scrollLeft ?? 0) > 0 && <div className="relative top-10 -mt-10 float-left flex items-center bg-neutral-900/50 size-10">
+                (scrollLeft ?? 0) > 0 && <div className="relative top-10 -mt-10 float-left flex items-center bg-neutral-50/50 dark:bg-neutral-900/50 size-10">
                     <ChevronLeft onClick={() => div.current.scrollLeft -= 200 } className="block mx-auto" />
                 </div> 
             }
 
             {
-                div.current && (scrollLength > 0) && ((scrollLeft ?? 0) < scrollLength) && <div className="relative top-10 -mt-10 float-right flex items-center bg-neutral-900/50 size-10">
+                div.current && (scrollLength > 0) && (scrollLength - (scrollLeft ?? 0) > scrollThresh) && <div className="relative top-10 -mt-10 float-right flex items-center bg-neutral-50/50 dark:bg-neutral-900/50 size-10">
                     <ChevronRight onClick={() => div.current.scrollLeft += 200 } className="block mx-auto" />
                 </div>
             }
             
             
-            <ul ref={div} id="tabbedSectionHeaderContent" className="scroll-smooth flex items-center gap-1 w-full overflow-scroll scrollbar-hide">
+            <ul onScroll={fn} ref={div} id="tabbedSectionHeaderContent" className="scroll-smooth flex items-center gap-1 w-full overflow-scroll scrollbar-hide">
             {
                 headers.map(({title, key, href, icon, className}) => (
                     <li className="font-bold mb-4 md:mb-0" key={key}>
