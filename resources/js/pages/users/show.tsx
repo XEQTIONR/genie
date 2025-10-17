@@ -178,6 +178,51 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
     }
 
     const isPro = true
+
+    function showTab(tab: string) {
+        switch (tab) {
+            case 'teams':
+                return (teams.length == 0 
+                    ? <NoTeams />
+                    : <div className="flex w-full h-full flex-col gap-6 mx-2 md:mx-8">
+                        <ItemGroup className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+                            {teams.map((team) => (
+                            <Item key={team.id} variant="outline" asChild role="listitem">
+                                <Link href={showTeam({
+                                    team: team.slug
+                                })}>
+                                    <ItemMedia variant="image">
+                                        <div className="w-16 h-16 relative">
+                                            <PlaceholderPattern className="absolute rounded-full inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
+                                        </div>
+                                    </ItemMedia>
+                                    <ItemContent className="h-full">
+                                        <ItemTitle className="line-clamp-1">
+                                            {team.name}
+                                        {/* <span className="text-muted-foreground">STH</span> */}
+                                        </ItemTitle>
+                                        <ItemDescription className="text-ellipsis">{team.description ?? "-"}</ItemDescription>
+                                    </ItemContent>
+                                    <ItemContent className="flex-none text-center">
+                                        <ItemDescription>
+                                            {team.users_count} 
+                                            <span className="ml-1.5">{team.users_count > 1 ? "members" : "member"}</span>
+                                        </ItemDescription>
+                                    </ItemContent>
+                                </Link>
+                            </Item>
+                            ))}
+                        </ItemGroup>
+                        {/* The teams.length key removes the CreateTeamForm when it changes */}
+                        <div key={teams.length} className="flex justify-end">
+                            <CreateTeamForm />
+                        </div>
+                    </div>
+                )
+            default: 
+                return null
+        }
+    }
     
     return (
         <AppLayout maxWidth='md:max-w-7xl' breadcrumbs={breadcrumbs}>
@@ -242,43 +287,7 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
                     {
                         loading 
                             ? <Spinner className="block mx-auto size-6" />
-                            : (tab == 'teams' && (teams.length == 0 
-                                ? <NoTeams />
-                                : <div className="flex w-full h-full flex-col gap-6 mx-2 md:mx-8">
-                                    <ItemGroup className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-                                        {teams.map((team) => (
-                                        <Item key={team.id} variant="outline" asChild role="listitem">
-                                            <Link href={showTeam({
-                                                team: team.slug
-                                            })}>
-                                                <ItemMedia variant="image">
-                                                    <div className="w-16 h-16 relative">
-                                                        <PlaceholderPattern className="absolute rounded-full inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
-                                                    </div>
-                                                </ItemMedia>
-                                                <ItemContent className="h-full">
-                                                    <ItemTitle className="line-clamp-1">
-                                                        {team.name}
-                                                    {/* <span className="text-muted-foreground">STH</span> */}
-                                                    </ItemTitle>
-                                                    <ItemDescription className="text-ellipsis">{team.description ?? "-"}</ItemDescription>
-                                                </ItemContent>
-                                                <ItemContent className="flex-none text-center">
-                                                    <ItemDescription>
-                                                        {team.users_count} 
-                                                        <span className="ml-1.5">{team.users_count > 1 ? "members" : "member"}</span>
-                                                    </ItemDescription>
-                                                </ItemContent>
-                                            </Link>
-                                        </Item>
-                                        ))}
-                                    </ItemGroup>
-                                    {/* The teams.length key removes the CreateTeamForm when it changes */}
-                                    <div key={teams.length} className="flex justify-end">
-                                        <CreateTeamForm />
-                                    </div>
-                                </div>
-                            ))
+                            : showTab(tab)
                     }
                 </div>
             </div>

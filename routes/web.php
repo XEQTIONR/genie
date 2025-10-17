@@ -21,6 +21,15 @@ Route::get('/profile/{user:username}', function(User $user) {
     ]);
 })->name('users.show');
 
+Route::get('/profile/{user:username}/teams', function(User $user) {
+    $teams = $user->teams()->withCount('users')->get();
+    return Inertia::render('users/show', [
+        'user' => $user,
+        'teams' => $teams,
+        'tab' => 'teams'
+    ]);
+})->name('users.teams.index');
+
 Route::get('/teams/{team:slug}', function(Team $team) {
     return Inertia::render('teams/show', [
         'team' => $team,
@@ -38,15 +47,6 @@ Route::get('/teams/{team:slug}/members', function(Team $team) {
         'tab' => 'members'
     ]);
 })->name('teams.users.index');
-
-Route::get('/profile/{user:username}/teams', function(User $user) {
-    $teams = $user->teams()->withCount('users')->get();
-    return Inertia::render('users/show', [
-        'user' => $user,
-        'teams' => $teams,
-        'tab' => 'teams'
-    ]);
-})->name('users.teams.index');
 
 Route::get('/', function () {
         return Inertia::render('dashboard');
