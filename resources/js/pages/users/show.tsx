@@ -1,13 +1,13 @@
 import { Button } from '@/components/ui/button'
 import { PlaceholderPattern } from '@/components/ui/placeholder-pattern'
 import AppLayout from '@/layouts/app-layout'
-import { show } from '@/routes/users'
+import { show, about } from '@/routes/users'
 import { show as showTeam } from '@/routes/teams'
 import { store } from '@/actions/App/Http/Controllers/TeamController'
 import { index as showTeams } from '@/routes/users/teams'
 import { NavItem, Team, User, type BreadcrumbItem } from '@/types'
 import { Head, Link } from '@inertiajs/react'
-import { EllipsisVertical, Mail, MapPin, UserPlus, Users } from 'lucide-react'
+import { AtSign, Dribbble, Drill, EllipsisVertical, Facebook, Figma, Gamepad2, Github, Gitlab, GraduationCap, House, Instagram, Lightbulb, Linkedin, Mail, MapPin, Pencil, PencilRuler, Slack, SquarePen, Twitch, Twitter, UserPlus, Users, Youtube } from 'lucide-react'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -56,6 +56,8 @@ import {
   ItemMedia,
   ItemTitle,
 } from "@/components/ui/item"
+import { Separator } from '@/components/ui/separator'
+import { cn } from '@/lib/utils'
 
 type ProfileTab = NavItem & {key: string, className?: string}
 
@@ -145,6 +147,8 @@ function NoTeams() {
     )
 }
 
+
+
 export default function Profile({ user, tab = 'showcase', teams } : { user: User, tab: string, teams: Team[] }) {
 
     const [loading, setLoading] = useState(false)
@@ -167,8 +171,8 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
     const tabs: ProfileTab[] = [
         { title: "Showcase", href: show({ user: user.username }), key: "showcase"},
         { title: "Activity", href: "/", key: "activity"},
+        { title: "About", href: about({ user: user.username }), key: "about" },
         { title: "Teams / Studios", href: showTeams({ user: user.username }).url, key: "teams"},
-        { title: "About", href: "/", key: "about" },
     ]
 
     if ( auth.user?.id === user.id ) {
@@ -179,12 +183,210 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
 
     const isPro = true
 
-    function showTab(tab: string) {
+    function About() {
+        
+        const [currentSection, setCurrentSection] = useState('overview')
+        const sectionLabels = [
+            {label: 'Overview', name: 'overview'},
+            {label: 'Skills & tools', name: 'skills'},
+            {label: 'Personal projects', name: 'projects'},
+            {label: 'Contact & socials', name: 'contact'},
+        ]
+
+        return <div className="w-full flex border bg-neutral-50 dark:bg-neutral-900 mx-8 rounded-lg">
+            <div className="w-1/4 flex flex-col p-2 gap-2">
+                <h2 className="text-xl font-bold mx-2 mt-2 mb-6">About</h2>
+                
+                {
+                    sectionLabels.map(({label, name}) => <div 
+                        key={name}
+                        onClick={() => setCurrentSection(name)} 
+                        className={cn(
+                            "font-medium py-1 px-2 rounded",
+                            (name == currentSection) ? "bg-accent font-bold" : "cursor-pointer hover:bg-accent" 
+                        )}
+                    >
+                        {label}
+                    </div>)
+                }
+            </div>
+            <Separator orientation="vertical"  />
+            <div className="w-3/4 p-4 flex flex-col gap-8">
+            {
+                currentSection == 'overview' && (
+                    <>
+                        <div className="flex flex-col gap-3">
+                            <div className="flex justify-between items-center">
+                                <h3 className="font-bold">Bio</h3>
+                                <EditButton />
+                            </div>
+                            <div>I'm a full-stack developer and I'm interested in joining a team to start a new project.</div>
+                        </div>
+                        <div className="flex justify-between items-center">
+                            <div className="flex items-center gap-2">
+                                <MapPin size={19} /> Lives in <span className="font-bold">Dhaka, Bangladesh</span>
+                            </div>
+                            <EditButton />
+                        </div>
+
+                        <div className="flex flex-col gap-3">
+                            <div className="flex justify-between items-center">
+                                <h3 className="font-bold flex items-center gap-2"><Gamepad2 size={20} /> Favorite games</h3>
+                                <EditButton />
+                            </div>
+                            <ul className="flex gap-2">
+                                <li>Street Fighter II,</li>
+                                <li>Doom,</li>
+                                <li>Unreal Tournament 2004</li>
+                            </ul>
+                        </div>
+                    </>
+                )
+            }
+            {
+                currentSection == 'skills' && (
+                    <>
+                        <div className="flex flex-col gap-3">
+                            <div className="flex justify-between items-center">
+                                <h3 className="font-bold flex items-center gap-2"><Lightbulb size={19} /> Skills</h3>
+                                <EditButton />
+                            </div>
+                            <div>I'm a full-stack developer and I'm interested in joining a team to start a new project.</div>
+                        </div>
+
+                        <div className="flex flex-col gap-3">
+                            <div className="flex justify-between items-center">
+                                <h3 className="font-bold flex items-center gap-2"><PencilRuler size={18} /> Tools</h3>
+                                <EditButton />
+                            </div>
+                            <ul className="flex gap-2">
+                                <li>Street Fighter II,</li>
+                                <li>Doom,</li>
+                                <li>Unreal Tournament 2004</li>
+                            </ul>
+                        </div>
+                    </>
+                )
+            }
+            {
+                currentSection == 'projects' && (
+                    <>
+                        <div className="flex flex-col gap-3">
+                            <div className="flex justify-between items-center">
+                                <h3 className="font-bold flex items-center gap-2"><Drill size={19} />Projects</h3>
+                                <EditButton />
+                            </div>
+                            <div>I'm a full-stack developer and I'm interested in joining a team to start a new project.</div>
+                        </div>
+                    </>
+                )
+            }
+            {
+                currentSection == 'contact' && (
+                    <>
+                        <div className="flex justify-between items-center">
+                            <div className="flex items-center gap-2">
+                                <AtSign size={18} /><span className="font-bold">{user.email}</span>
+                            </div>
+                            <EditButton />
+                        </div>
+                        <div className="flex justify-between items-center">
+                            <div className="flex items-center gap-2">
+                                <Linkedin size={18} /><span className="font-bold">{"/in/ishteharhussain"}</span>
+                            </div>
+                            <EditButton />
+                        </div>
+                        <div className="flex justify-between items-center">
+                            <div className="flex items-center gap-2">
+                                <Dribbble size={18} /><span className="font-bold">{"/in/ishteharhussain"}</span>
+                            </div>
+                            <EditButton />
+                        </div>
+                        <div className="flex justify-between items-center">
+                            <div className="flex items-center gap-2">
+                                <Instagram size={18} /><span className="font-bold">{"/in/ishteharhussain"}</span>
+                            </div>
+                            <EditButton />
+                        </div>
+                        <div className="flex justify-between items-center">
+                            <div className="flex items-center gap-2">
+                                <Twitter size={18} /><span className="font-bold">{"/in/ishteharhussain"}</span>
+                            </div>
+                            <EditButton />
+                        </div>
+                        <div className="flex justify-between items-center">
+                            <div className="flex items-center gap-2">
+                                <Twitch size={18} /><span className="font-bold">{"/in/ishteharhussain"}</span>
+                            </div>
+                            <EditButton />
+                        </div>
+                        <div className="flex justify-between items-center">
+                            <div className="flex items-center gap-2">
+                                <Facebook size={18} /><span className="font-bold">{"/in/ishteharhussain"}</span>
+                            </div>
+                            <EditButton />
+                        </div>
+                        <div className="flex justify-between items-center">
+                            <div className="flex items-center gap-2">
+                                <Youtube size={18} /><span className="font-bold">{"/in/ishteharhussain"}</span>
+                            </div>
+                            <EditButton />
+                        </div>
+                        {/* <div className="flex justify-between items-center">
+                            <div className="flex items-center gap-2">
+                                <Github size={18} /><span className="font-bold">{"/in/ishteharhussain"}</span>
+                            </div>
+                            <EditButton />
+                        </div>
+                        <div className="flex justify-between items-center">
+                            <div className="flex items-center gap-2">
+                                <Gitlab size={18} /><span className="font-bold">{"/in/ishteharhussain"}</span>
+                            </div>
+                            <EditButton />
+                        </div> */}
+                        <div className="flex justify-between items-center">
+                            <div className="flex items-center gap-2">
+                                <Slack size={18} /><span className="font-bold">{"/in/ishteharhussain"}</span>
+                            </div>
+                            <EditButton />
+                        </div>
+                        <div className="flex justify-between items-center">
+                            <div className="flex items-center gap-2">
+                                <Figma size={18} /><span className="font-bold">{"/in/ishteharhussain"}</span>
+                            </div>
+                            <EditButton />
+                        </div>
+
+                        {/* <div className="flex flex-col gap-3">
+                            <div className="flex justify-between items-center">
+                                <h3 className="font-bold flex items-center gap-2"><Gamepad2 size={20} /> Favorite games</h3>
+                                <EditButton />
+                            </div>
+                            <ul className="flex gap-2">
+                                <li>Street Fighter II,</li>
+                                <li>Doom,</li>
+                                <li>Unreal Tournament 2004</li>
+                            </ul>
+                        </div> */}
+                    </>
+                )
+            }
+            </div>
+        </div>
+    }
+    
+    function EditButton() {
+        return auth.user?.id === user.id 
+            ? <Button className="cursor-pointer" size="icon" variant="ghost"><Pencil /></Button>
+            : null
+    }
+
+    function CurrentTab({tab} : {tab: string}) {
         switch (tab) {
             case 'teams':
                 return (teams.length == 0 
                     ? <NoTeams />
-                    : <div className="flex w-full h-full flex-col gap-6 mx-2 md:mx-8">
+                    : <div className="flex size-full flex-col gap-6 mx-2 md:mx-8">
                         <ItemGroup className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
                             {teams.map((team) => (
                             <Item key={team.id} variant="outline" asChild role="listitem">
@@ -218,6 +420,10 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
                             <CreateTeamForm />
                         </div>
                     </div>
+                )
+            case 'about':
+                return (
+                    <About />
                 )
             default: 
                 return null
@@ -284,11 +490,11 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
                     />
                 </div>
                 <div className="w-full relative h-full md:min-h-[50vh] flex overflow-hidden border-sidebar-border/70 dark:border-sidebar-border">
-                    {
-                        loading 
-                            ? <Spinner className="block mx-auto size-6" />
-                            : showTab(tab)
-                    }
+                {
+                    loading 
+                        ? <Spinner className="block m-auto size-6" />
+                        : <CurrentTab tab={tab} />
+                }
                 </div>
             </div>
         </AppLayout>
