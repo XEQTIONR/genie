@@ -57,6 +57,7 @@ export interface User {
     email: string
     avatar?: string
     email_verified_at: string | null
+    location: { city: string, country: string } | null
     two_factor_enabled?: boolean
     status: string | null
     bio: string | null

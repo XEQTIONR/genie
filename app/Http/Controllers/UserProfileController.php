@@ -61,7 +61,8 @@ class UserProfileController extends Controller
                 return $this->updateStatus($request, $user);
             case 'bio':
                 return $this->updateBio($request, $user);
-            default:
+            case 'location':
+                return $this->updateLocation($request, $user);
         }
     }
 
@@ -86,7 +87,7 @@ class UserProfileController extends Controller
             'user' => $user
         ])->with('notification', [
             'type' => 'info',
-            'message' => "Status updated",
+            'message' => "Status updated.",
             'button' => null
         ]);
     }
@@ -104,7 +105,31 @@ class UserProfileController extends Controller
             'user' => $user
         ])->with('notification', [
             'type' => 'info',
-            'message' => "Bio updated",
+            'message' => "Bio updated.",
+            'button' => null
+        ]);
+    }
+
+    protected function updateLocation(Request $request, User $user)
+    {
+        $validated = $request->validate([
+            'city' => 'nullable|string|max:20',
+            'country' => 'nullable|string|required_with:city',
+        ]);
+
+        if ($validated['city'] === null && $validated['country'] === null) {
+            $user->location = null;
+        } else {
+            $user->location = $validated;
+        }
+
+        $user->save();
+
+        return to_route('users.about', [
+            'user' => $user
+        ])->with('notification', [
+            'type' => 'info',
+            'message' => "Location updated.",
             'button' => null
         ]);
     }

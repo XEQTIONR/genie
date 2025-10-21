@@ -8,6 +8,7 @@ import {
   CommandSeparator,
 } from "@/components/ui/command"
 import { useState } from "react"
+import { Spinner } from "./spinner"
 
 
 interface SearchOption {
@@ -25,11 +26,13 @@ export default function SearchBar({
     placeholder,
     onQueryChange,
     onSelectOption,
+    searching = false,
     searchOptions,
 }: {
-    placeholder?: string,
+    placeholder?: string
     onQueryChange?: (q: string) => void
     onSelectOption?: (option: unknown) => void
+    searching?: boolean
     searchOptions: SearchOption[] | SearchOptionGroup[]
 }) {
 
@@ -47,7 +50,9 @@ export default function SearchBar({
                 placeholder={placeholder ?? "Search..."} 
             />
             { queryString.length > 0 && <CommandList>
-                <CommandEmpty>No results found.</CommandEmpty>
+                <CommandEmpty>
+                    { searching ? <Spinner className="block mx-auto" /> : "No results found"}
+                </CommandEmpty>
                 {
                     searchOptions.length > 0
                         ? ( "heading" in searchOptions[0]

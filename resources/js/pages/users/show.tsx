@@ -32,7 +32,7 @@ import {
   EmptyTitle,
 } from "@/components/ui/empty"
 import { Spinner } from '@/components/ui/spinner'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
   Dialog,
   DialogClose,
@@ -62,6 +62,9 @@ import { Separator } from '@/components/ui/separator'
 import { cn } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
 import SearchBar from '@/components/ui/search-bar'
+import { Combobox, Option } from '@/components/ui/combobox'
+import { Label } from '@/components/ui/label'
+import axios from 'axios'
 
 type ProfileTab = NavItem & {key: string, className?: string}
 
@@ -73,6 +76,26 @@ function RenderMultilineText({ text } : { text: string}) {
         paragraphs.map((para) => <p className="mb-2">{para}</p>)        
     }
     </>
+}
+
+function EditLocation({ defaultValue } : { defaultValue?: string}) {
+
+    const [options, setOptions] = useState<Option[]>([])
+
+    useEffect(() => {
+        axios.get('https://restcountries.com/v3.1/all?fields=name,flag')
+            .then(({data}) => {
+                const opts = data.map(({name, flag} : { name: { common: string }, flag: string}) => {
+                    return { name: name.common, flag }
+                }).sort((a: {name: string}, b: {name: string}) => a.name.localeCompare(b.name))
+                .filter(({name} : {name: string}) => name !== 'Israel') // filter out fake countries
+                .map(({ name, flag } : { name: string, flag: string }) => {
+                    return { label: flag + ' ' + name, value: name }
+                })
+                setOptions([{label: "Not selected", value: ""}, ...opts])
+            })
+    }, [])
+    return <Combobox placeholder="Not selected" defaultValue={defaultValue ?? ""} name="country" items={options} containerClassName="w-64" contentClassName="w-64" />
 }
 
 function CreateTeamForm () {
@@ -426,12 +449,59 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
                             </div>
                             <EditButton what="bio" />
                         </div>
-                        <div className="flex justify-between items-center">
-                            <div className="flex items-center gap-2">
-                                <MapPin size={19} /> Lives in <span className="font-bold">Dhaka, Bangladesh</span>
-                            </div>
-                            <EditButton />
-                        </div>
+                        {
+                            editing === 'location'
+                            ? (
+                                <Form
+                                    errorBag="userInfo" 
+                                    className="flex flex-col gap-1"
+                                    action={updateUser({ user: user.id })}
+                                    options={{ 
+                                        preserveScroll: true,
+                                        onSuccess: () => setEditing(false)
+                                    }}
+                                >
+                                {
+                                    ({ errors }) => (<>    
+                                    <Input type="hidden" name="field" value="location" />
+                                    <h3 className="font-bold">Location</h3>
+                                    <div className="w-full flex gap-2 -ml-1 mt-">
+                                        <div className="flex flex-col gap-2">
+                                            <Label className="ml-1">City</Label>
+                                            <Input defaultValue={user.location?.city} name="city" className="dark bg-background" />
+                                        </div>
+                                        <div className="flex flex-col gap-2">
+                                            <Label className="ml-1">Country</Label>
+                                            <EditLocation defaultValue={user.location?.country} />
+                                        </div>
+                                    </div>
+                                    <FieldDescription className="text-destructive-foreground">{errors.city}</FieldDescription>
+                                    <FieldDescription className="text-destructive-foreground">{errors.country}</FieldDescription>
+                                    <div className="flex gap-2 mt-1.5">
+                                        <Button
+                                            type="submit" 
+                                            className="cursor-pointer text-neutral-900 bg-neutral-200 hover:bg-[#e1e1e1] dark:hover:bg-neutral-100" 
+                                            size="sm"
+                                        >
+                                            Submit
+                                        </Button>
+                                        <Button className="cursor-pointer" onClick={() => setEditing(false)} variant="destructive" size="sm">Cancel</Button>
+                                    </div>
+                                </>)}
+                                </Form>
+                            ) : (
+                                <div className="flex justify-between items-center">
+                                    <div className="flex items-center gap-2">
+                                        <MapPin size={19} /> {
+                                            user.location
+                                            ? <>Lives in <span className="font-bold">{renderLocation(user.location)}</span></>
+                                            : <span className="italic">Location not specified</span>
+                                        }
+                                    </div>
+                                    <EditButton what="location" />
+                                </div>
+                            )
+                        }
 
                         <div className="flex flex-col gap-3">
                             <div className="flex justify-between items-center">
@@ -594,6 +664,20 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
                 return null
         }
     }
+
+    function renderLocation(location: { 
+        city?: string
+        country: string 
+    } | null) {
+        if (location) {
+            if (location.city) {
+                return `${location.city}, ${location.country}`
+            }
+
+            return location.country
+        }
+        return null
+    }
     
     return (
         <AppLayout maxWidth='md:max-w-7xl' breadcrumbs={breadcrumbs}>
@@ -632,7 +716,10 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
                             </div>
                         </div>
                         <div className="flex flex-col md:flex-row gap-2 md:gap-5 text-xs md:text-base">
-                            <div className="flex items-center gap-2 text-neutral-400 font-medium"><MapPin size={16} /> Dhaka, Bangladesh</div>
+                            {
+                                user.location &&
+                                <div className="flex items-center gap-2 text-neutral-400 font-medium"><MapPin size={16} /> {renderLocation(user.location)}</div>
+                            }
                             {
                                 user.status &&
                                 <div className="flex text-neutral-400 font-medium"><span className="font-bold text-nowrap mr-1">Status :</span> {user.status}</div>
