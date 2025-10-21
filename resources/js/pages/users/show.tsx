@@ -4,10 +4,11 @@ import AppLayout from '@/layouts/app-layout'
 import { show, about } from '@/routes/users'
 import { show as showTeam } from '@/routes/teams'
 import { store } from '@/actions/App/Http/Controllers/TeamController'
+import { update as updateUser } from '@/actions/App/Http/Controllers/UserProfileController'
 import { index as showTeams } from '@/routes/users/teams'
 import { NavItem, Team, User, type BreadcrumbItem } from '@/types'
 import { Head, Link } from '@inertiajs/react'
-import { AtSign, Dribbble, Drill, EllipsisVertical, Facebook, Figma, Gamepad2, Github, Gitlab, Globe, GraduationCap, Hammer, House, Instagram, Lightbulb, Linkedin, Mail, MapPin, Pencil, PencilRuler, Rocket, Slack, SquarePen, Twitch, Twitter, UserPlus, Users, X, Youtube } from 'lucide-react'
+import { AtSign, Dribbble, EllipsisVertical, Facebook, Figma, Gamepad2, Github, Gitlab, Globe, Hammer, Instagram, Lightbulb, Linkedin, Mail, MapPin, Pencil, PencilRuler, Rocket, Slack, Twitch, Twitter, UserPlus, Users, X, Youtube } from 'lucide-react'
 import { Godot, Unity, Unreal } from '@/components/icons/create'
 import {
   DropdownMenu,
@@ -218,6 +219,17 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
 
     const [loading, setLoading] = useState(false)
 
+    const [editing, setEditing] = useState<string|false>(false)
+
+    const [currentSection, setCurrentSection] = useState('overview')
+
+    const sectionLabels = [
+        {label: 'Overview', name: 'overview'},
+        {label: 'Skills & tools', name: 'skills'},
+        {label: 'Personal & releases', name: 'projects'},
+        {label: 'Contact & socials', name: 'contact'},
+    ]
+
     const { auth } = usePage<SharedData>().props
 
     const breadcrumbs: BreadcrumbItem[] = [
@@ -235,7 +247,7 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
 
     const tabs: ProfileTab[] = [
         { title: "Showcase", href: show({ user: user.username }), key: "showcase"},
-        { title: "Activity", href: "/", key: "activity"},
+        // { title: "Activity", href: "/", key: "activity"},
         { title: "About", href: about({ user: user.username }), key: "about" },
         { title: "Teams / Studios", href: showTeams({ user: user.username }).url, key: "teams"},
     ]
@@ -247,18 +259,65 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
     }
 
     const isPro = true
+    
+    function EditButton({ disabled = false, what } : { disabled?: boolean, what: string }) {
+        return auth.user?.id === user.id && editing !== what 
+            ? <Button
+                onClick={() => {
+                    setEditing(what)
+                }} 
+                disabled={disabled} 
+                className="cursor-pointer" 
+                size="icon" variant="ghost"
+                >
+                    <Pencil />
+                </Button>
+            : <div className="size-8"></div>
+    }
 
-    function About() {
-        
-        const [currentSection, setCurrentSection] = useState('skills')
-        const sectionLabels = [
-            {label: 'Overview', name: 'overview'},
-            {label: 'Skills & tools', name: 'skills'},
-            {label: 'Personal & releases', name: 'projects'},
-            {label: 'Contact & socials', name: 'contact'},
-        ]
-
-        return <div className="w-full flex border bg-neutral-50 dark:bg-neutral-900 mx-8 rounded-lg">
+    function showTab(tab: string) {
+        switch (tab) {
+            case 'teams':
+                return (teams.length == 0 
+                    ? <NoTeams />
+                    : <div className="flex size-full flex-col gap-6 mx-2 md:mx-8">
+                        <ItemGroup className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+                            {teams.map((team) => (
+                            <Item key={team.id} variant="outline" asChild role="listitem">
+                                <Link href={showTeam({
+                                    team: team.slug
+                                })}>
+                                    <ItemMedia variant="image">
+                                        <div className="w-16 h-16 relative">
+                                            <PlaceholderPattern className="absolute rounded-full inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
+                                        </div>
+                                    </ItemMedia>
+                                    <ItemContent className="h-full">
+                                        <ItemTitle className="line-clamp-1">
+                                            {team.name}
+                                        {/* <span className="text-muted-foreground">STH</span> */}
+                                        </ItemTitle>
+                                        <ItemDescription className="text-ellipsis">{team.description ?? "-"}</ItemDescription>
+                                    </ItemContent>
+                                    <ItemContent className="flex-none text-center">
+                                        <ItemDescription>
+                                            {team.users_count} 
+                                            <span className="ml-1.5">{team.users_count > 1 ? "members" : "member"}</span>
+                                        </ItemDescription>
+                                    </ItemContent>
+                                </Link>
+                            </Item>
+                            ))}
+                        </ItemGroup>
+                        {/* The teams.length key removes the CreateTeamForm when it changes */}
+                        <div key={teams.length} className="flex justify-end">
+                            <CreateTeamForm />
+                        </div>
+                    </div>
+                )
+            case 'about':
+                return (
+                    <div className="w-full flex border bg-neutral-50 dark:bg-neutral-900 mx-8 rounded-lg">
             <div className="w-1/4 flex flex-col p-2 gap-2">
                 <h2 className="text-xl font-bold mx-2 mt-2 mb-6">About</h2>
                 
@@ -280,12 +339,44 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
             {
                 currentSection == 'overview' && (
                     <>
-                        <div className="flex flex-col gap-3">
-                            <div className="flex justify-between items-center">
+                        <div className="flex justify-between items-start">
+                            <div className="flex flex-col gap-2 w-full">
                                 <h3 className="font-bold">Status</h3>
-                                <EditButton />
+                                { editing === 'status' 
+                                    ? <Form
+                                        errorBag="userInfo"
+                                        action={updateUser({ user: user.id })}
+                                        options={{ 
+                                            preserveScroll: true,
+                                            onSuccess: () => setEditing(false)
+                                        }} 
+                                        className="flex grow flex-col gap-2"
+                                    >
+                                    {
+                                        ({ errors }) => (
+                                            <>
+                                                <Input type="hidden" name="field" value="status" />
+                                                <Input autoFocus defaultValue={user.status ?? ""} name="status" maxLength={50} className="dark:bg-background bg-white relative -left-0.5" />
+                                                <FieldDescription className="text-destructive-foreground">{errors?.status}</FieldDescription>
+
+                                                <div className="flex gap-2">
+                                                    <Button
+                                                        type="submit" 
+                                                        className="cursor-pointer text-neutral-900 bg-neutral-200 hover:bg-[#e1e1e1] dark:hover:bg-neutral-100" 
+                                                        size="sm"
+                                                    >
+                                                        Submit
+                                                    </Button>
+                                                    <Button className="cursor-pointer" onClick={() => setEditing(false)} variant="destructive" size="sm">Cancel</Button>
+                                                </div>
+                                            </>
+                                        )
+                                    }
+                                    </Form>
+                                    : <div>{user.status ?? "--"}</div>
+                                }
                             </div>
-                            <div>Looking to join a team to build something great and pretty</div>
+                            <EditButton what="status" />
                         </div>
                         <div className="flex flex-col gap-3">
                             <div className="flex justify-between items-center">
@@ -457,57 +548,6 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
             }
             </div>
         </div>
-    }
-    
-    function EditButton({ disabled = false } : { disabled?: boolean }) {
-        return auth.user?.id === user.id 
-            ? <Button disabled={disabled} className="cursor-pointer" size="icon" variant="ghost"><Pencil /></Button>
-            : null
-    }
-
-    function showTab(tab: string) {
-        switch (tab) {
-            case 'teams':
-                return (teams.length == 0 
-                    ? <NoTeams />
-                    : <div className="flex size-full flex-col gap-6 mx-2 md:mx-8">
-                        <ItemGroup className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-                            {teams.map((team) => (
-                            <Item key={team.id} variant="outline" asChild role="listitem">
-                                <Link href={showTeam({
-                                    team: team.slug
-                                })}>
-                                    <ItemMedia variant="image">
-                                        <div className="w-16 h-16 relative">
-                                            <PlaceholderPattern className="absolute rounded-full inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
-                                        </div>
-                                    </ItemMedia>
-                                    <ItemContent className="h-full">
-                                        <ItemTitle className="line-clamp-1">
-                                            {team.name}
-                                        {/* <span className="text-muted-foreground">STH</span> */}
-                                        </ItemTitle>
-                                        <ItemDescription className="text-ellipsis">{team.description ?? "-"}</ItemDescription>
-                                    </ItemContent>
-                                    <ItemContent className="flex-none text-center">
-                                        <ItemDescription>
-                                            {team.users_count} 
-                                            <span className="ml-1.5">{team.users_count > 1 ? "members" : "member"}</span>
-                                        </ItemDescription>
-                                    </ItemContent>
-                                </Link>
-                            </Item>
-                            ))}
-                        </ItemGroup>
-                        {/* The teams.length key removes the CreateTeamForm when it changes */}
-                        <div key={teams.length} className="flex justify-end">
-                            <CreateTeamForm />
-                        </div>
-                    </div>
-                )
-            case 'about':
-                return (
-                    <About />
                 )
             default: 
                 return null
@@ -552,7 +592,10 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
                         </div>
                         <div className="flex flex-col md:flex-row gap-2 md:gap-5 text-xs md:text-base">
                             <div className="flex items-center gap-2 text-neutral-400 font-medium"><MapPin size={16} /> Dhaka, Bangladesh</div>
-                            <div className="flex text-neutral-400 font-medium"><span className="font-bold text-nowrap mr-1">Status :</span> Looking to join a team to build something great and pretty</div>
+                            {
+                                user.status &&
+                                <div className="flex text-neutral-400 font-medium"><span className="font-bold text-nowrap mr-1">Status :</span> {user.status}</div>
+                            }
                         </div>
                         <div className="flex flex-wrap gap-4 mt-4">
                         {
@@ -585,5 +628,5 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
                 </div>
             </div>
         </AppLayout>
-    );
+    )
 }

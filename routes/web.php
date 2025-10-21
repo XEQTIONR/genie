@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\TeamController;
+use App\Http\Controllers\UserProfileController;
 use App\Models\Team;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -20,6 +21,8 @@ Route::get('/profile/{user:username}', function(User $user) {
         'tab' => 'showcase'
     ]);
 })->name('users.show');
+
+Route::patch('/profile/{user}', [UserProfileController::class, 'update'])->name('users.update');
 
 Route::get('/profile/{user:username}/about', function(User $user) {
     return Inertia::render('users/show', [

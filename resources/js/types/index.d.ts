@@ -46,7 +46,7 @@ export interface Team {
     slug: string
     created_at: string
     updated_at: string
-    user_count?: number
+    users_count?: number
     owner_id: number
 }
 
@@ -58,6 +58,7 @@ export interface User {
     avatar?: string
     email_verified_at: string | null
     two_factor_enabled?: boolean
+    status: string | null
     created_at: string
     updated_at: string
     [key: string]: unknown // This allows for additional properties...

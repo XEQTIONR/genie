@@ -14,6 +14,10 @@ return new class extends Migration
         Schema::table('users', function (Blueprint $table) {
             $table->string('username')->unique()->after('id');
             $table->string('location')->nullable()->after('password');
+            $table->text('bio')->nullable()->after('location');
+            $table->string('status')->nullable()->after('bio');
+            $table->string('state')->nullable()->after('status');
+            $table->json('meta')->nullable()->after('state');
         });
     }
 
@@ -26,6 +30,10 @@ return new class extends Migration
             $table->dropUnique('users_username_unique');
             $table->dropColumn('username');
             $table->dropColumn('location');
+            $table->dropColumn('bio');
+            $table->dropColumn('status');
+            $table->dropColumn('state');
+            $table->dropColumn('meta');
         });
     }
 };
