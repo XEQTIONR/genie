@@ -58,8 +58,10 @@ class UserProfileController extends Controller
 
         switch ($validated['field']) {
             case 'status':
-            default:
                 return $this->updateStatus($request, $user);
+            case 'bio':
+                return $this->updateBio($request, $user);
+            default:
         }
     }
 
@@ -85,6 +87,24 @@ class UserProfileController extends Controller
         ])->with('notification', [
             'type' => 'info',
             'message' => "Status updated",
+            'button' => null
+        ]);
+    }
+
+    protected function updateBio(Request $request, User $user)
+    {
+        $validated = $request->validate([
+            'bio' => 'nullable|string|max:500'
+        ]);
+
+        $user->bio = $validated['bio'];
+        $user->save();
+
+        return to_route('users.about', [
+            'user' => $user
+        ])->with('notification', [
+            'type' => 'info',
+            'message' => "Bio updated",
             'button' => null
         ]);
     }

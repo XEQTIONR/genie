@@ -65,6 +65,16 @@ import SearchBar from '@/components/ui/search-bar'
 
 type ProfileTab = NavItem & {key: string, className?: string}
 
+function RenderMultilineText({ text } : { text: string}) {
+    const paragraphs = text.split('\n');
+
+    return <>
+    {
+        paragraphs.map((para) => <p className="mb-2">{para}</p>)        
+    }
+    </>
+}
+
 function CreateTeamForm () {
     return (
         <Dialog>
@@ -212,8 +222,6 @@ function NoReleases() {
         </Empty>
     )
 }
-
-
 
 export default function Profile({ user, tab = 'showcase', teams } : { user: User, tab: string, teams: Team[] }) {
 
@@ -378,12 +386,45 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
                             </div>
                             <EditButton what="status" />
                         </div>
-                        <div className="flex flex-col gap-3">
-                            <div className="flex justify-between items-center">
+                        <div className="flex justify-between items-start">
+                            <div className="flex flex-col gap-2 w-full">
                                 <h3 className="font-bold">Bio</h3>
-                                <EditButton />
+                                { editing === 'bio' 
+                                    ? <Form
+                                        errorBag="userInfo"
+                                        action={updateUser({ user: user.id })}
+                                        options={{ 
+                                            preserveScroll: true,
+                                            onSuccess: () => setEditing(false)
+                                        }} 
+                                        className="flex grow flex-col gap-2"
+                                    >
+                                    {
+                                        ({ errors }) => (
+                                            <>
+                                                <Input type="hidden" name="field" value="bio" />
+                                                <Textarea autoFocus defaultValue={user.bio ?? ""} name="bio" maxLength={500} className="dark:bg-background bg-white relative -left-0.5 min-h-30" />
+                                                {/* <Input autoFocus defaultValue={user.bio ?? ""} name="bio" maxLength={50} className="dark:bg-background bg-white relative -left-0.5" /> */}
+                                                <FieldDescription className="text-destructive-foreground">{errors?.bio}</FieldDescription>
+
+                                                <div className="flex gap-2">
+                                                    <Button
+                                                        type="submit" 
+                                                        className="cursor-pointer text-neutral-900 bg-neutral-200 hover:bg-[#e1e1e1] dark:hover:bg-neutral-100" 
+                                                        size="sm"
+                                                    >
+                                                        Submit
+                                                    </Button>
+                                                    <Button className="cursor-pointer" onClick={() => setEditing(false)} variant="destructive" size="sm">Cancel</Button>
+                                                </div>
+                                            </>
+                                        )
+                                    }
+                                    </Form>
+                                    : <div>{user.bio ? <RenderMultilineText text={user.bio} /> : "--"}</div>
+                                }
                             </div>
-                            <div>I'm a full-stack developer and I'm interested in joining a team to start a new project.</div>
+                            <EditButton what="bio" />
                         </div>
                         <div className="flex justify-between items-center">
                             <div className="flex items-center gap-2">
