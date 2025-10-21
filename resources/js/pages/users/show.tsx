@@ -58,6 +58,8 @@ import {
 } from "@/components/ui/item"
 import { Separator } from '@/components/ui/separator'
 import { cn } from '@/lib/utils'
+import { Badge } from '@/components/ui/badge'
+import SearchBar from '@/components/ui/search-bar'
 
 type ProfileTab = NavItem & {key: string, className?: string}
 
@@ -247,16 +249,41 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
                 currentSection == 'skills' && (
                     <>
                         <div className="flex flex-col gap-3">
-                            <div className="flex justify-between items-center">
-                                <h3 className="font-bold flex items-center gap-2"><Lightbulb size={19} /> Skills</h3>
-                                <EditButton />
+                            <div className="flex flex-col gap-0">
+                                <div className="flex justify-between items-center">
+                                    <h3 className="font-bold flex items-center gap-2"><Lightbulb size={19} /> Skills</h3>
+                                    <EditButton />
+                                </div>
+                                <span className="text-xs">Roles that I have experience working in</span>
                             </div>
-                            <div>I'm a full-stack developer and I'm interested in joining a team to start a new project.</div>
+                            <div className="flex gap-2">
+                                <Badge className="text-sm">Level Designer</Badge>
+                                <Badge className="text-sm">Gameplay Programmer <X /></Badge>
+                            </div>
+                            <SearchBar searchOptions={[
+                                {
+                                    heading: 'Heading1',
+                                    options: [
+                                        {label: 'Xabel1', value: 1},
+                                        {label: 'xabel2', value: 2},
+                                        {label: 'Label3', value: 3},
+                                    ]
+                                },
+                                {
+                                    heading: 'Heading2',
+                                    options: [
+                                        {label: 'Xabel4', value: 1},
+                                        {label: 'xabel5', value: 2},
+                                        {label: 'Label6', value: 3},
+                                    ]
+                                }
+                                
+                            ]} />
                         </div>
 
                         <div className="flex flex-col gap-3">
                             <div className="flex justify-between items-center">
-                                <h3 className="font-bold flex items-center gap-2"><PencilRuler size={18} /> Tools</h3>
+                                <h3 className="font-bold flex items-center gap-2"><Drill size={19} /> Tools</h3>
                                 <EditButton />
                             </div>
                             <ul className="flex gap-2">
@@ -273,7 +300,7 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
                     <>
                         <div className="flex flex-col gap-3">
                             <div className="flex justify-between items-center">
-                                <h3 className="font-bold flex items-center gap-2"><Drill size={19} />Projects</h3>
+                                <h3 className="font-bold flex items-center gap-2"><PencilRuler size={19} />Projects</h3>
                                 <EditButton />
                             </div>
                             <div>I'm a full-stack developer and I'm interested in joining a team to start a new project.</div>
@@ -381,7 +408,7 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
             : null
     }
 
-    function CurrentTab({tab} : {tab: string}) {
+    function showTab(tab: string) {
         switch (tab) {
             case 'teams':
                 return (teams.length == 0 
@@ -493,7 +520,7 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
                 {
                     loading 
                         ? <Spinner className="block m-auto size-6" />
-                        : <CurrentTab tab={tab} />
+                        : showTab(tab)
                 }
                 </div>
             </div>
