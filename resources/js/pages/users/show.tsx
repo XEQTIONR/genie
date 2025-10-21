@@ -7,7 +7,7 @@ import { store } from '@/actions/App/Http/Controllers/TeamController'
 import { index as showTeams } from '@/routes/users/teams'
 import { NavItem, Team, User, type BreadcrumbItem } from '@/types'
 import { Head, Link } from '@inertiajs/react'
-import { AtSign, Dribbble, Drill, EllipsisVertical, Facebook, Figma, Gamepad2, Github, Gitlab, GraduationCap, Hammer, House, Instagram, Lightbulb, Linkedin, Mail, MapPin, Pencil, PencilRuler, Slack, SquarePen, Twitch, Twitter, UserPlus, Users, X, Youtube } from 'lucide-react'
+import { AtSign, Dribbble, Drill, EllipsisVertical, Facebook, Figma, Gamepad2, Github, Gitlab, GraduationCap, Hammer, House, Instagram, Lightbulb, Linkedin, Mail, MapPin, Pencil, PencilRuler, Rocket, Slack, SquarePen, Twitch, Twitter, UserPlus, Users, X, Youtube } from 'lucide-react'
 import { Godot, Unity, Unreal } from '@/components/icons/create'
 import {
   DropdownMenu,
@@ -317,21 +317,28 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
             }
             {
                 currentSection == 'projects' && (
-                    <>
-                        <div className="flex flex-col gap-3">
+                    <div className="w-full flex flex-col gap-5">
+                        <div className="w-full flex flex-col gap-3">
                             <div className="flex justify-between items-center">
                                 <h3 className="font-bold flex items-center gap-2"><PencilRuler size={19} />Projects</h3>
                                 <EditButton />
                             </div>
                             <div>I'm a full-stack developer and I'm interested in joining a team to start a new project.</div>
                         </div>
-                    </>
+                        <div className="flex flex-col gap-3">
+                            <div className="flex justify-between items-center">
+                                <h3 className="font-bold flex items-center gap-2"><Rocket size={18} />Releases</h3>
+                                <EditButton />
+                            </div>
+                            <div>I'm a full-stack developer and I'm interested in joining a team to start a new project.</div>
+                        </div>
+                    </div>
                 )
             }
             {
                 currentSection == 'contact' && (
                     <>
-                        <div className="flex justify-between items-center">
+                        {/* <div className="flex justify-between items-center">
                             <div className="flex items-center gap-2">
                                 <AtSign size={18} /><span className="font-bold">{user.email}</span>
                             </div>
@@ -378,7 +385,7 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
                                 <Youtube size={18} /><span className="font-bold">{"/in/ishteharhussain"}</span>
                             </div>
                             <EditButton />
-                        </div>
+                        </div> */}
                         {/* <div className="flex justify-between items-center">
                             <div className="flex items-center gap-2">
                                 <Github size={18} /><span className="font-bold">{"/in/ishteharhussain"}</span>
@@ -391,30 +398,33 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
                             </div>
                             <EditButton />
                         </div> */}
-                        <div className="flex justify-between items-center">
-                            <div className="flex items-center gap-2">
-                                <Slack size={18} /><span className="font-bold">{"/in/ishteharhussain"}</span>
+                        <div className="w-full flex justify-between">
+                            <div className="flex flex-col gap-3">
+                                <div className="flex items-center gap-2">
+                                    <AtSign size={18} /><span>{"ishteharhussain@gmail.com"}</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <Linkedin size={18} /><span>{"/in/ishteharhussain"}</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <Instagram size={18} /><span>{"ishteharhussain"}</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <Dribbble size={18} /><span>{"Kreatank"}</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <Youtube size={18} /><span>{"@XEQTIONR"}</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <Facebook size={18} /><span>{"xeqtionr"}</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <Twitter size={18} /><span>{"@XEQTIONR"}</span>
+                                </div>
+                                {/* <EditButton /> */}
                             </div>
                             <EditButton />
                         </div>
-                        <div className="flex justify-between items-center">
-                            <div className="flex items-center gap-2">
-                                <Figma size={18} /><span className="font-bold">{"/in/ishteharhussain"}</span>
-                            </div>
-                            <EditButton />
-                        </div>
-
-                        {/* <div className="flex flex-col gap-3">
-                            <div className="flex justify-between items-center">
-                                <h3 className="font-bold flex items-center gap-2"><Gamepad2 size={20} /> Favorite games</h3>
-                                <EditButton />
-                            </div>
-                            <ul className="flex gap-2">
-                                <li>Street Fighter II,</li>
-                                <li>Doom,</li>
-                                <li>Unreal Tournament 2004</li>
-                            </ul>
-                        </div> */}
                     </>
                 )
             }
