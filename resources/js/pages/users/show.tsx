@@ -7,7 +7,8 @@ import { store } from '@/actions/App/Http/Controllers/TeamController'
 import { index as showTeams } from '@/routes/users/teams'
 import { NavItem, Team, User, type BreadcrumbItem } from '@/types'
 import { Head, Link } from '@inertiajs/react'
-import { AtSign, Dribbble, Drill, EllipsisVertical, Facebook, Figma, Gamepad2, Github, Gitlab, GraduationCap, House, Instagram, Lightbulb, Linkedin, Mail, MapPin, Pencil, PencilRuler, Slack, SquarePen, Twitch, Twitter, UserPlus, Users, Youtube } from 'lucide-react'
+import { AtSign, Dribbble, Drill, EllipsisVertical, Facebook, Figma, Gamepad2, Github, Gitlab, GraduationCap, Hammer, House, Instagram, Lightbulb, Linkedin, Mail, MapPin, Pencil, PencilRuler, Slack, SquarePen, Twitch, Twitter, UserPlus, Users, X, Youtube } from 'lucide-react'
+import { Godot, Unity, Unreal, Unreal2 } from '@/components/icons/create'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -260,7 +261,7 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
                                 <Badge className="text-sm">Level Designer</Badge>
                                 <Badge className="text-sm">Gameplay Programmer <X /></Badge>
                             </div>
-                            <SearchBar searchOptions={[
+                            {/* <SearchBar searchOptions={[
                                 {
                                     heading: 'Heading1',
                                     options: [
@@ -278,19 +279,38 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
                                     ]
                                 }
                                 
-                            ]} />
+                            ]} /> */}
                         </div>
 
                         <div className="flex flex-col gap-3">
                             <div className="flex justify-between items-center">
-                                <h3 className="font-bold flex items-center gap-2"><Drill size={19} /> Tools</h3>
+                                <h3 className="font-bold flex items-center gap-2"><Hammer size={18} /> Tools</h3>
                                 <EditButton />
                             </div>
-                            <ul className="flex gap-2">
-                                <li>Street Fighter II,</li>
-                                <li>Doom,</li>
-                                <li>Unreal Tournament 2004</li>
-                            </ul>
+                            <div className="flex gap-1.5">
+                                <div className="size-16 rounded-md flex justify-center items-center bg-neutral-100 border dark:border-neutral-700  dark:bg-neutral-900">
+                                    <Github size={25} />
+                                </div>
+                                <div className="size-16 rounded-md flex justify-center items-center bg-neutral-100 border dark:border-neutral-700  dark:bg-neutral-900">
+                                    <Gitlab size={25} />
+                                </div>
+                                {/* <div className="size-16 rounded-md flex justify-center items-center bg-neutral-100 border dark:border-neutral-700  dark:bg-neutral-900">
+                                    <Dribbble  size={25} />
+                                </div> */}
+                                <div className="size-16 rounded-md flex justify-center items-center bg-neutral-100 border dark:border-neutral-700  dark:bg-neutral-900">
+                                    <Godot strokeWidth={1.7} size={30} />
+                                </div>
+                                <div className="size-16 rounded-md flex justify-center items-center bg-neutral-100 border dark:border-neutral-700  dark:bg-neutral-900">
+                                    <Unity strokeWidth={1.7} size={30} />
+                                </div>
+                                <div className="size-16 rounded-md flex justify-center items-center bg-neutral-100 border dark:border-neutral-700  dark:bg-neutral-900">
+                                    <Unreal strokeWidth={1.7} size={30} />
+                                </div>
+                                <div className="size-16 rounded-md flex justify-center items-center bg-neutral-100 border dark:border-neutral-700  dark:bg-neutral-900">
+                                    <Figma size={23} />
+                                </div>
+                            </div>
+                            {/* <SearchBar searchOptions={[]} /> */}
                         </div>
                     </>
                 )
