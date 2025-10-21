@@ -8,7 +8,7 @@ import { index as showTeams } from '@/routes/users/teams'
 import { NavItem, Team, User, type BreadcrumbItem } from '@/types'
 import { Head, Link } from '@inertiajs/react'
 import { AtSign, Dribbble, Drill, EllipsisVertical, Facebook, Figma, Gamepad2, Github, Gitlab, GraduationCap, Hammer, House, Instagram, Lightbulb, Linkedin, Mail, MapPin, Pencil, PencilRuler, Slack, SquarePen, Twitch, Twitter, UserPlus, Users, X, Youtube } from 'lucide-react'
-import { Godot, Unity, Unreal, Unreal2 } from '@/components/icons/create'
+import { Godot, Unity, Unreal } from '@/components/icons/create'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -188,7 +188,7 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
 
     function About() {
         
-        const [currentSection, setCurrentSection] = useState('overview')
+        const [currentSection, setCurrentSection] = useState('skills')
         const sectionLabels = [
             {label: 'Overview', name: 'overview'},
             {label: 'Skills & tools', name: 'skills'},
@@ -261,7 +261,7 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
                                 <Badge className="text-sm">Level Designer</Badge>
                                 <Badge className="text-sm">Gameplay Programmer <X /></Badge>
                             </div>
-                            {/* <SearchBar searchOptions={[
+                            <SearchBar searchOptions={[
                                 {
                                     heading: 'Heading1',
                                     options: [
@@ -279,7 +279,7 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
                                     ]
                                 }
                                 
-                            ]} /> */}
+                            ]} />
                         </div>
 
                         <div className="flex flex-col gap-3">
@@ -292,19 +292,19 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
                                     <Github size={25} />
                                 </div>
                                 <div className="size-16 rounded-md flex justify-center items-center bg-neutral-100 border dark:border-neutral-700  dark:bg-neutral-900">
-                                    <Gitlab size={25} />
+                                    <Gitlab size={27} />
                                 </div>
                                 {/* <div className="size-16 rounded-md flex justify-center items-center bg-neutral-100 border dark:border-neutral-700  dark:bg-neutral-900">
                                     <Dribbble  size={25} />
                                 </div> */}
                                 <div className="size-16 rounded-md flex justify-center items-center bg-neutral-100 border dark:border-neutral-700  dark:bg-neutral-900">
-                                    <Godot strokeWidth={1.7} size={30} />
+                                    <Godot strokeWidth={1.1} size={39} />
                                 </div>
                                 <div className="size-16 rounded-md flex justify-center items-center bg-neutral-100 border dark:border-neutral-700  dark:bg-neutral-900">
-                                    <Unity strokeWidth={1.7} size={30} />
+                                    <Unity strokeWidth={1.5} size={32} />
                                 </div>
                                 <div className="size-16 rounded-md flex justify-center items-center bg-neutral-100 border dark:border-neutral-700  dark:bg-neutral-900">
-                                    <Unreal strokeWidth={1.7} size={30} />
+                                    <Unreal strokeWidth={1.5} size={28} />
                                 </div>
                                 <div className="size-16 rounded-md flex justify-center items-center bg-neutral-100 border dark:border-neutral-700  dark:bg-neutral-900">
                                     <Figma size={23} />
