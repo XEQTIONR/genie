@@ -58,7 +58,7 @@ class TeamController extends Controller
 
         $user->teams()->save($team);
 
-        return redirect(route('users.teams.show', [ 'user' => $user ]))->with('notification', [
+        return redirect(route('users.teams.index', [ 'user' => $user ]))->with('notification', [
             'type' => 'info',
             'message' => "New team created - $team->name",
             'button' => null

@@ -7,7 +7,7 @@ import { store } from '@/actions/App/Http/Controllers/TeamController'
 import { index as showTeams } from '@/routes/users/teams'
 import { NavItem, Team, User, type BreadcrumbItem } from '@/types'
 import { Head, Link } from '@inertiajs/react'
-import { AtSign, Dribbble, Drill, EllipsisVertical, Facebook, Figma, Gamepad2, Github, Gitlab, GraduationCap, Hammer, House, Instagram, Lightbulb, Linkedin, Mail, MapPin, Pencil, PencilRuler, Rocket, Slack, SquarePen, Twitch, Twitter, UserPlus, Users, X, Youtube } from 'lucide-react'
+import { AtSign, Dribbble, Drill, EllipsisVertical, Facebook, Figma, Gamepad2, Github, Gitlab, Globe, GraduationCap, Hammer, House, Instagram, Lightbulb, Linkedin, Mail, MapPin, Pencil, PencilRuler, Rocket, Slack, SquarePen, Twitch, Twitter, UserPlus, Users, X, Youtube } from 'lucide-react'
 import { Godot, Unity, Unreal } from '@/components/icons/create'
 import {
   DropdownMenu,
@@ -118,7 +118,6 @@ function CreateTeamForm () {
 
 function NoTeams() {
     return (
-        <>
             <Empty>
                 <EmptyHeader>
                     <EmptyMedia variant="icon">
@@ -146,7 +145,70 @@ function NoTeams() {
                     </a>
                 </Button>
             </Empty>
-        </>
+    )
+}
+
+function NoProjects() {
+    return (
+        <Empty>
+            <EmptyHeader>
+                <EmptyMedia variant="icon">
+                    <PencilRuler />
+                </EmptyMedia>
+                <EmptyTitle>No projects</EmptyTitle>
+                <EmptyDescription>
+                    You don&apos;t have any projects. You are free to create one.
+                </EmptyDescription>
+            </EmptyHeader>
+            <EmptyContent>
+                <div className="flex gap-2"> 
+                    <Button className="cursor-pointer">Create a new project</Button>
+                    {/* <Button className="cursor-pointer" variant="outline">Join existing team</Button> */}
+                </div>
+            </EmptyContent>
+            <Button
+                variant="link"
+                asChild
+                className="text-muted-foreground"
+                size="sm"
+            >
+                <a href="#">
+                Learn More <ArrowUpRightIcon />
+                </a>
+            </Button>
+        </Empty>
+    )
+}
+
+function NoReleases() {
+    return (
+        <Empty>
+            <EmptyHeader>
+                <EmptyMedia variant="icon">
+                    <Rocket />
+                </EmptyMedia>
+                <EmptyTitle>No releases</EmptyTitle>
+                <EmptyDescription>
+                    You don&apos;t have not recorded any game releases.
+                </EmptyDescription>
+            </EmptyHeader>
+            <EmptyContent>
+                <div className="flex gap-2"> 
+                    <Button className="cursor-pointer">Add a new release</Button>
+                    {/* <Button className="cursor-pointer" variant="outline">Join existing team</Button> */}
+                </div>
+            </EmptyContent>
+            <Button
+                variant="link"
+                asChild
+                className="text-muted-foreground"
+                size="sm"
+            >
+                <a href="#">
+                Learn More <ArrowUpRightIcon />
+                </a>
+            </Button>
+        </Empty>
     )
 }
 
@@ -192,7 +254,7 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
         const sectionLabels = [
             {label: 'Overview', name: 'overview'},
             {label: 'Skills & tools', name: 'skills'},
-            {label: 'Personal projects', name: 'projects'},
+            {label: 'Personal & releases', name: 'projects'},
             {label: 'Contact & socials', name: 'contact'},
         ]
 
@@ -218,6 +280,13 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
             {
                 currentSection == 'overview' && (
                     <>
+                        <div className="flex flex-col gap-3">
+                            <div className="flex justify-between items-center">
+                                <h3 className="font-bold">Status</h3>
+                                <EditButton />
+                            </div>
+                            <div>Looking to join a team to build something great and pretty</div>
+                        </div>
                         <div className="flex flex-col gap-3">
                             <div className="flex justify-between items-center">
                                 <h3 className="font-bold">Bio</h3>
@@ -317,91 +386,49 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
             }
             {
                 currentSection == 'projects' && (
-                    <div className="w-full flex flex-col gap-5">
-                        <div className="w-full flex flex-col gap-3">
-                            <div className="flex justify-between items-center">
-                                <h3 className="font-bold flex items-center gap-2"><PencilRuler size={19} />Projects</h3>
-                                <EditButton />
-                            </div>
-                            <div>I'm a full-stack developer and I'm interested in joining a team to start a new project.</div>
-                        </div>
+                    <div className="w-full flex flex-col">
                         <div className="flex flex-col gap-3">
-                            <div className="flex justify-between items-center">
-                                <h3 className="font-bold flex items-center gap-2"><Rocket size={18} />Releases</h3>
-                                <EditButton />
+                            <div className="flex flex-col gap-0">
+                                <div className="flex justify-between items-center">
+                                    <h3 className="font-bold flex items-center gap-2"><PencilRuler size={18} />Projects</h3>
+                                    <EditButton disabled={true} />
+                                </div>
+                                <span className="text-xs">Current game development projects you are working on that have not been released</span>
                             </div>
-                            <div>I'm a full-stack developer and I'm interested in joining a team to start a new project.</div>
+                            <NoProjects />
+                        </div>
+                        <Separator className="mb-5" />
+                        <div className="flex flex-col gap-3">
+                            <div className="flex flex-col gap-0">
+                                <div className="flex justify-between items-center">
+                                    <h3 className="font-bold flex items-center gap-2"><Rocket size={18} />Releases</h3>
+                                    <EditButton disabled={true} />
+                                </div>
+                                <span className="text-xs">Completed game titles by you that are available to the public</span>
+                            </div>
+                            <NoReleases />
                         </div>
                     </div>
                 )
             }
             {
                 currentSection == 'contact' && (
-                    <>
-                        {/* <div className="flex justify-between items-center">
-                            <div className="flex items-center gap-2">
-                                <AtSign size={18} /><span className="font-bold">{user.email}</span>
-                            </div>
-                            <EditButton />
-                        </div>
-                        <div className="flex justify-between items-center">
-                            <div className="flex items-center gap-2">
-                                <Linkedin size={18} /><span className="font-bold">{"/in/ishteharhussain"}</span>
-                            </div>
-                            <EditButton />
-                        </div>
-                        <div className="flex justify-between items-center">
-                            <div className="flex items-center gap-2">
-                                <Dribbble size={18} /><span className="font-bold">{"/in/ishteharhussain"}</span>
-                            </div>
-                            <EditButton />
-                        </div>
-                        <div className="flex justify-between items-center">
-                            <div className="flex items-center gap-2">
-                                <Instagram size={18} /><span className="font-bold">{"/in/ishteharhussain"}</span>
-                            </div>
-                            <EditButton />
-                        </div>
-                        <div className="flex justify-between items-center">
-                            <div className="flex items-center gap-2">
-                                <Twitter size={18} /><span className="font-bold">{"/in/ishteharhussain"}</span>
-                            </div>
-                            <EditButton />
-                        </div>
-                        <div className="flex justify-between items-center">
-                            <div className="flex items-center gap-2">
-                                <Twitch size={18} /><span className="font-bold">{"/in/ishteharhussain"}</span>
-                            </div>
-                            <EditButton />
-                        </div>
-                        <div className="flex justify-between items-center">
-                            <div className="flex items-center gap-2">
-                                <Facebook size={18} /><span className="font-bold">{"/in/ishteharhussain"}</span>
-                            </div>
-                            <EditButton />
-                        </div>
-                        <div className="flex justify-between items-center">
-                            <div className="flex items-center gap-2">
-                                <Youtube size={18} /><span className="font-bold">{"/in/ishteharhussain"}</span>
-                            </div>
-                            <EditButton />
-                        </div> */}
-                        {/* <div className="flex justify-between items-center">
-                            <div className="flex items-center gap-2">
-                                <Github size={18} /><span className="font-bold">{"/in/ishteharhussain"}</span>
-                            </div>
-                            <EditButton />
-                        </div>
-                        <div className="flex justify-between items-center">
-                            <div className="flex items-center gap-2">
-                                <Gitlab size={18} /><span className="font-bold">{"/in/ishteharhussain"}</span>
-                            </div>
-                            <EditButton />
-                        </div> */}
-                        <div className="w-full flex justify-between">
+                    <div className="w-full flex justify-between">
+                        <div className="flex flex-col gap-10">
                             <div className="flex flex-col gap-3">
+                                <div className="flex justify-between items-center">
+                                    <h3 className="font-bold flex items-center gap-2">Contact</h3>
+                                </div>
                                 <div className="flex items-center gap-2">
                                     <AtSign size={18} /><span>{"ishteharhussain@gmail.com"}</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <Globe size={18} /><span>{"https://www.ishteharhussain.com"}</span>
+                                </div>
+                            </div>
+                            <div className="flex flex-col gap-3">
+                                <div className="flex justify-between items-center">
+                                    <h3 className="font-bold flex items-center gap-2">Socials</h3>
                                 </div>
                                 <div className="flex items-center gap-2">
                                     <Linkedin size={18} /><span>{"/in/ishteharhussain"}</span>
@@ -421,20 +448,20 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
                                 <div className="flex items-center gap-2">
                                     <Twitter size={18} /><span>{"@XEQTIONR"}</span>
                                 </div>
-                                {/* <EditButton /> */}
                             </div>
-                            <EditButton />
+                            {/* <EditButton /> */}
                         </div>
-                    </>
+                        <EditButton />
+                    </div>
                 )
             }
             </div>
         </div>
     }
     
-    function EditButton() {
+    function EditButton({ disabled = false } : { disabled?: boolean }) {
         return auth.user?.id === user.id 
-            ? <Button className="cursor-pointer" size="icon" variant="ghost"><Pencil /></Button>
+            ? <Button disabled={disabled} className="cursor-pointer" size="icon" variant="ghost"><Pencil /></Button>
             : null
     }
 
@@ -501,7 +528,7 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
                         <PlaceholderPattern className="absolute rounded-full inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
                     </div>
                     <div className="md:mx-8">
-                        <div className="w-full flex justify-between items-center">
+                        <div className="w-full flex justify-between items-center mb-2">
                             <div className="text-2xl sm:text-5xl font-bold flex items-center gap-4 max-w-4/5">
                                 {user.name}
                                 {isPro && <span className="text-sm bg-primary text-background px-2 py-0.5 rounded">PRO</span>}
@@ -523,7 +550,10 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
                                 </DropdownMenu>
                             </div>
                         </div>
-                        <div className="flex items-center gap-2 mt-2 text-neutral-400 font-medium"><MapPin size={16} /> Dhaka, Bangladesh</div>
+                        <div className="flex flex-col md:flex-row gap-2 md:gap-5 text-xs md:text-base">
+                            <div className="flex items-center gap-2 text-neutral-400 font-medium"><MapPin size={16} /> Dhaka, Bangladesh</div>
+                            <div className="flex text-neutral-400 font-medium"><span className="font-bold text-nowrap mr-1">Status :</span> Looking to join a team to build something great and pretty</div>
+                        </div>
                         <div className="flex flex-wrap gap-4 mt-4">
                         {
                             titles.map((title) => (
