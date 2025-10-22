@@ -28,6 +28,7 @@ class User extends Authenticatable
         'status',
         'bio',
         'location',
+        'meta'
     ];
 
     /**
@@ -51,6 +52,7 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'location' => 'array',
+            'meta' => 'array',
         ];
     }
 

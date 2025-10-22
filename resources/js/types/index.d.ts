@@ -63,5 +63,8 @@ export interface User {
     bio: string | null
     created_at: string
     updated_at: string
+    meta: {
+        fav_games?: string[]
+    } | null
     [key: string]: unknown // This allows for additional properties...
 }

@@ -8,7 +8,7 @@ import { update as updateUser } from '@/actions/App/Http/Controllers/UserProfile
 import { index as showTeams } from '@/routes/users/teams'
 import { NavItem, Team, User, type BreadcrumbItem } from '@/types'
 import { Head, Link } from '@inertiajs/react'
-import { AtSign, Dribbble, EllipsisVertical, Facebook, Figma, Gamepad2, Github, Gitlab, Globe, Hammer, Instagram, Lightbulb, Linkedin, Mail, MapPin, Pencil, PencilRuler, Rocket, Slack, Twitch, Twitter, UserPlus, Users, X, Youtube } from 'lucide-react'
+import { AtSign, Dribbble, EllipsisVertical, Facebook, Figma, Gamepad2, Github, Gitlab, Globe, Hammer, Instagram, Lightbulb, Linkedin, Mail, MapPin, Pencil, PencilRuler, Plus, Rocket, Slack, Trash, Twitch, Twitter, UserPlus, Users, X, Youtube } from 'lucide-react'
 import { Godot, Unity, Unreal } from '@/components/icons/create'
 import {
   DropdownMenu,
@@ -252,6 +252,8 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
 
     const [editing, setEditing] = useState<string|false>(false)
 
+    const [favGames, setFavGames] = useState(user.meta?.fav_games ?? [])
+
     const [currentSection, setCurrentSection] = useState('overview')
 
     const sectionLabels = [
@@ -465,7 +467,7 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
                                     ({ errors }) => (<>    
                                     <Input type="hidden" name="field" value="location" />
                                     <h3 className="font-bold">Location</h3>
-                                    <div className="w-full flex gap-2 -ml-1 mt-">
+                                    <div className="w-full flex gap-2 -ml-1 mt-2">
                                         <div className="flex flex-col gap-2">
                                             <Label className="ml-1">City</Label>
                                             <Input defaultValue={user.location?.city} name="city" className="dark bg-background" />
@@ -502,17 +504,93 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
                                 </div>
                             )
                         }
-
+                        
                         <div className="flex flex-col gap-3">
-                            <div className="flex justify-between items-center">
+                            <div className="flex justify-between items-center min-h-10">
                                 <h3 className="font-bold flex items-center gap-2"><Gamepad2 size={20} /> Favorite games</h3>
-                                <EditButton />
+                                <EditButton what="fav_games" />
                             </div>
-                            <ul className="flex gap-2">
-                                <li>Street Fighter II,</li>
-                                <li>Doom,</li>
-                                <li>Unreal Tournament 2004</li>
-                            </ul>
+                            {
+                                editing === 'fav_games'
+                                    ? (
+                                        <Form
+                                            errorBag="userInfo" 
+                                            className="flex flex-col gap-1"
+                                            action={updateUser({ user: user.id })}
+                                            options={{ 
+                                                preserveScroll: true,
+                                                onSuccess: () => setEditing(false)
+                                            }}
+                                        >
+                                        {
+                                            ({ errors }) => (<>    
+                                                <Input type="hidden" name="field" value="fav_games" />
+                                                <div className="flex flex-col gap-2">
+                                                    <ul>
+                                                    {
+                                                        favGames.map((game : string, index: number) => (
+                                                            <li className="flex gap-1.5 mb-1">
+                                                                <Input
+                                                                    value={game}
+                                                                    onChange={({target}) => setFavGames((v) => {
+                                                                        const temp = [...v]
+                                                                        temp[index] = target.value
+                                                                        return temp
+                                                                    })}
+                                                                    name="fav_games[]"
+                                                                    className="bg-background"
+                                                                />
+                                                                <Button
+                                                                    type="button"
+                                                                    className="cursor-pointer"
+                                                                    onClick={() => {setFavGames(() => favGames.filter((_, i) => i !== index))}}
+                                                                    variant="ghost" 
+                                                                    size="icon"
+                                                                >
+                                                                    <Trash />
+                                                                </Button>
+                                                            </li>
+                                                        ))
+                                                    }
+                                                    </ul>
+                                                </div>
+                                                <FieldDescription className="text-destructive-foreground">{errors.fav_games}</FieldDescription>
+                                                <div className="flex justify-between mt-1.5">
+                                                    <Button className="cursor-pointer" type="button" onClick={() => setFavGames([...favGames, ''])} variant="ghost" size="sm"><Plus />Add another</Button>
+                                                    <div className="flex gap-2">
+                                                        <Button
+                                                            type="submit" 
+                                                            className="cursor-pointer text-neutral-900 bg-neutral-200 hover:bg-[#e1e1e1] dark:hover:bg-neutral-100" 
+                                                            size="sm"
+                                                        >
+                                                            Submit
+                                                        </Button>
+                                                        <Button 
+                                                            className="cursor-pointer" 
+                                                            onClick={() => {
+                                                                setFavGames(user.meta?.fav_games ?? [])
+                                                                setEditing(false)
+                                                            }} 
+                                                            variant="destructive" 
+                                                            size="sm"
+                                                        >
+                                                            Cancel
+                                                        </Button>
+                                                    </div>
+                                                </div>
+                                            </>)
+                                        }
+                                        </Form>
+                                    ) : (
+                                        favGames.length > 1 || (favGames.length > 0 && favGames[0] !== "")  ? <ul className="flex gap-2">
+                                        {
+                                            favGames.map((game, index) => (
+                                                index == (favGames.length - 1) ? <li>{game}</li> : <li>{game},</li>
+                                            ))
+                                        }
+                                        </ul> : <span>--</span>
+                                    )
+                            }
                         </div>
                     </>
                 )

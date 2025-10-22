@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class UserProfileController extends Controller
 {
@@ -63,6 +64,8 @@ class UserProfileController extends Controller
                 return $this->updateBio($request, $user);
             case 'location':
                 return $this->updateLocation($request, $user);
+            case 'fav_games':
+                return $this->updateFavoriteGames($request, $user);
         }
     }
 
@@ -130,6 +133,43 @@ class UserProfileController extends Controller
         ])->with('notification', [
             'type' => 'info',
             'message' => "Location updated.",
+            'button' => null
+        ]);
+    }
+
+    protected function updateFavoriteGames(Request $request, User $user)
+    {
+        $validated = $request->validate(['fav_games' => [
+            'list',
+            Rule::doesntContain([null, ''])
+        ]], [
+            'fav_games.doesnt_contain' => 'Field cannot be empty'
+        ]);
+        $meta = $user->meta;
+
+        if (!$meta) { // existing meta is empty
+            $meta = [];
+        }
+        
+        if (! array_key_exists('fav_games', $validated)) { // no fav games input
+            unset($meta['fav_games']);
+        } else {
+            $meta['fav_games'] = $validated['fav_games'];
+        }
+
+        $user->meta = $meta;
+
+        if ($meta == []) { // if existing meta is still empty
+            $user->meta = null;
+        }
+
+        $user->save();
+
+        return to_route('users.about', [
+            'user' => $user
+        ])->with('notification', [
+            'type' => 'info',
+            'message' => "Favorite games updated.",
             'button' => null
         ]);
     }
