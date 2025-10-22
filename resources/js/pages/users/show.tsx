@@ -8,7 +8,7 @@ import { update as updateUser } from '@/actions/App/Http/Controllers/UserProfile
 import { index as showTeams } from '@/routes/users/teams'
 import { NavItem, Team, User, type BreadcrumbItem } from '@/types'
 import { Head, Link } from '@inertiajs/react'
-import { AtSign, Dribbble, EllipsisVertical, Facebook, Figma, Gamepad2, Github, Gitlab, Globe, Hammer, Instagram, Lightbulb, Linkedin, Mail, MapPin, Pencil, PencilRuler, Plus, Rocket, Slack, Trash, Twitch, Twitter, UserPlus, Users, X, Youtube } from 'lucide-react'
+import { AtSign, Dribbble, EllipsisVertical, Facebook, Figma, Gamepad2, Github, Gitlab, Globe, Hammer, Instagram, Lightbulb, Linkedin, LinkIcon, Mail, MapPin, Pencil, PencilRuler, Plus, Rocket, Slack, Trash, Twitch, Twitter, UserPlus, Users, X, Youtube } from 'lucide-react'
 import { Godot, Unity, Unreal } from '@/components/icons/create'
 import {
   DropdownMenu,
@@ -260,7 +260,7 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
     const sectionLabels = [
         {label: 'Overview', name: 'overview'},
         {label: 'Skills & tools', name: 'skills'},
-        {label: 'Personal & releases', name: 'projects'},
+        {label: 'Projects & releases', name: 'projects'},
         {label: 'Contact & socials', name: 'contact'},
     ]
 
@@ -288,7 +288,7 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
 
     const isPro = true
 
-    const { data, setData, patch, wasSuccessful } = useForm<{skills: string[]}>({
+    const skillForm = useForm<{skills: string[], field: string}>({
         field: 'skills',
         skills: user.meta?.skills ?? []
     })
@@ -613,7 +613,7 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
                                     <form 
                                         onSubmit={(e) => {
                                             e.preventDefault()
-                                            patch(updateUser({ user: user.id }).url, {
+                                            skillForm.patch(updateUser({ user: user.id }).url, {
                                                 preserveScroll: true,
                                                 onSuccess: () => setEditing(false)
                                             })
@@ -625,8 +625,8 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
                                                 <h3 className="font-bold flex items-center gap-2"><Lightbulb size={19} /> Skills</h3>
                                                 <EditButton 
                                                     onClick={() => {
-                                                        setData({
-                                                            ...data,
+                                                        skillForm.setData({
+                                                            ...skillForm.data,
                                                             skills: user.meta?.skills ?? []
                                                         })
                                                     }} 
@@ -638,13 +638,13 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
                                         <div className="flex gap-2">
                                         {
                                             editing == 'skills'
-                                            ? (data.skills.sort().map(item => (
+                                            ? (skillForm.data.skills.sort().map(item => (
                                                 <Badge 
                                                     onClick={() => {
                                                         if (editing === 'skills') {
-                                                            setData({
-                                                                ...data,
-                                                                skills: data.skills.filter(d => d !== item)
+                                                            skillForm.setData({
+                                                                ...skillForm.data,
+                                                                skills: skillForm.data.skills.filter(d => d !== item)
                                                             })
                                                         } 
                                                     }} 
@@ -656,9 +656,9 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
                                                 <Badge 
                                                     onClick={() => {
                                                         if (editing === 'skills') {
-                                                            setData({
-                                                                ...data,
-                                                                skills: data.skills.filter(d => d !== item)
+                                                            skillForm.setData({
+                                                                ...skillForm.data,
+                                                                skills: skillForm.data.skills.filter(d => d !== item)
                                                             })
                                                         } 
                                                     }} 
@@ -674,9 +674,9 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
                                             <>
                                                 <SearchBar
                                                     onSelectOption={(option: string) => {
-                                                        const d = {...data}
+                                                        const d = {...skillForm.data}
                                                         d.skills = [ ...d.skills.filter(val => val !== option), option ]
-                                                        setData(d)
+                                                        skillForm.setData(d)
                                                     }} 
                                                     searchOptions={roles.map(({name, items}) => {
                                                         return {
@@ -773,17 +773,29 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
                         }
                         {
                             currentSection == 'contact' && (
-                                <div className="w-full flex justify-between">
+                                <form className="w-full flex justify-between">
                                     <div className="flex flex-col gap-10">
                                         <div className="flex flex-col gap-3">
                                             <div className="flex justify-between items-center">
                                                 <h3 className="font-bold flex items-center gap-2">Contact</h3>
                                             </div>
                                             <div className="flex items-center gap-2">
-                                                <AtSign size={18} /><span>{"ishteharhussain@gmail.com"}</span>
+                                                <AtSign size={18} />
+                                                {
+                                                    editing == 'contact'
+                                                        ? <Input name="email" className="bg-background w-60" />
+                                                        :<span>{"ishteharhussain@gmail.com"}</span>
+                                                        
+                                                }
                                             </div>
                                             <div className="flex items-center gap-2">
-                                                <Globe size={18} /><span>{"https://www.ishteharhussain.com"}</span>
+                                                <Globe size={18} />
+                                                {
+                                                    editing == 'contact'
+                                                        ? <Input name="website" className="bg-background w-60" />
+                                                        :<span>{"https://www.ishteharhussain.com"}</span>
+                                                        
+                                                }
                                             </div>
                                         </div>
                                         <div className="flex flex-col gap-3">
@@ -791,28 +803,73 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
                                                 <h3 className="font-bold flex items-center gap-2">Socials</h3>
                                             </div>
                                             <div className="flex items-center gap-2">
-                                                <Linkedin size={18} /><span>{"/in/ishteharhussain"}</span>
+                                                <Linkedin size={18} />
+                                                {
+                                                    editing == 'contact'
+                                                        ? <Input name="social[]" className="bg-background w-60" />
+                                                        :<span>{"/in/ishteharhussain"}</span>
+                                                        
+                                                }
                                             </div>
                                             <div className="flex items-center gap-2">
-                                                <Instagram size={18} /><span>{"ishteharhussain"}</span>
+                                                <Instagram size={18} />
+                                                {
+                                                    editing == 'contact'
+                                                        ? <Input name="social[]" className="bg-background w-60" />
+                                                        :<span>{"ishteharhussain"}</span>
+                                                        
+                                                }
                                             </div>
                                             <div className="flex items-center gap-2">
-                                                <Dribbble size={18} /><span>{"Kreatank"}</span>
+                                                <Dribbble size={18} />
+                                                {
+                                                    editing == 'contact'
+                                                        ? <Input name="social[]" className="bg-background w-60" />
+                                                        :<span>{"Kreatank"}</span>
+                                                        
+                                                }
                                             </div>
                                             <div className="flex items-center gap-2">
-                                                <Youtube size={18} /><span>{"@XEQTIONR"}</span>
+                                                <Youtube size={18} />
+                                                {
+                                                    editing == 'contact'
+                                                        ? <Input name="social[]" className="bg-background w-60" />
+                                                        :<span>{"@XEQTIONR"}</span>
+                                                        
+                                                }
                                             </div>
                                             <div className="flex items-center gap-2">
-                                                <Facebook size={18} /><span>{"xeqtionr"}</span>
+                                                <Facebook size={18} />
+                                                {
+                                                    editing == 'contact'
+                                                        ? <Input name="social[]" className="bg-background w-60" />
+                                                        :<span>{"xeqtionr"}</span>
+                                                        
+                                                }
                                             </div>
                                             <div className="flex items-center gap-2">
-                                                <Twitter size={18} /><span>{"@XEQTIONR"}</span>
+                                                <Twitter size={18} />
+                                                {
+                                                    editing == 'contact'
+                                                        ? <Input name="social[]" className="bg-background w-60" />
+                                                        :<span>{"@XEQTIONR"}</span>
+                                                        
+                                                }
+                                            </div>
+                                            <div className="flex items-center gap-2">
+                                                <LinkIcon size={18} />
+                                                {
+                                                    editing == 'contact'
+                                                        ? <Input name="social[]" className="bg-background w-60" />
+                                                        :<span>{"@XEQTIONR"}</span>
+                                                        
+                                                }
                                             </div>
                                         </div>
                                         {/* <EditButton /> */}
                                     </div>
-                                    <EditButton />
-                                </div>
+                                    <EditButton what="contact" />
+                                </form>
                             )
                         }
                         </div>

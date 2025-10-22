@@ -178,7 +178,7 @@ class UserProfileController extends Controller
 
     protected function updateSkills(Request $request, User $user)
     {
-        $validated = $request->validate(['skills' => [
+        $validated = $request->validateWithBag('userInfo', ['skills' => [
             'nullable',
             'list',
             Rule::doesntContain([null, ''])

@@ -82,8 +82,8 @@ export function AppHeader({ breadcrumbs = [], maxWidth }: AppHeaderProps) {
 
     return (
         <>
-            <div className=" h-16 sticky top-0 bg-background z-50">
-                <div className="w-full fixed border-b border-sidebar-border/80">
+            <div className="h-16 sticky top-0 z-50">
+                <div className="w-full fixed border-b border-sidebar-border/80 bg-background">
                     <div className={cn(
                         "mx-auto flex items-center px-4",
                         maxWidth
