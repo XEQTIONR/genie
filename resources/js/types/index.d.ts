@@ -65,6 +65,7 @@ export interface User {
     updated_at: string
     meta: {
         fav_games?: string[]
+        skills?: string[]
     } | null
     [key: string]: unknown // This allows for additional properties...
 }

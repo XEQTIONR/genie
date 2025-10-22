@@ -21,7 +21,7 @@ import {
 import { TabbedSectionHeaders } from '@/components/ui/tabbed-sections'
 import { type SharedData } from '@/types'
 import { usePage } from '@inertiajs/react'
-import { Form } from '@inertiajs/react'
+import { Form, useForm } from '@inertiajs/react'
 import { ArrowUpRightIcon } from "lucide-react"
 import {
   Empty,
@@ -65,6 +65,7 @@ import SearchBar from '@/components/ui/search-bar'
 import { Combobox, Option } from '@/components/ui/combobox'
 import { Label } from '@/components/ui/label'
 import axios from 'axios'
+import roles from '@/data/roles'
 
 type ProfileTab = NavItem & {key: string, className?: string}
 
@@ -270,12 +271,6 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
             title: 'Profile',
             href: show({ user: user.username }).url,
         },
-    ];
-
-    const titles = [
-        'Software Engineer',
-        'Full Stack Developer',
-        'Backend Developer'
     ]
 
     const tabs: ProfileTab[] = [
@@ -292,11 +287,27 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
     }
 
     const isPro = true
+
+    const { data, setData, patch, wasSuccessful } = useForm<{skills: string[]}>({
+        field: 'skills',
+        skills: user.meta?.skills ?? []
+    })
     
-    function EditButton({ disabled = false, what } : { disabled?: boolean, what: string }) {
+    function EditButton({ 
+        disabled = false, 
+        what,
+        onClick 
+    } : { 
+        disabled?: boolean 
+        what: string
+        onClick?: () => void 
+    }) {
         return auth.user?.id === user.id && editing !== what 
             ? <Button
                 onClick={() => {
+                    if (onClick) {
+                        onClick()
+                    }
                     setEditing(what)
                 }} 
                 disabled={disabled} 
@@ -350,393 +361,462 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
                 )
             case 'about':
                 return (
-                    <div className="w-full flex border bg-neutral-50 dark:bg-neutral-900 mx-8 rounded-lg">
-            <div className="w-1/4 flex flex-col p-2 gap-2">
-                <h2 className="text-xl font-bold mx-2 mt-2 mb-6">About</h2>
-                
-                {
-                    sectionLabels.map(({label, name}) => <div 
-                        key={name}
-                        onClick={() => setCurrentSection(name)} 
-                        className={cn(
-                            "font-medium py-1 px-2 rounded",
-                            (name == currentSection) ? "bg-accent font-bold" : "cursor-pointer hover:bg-accent" 
-                        )}
-                    >
-                        {label}
-                    </div>)
-                }
-            </div>
-            <Separator orientation="vertical"  />
-            <div className="w-3/4 p-4 flex flex-col gap-8">
-            {
-                currentSection == 'overview' && (
-                    <>
-                        <div className="flex justify-between items-start">
-                            <div className="flex flex-col gap-2 w-full">
-                                <h3 className="font-bold">Status</h3>
-                                { editing === 'status' 
-                                    ? <Form
-                                        errorBag="userInfo"
-                                        action={updateUser({ user: user.id })}
-                                        options={{ 
-                                            preserveScroll: true,
-                                            onSuccess: () => setEditing(false)
-                                        }} 
-                                        className="flex grow flex-col gap-2"
-                                    >
-                                    {
-                                        ({ errors }) => (
-                                            <>
-                                                <Input type="hidden" name="field" value="status" />
-                                                <Input autoFocus defaultValue={user.status ?? ""} name="status" maxLength={50} className="dark:bg-background bg-white relative -left-0.5" />
-                                                <FieldDescription className="text-destructive-foreground">{errors?.status}</FieldDescription>
-
-                                                <div className="flex gap-2">
-                                                    <Button
-                                                        type="submit" 
-                                                        className="cursor-pointer text-neutral-900 bg-neutral-200 hover:bg-[#e1e1e1] dark:hover:bg-neutral-100" 
-                                                        size="sm"
-                                                    >
-                                                        Submit
-                                                    </Button>
-                                                    <Button className="cursor-pointer" onClick={() => setEditing(false)} variant="destructive" size="sm">Cancel</Button>
-                                                </div>
-                                            </>
-                                        )
-                                    }
-                                    </Form>
-                                    : <div>{user.status ?? "--"}</div>
-                                }
-                            </div>
-                            <EditButton what="status" />
-                        </div>
-                        <div className="flex justify-between items-start">
-                            <div className="flex flex-col gap-2 w-full">
-                                <h3 className="font-bold">Bio</h3>
-                                { editing === 'bio' 
-                                    ? <Form
-                                        errorBag="userInfo"
-                                        action={updateUser({ user: user.id })}
-                                        options={{ 
-                                            preserveScroll: true,
-                                            onSuccess: () => setEditing(false)
-                                        }} 
-                                        className="flex grow flex-col gap-2"
-                                    >
-                                    {
-                                        ({ errors }) => (
-                                            <>
-                                                <Input type="hidden" name="field" value="bio" />
-                                                <Textarea autoFocus defaultValue={user.bio ?? ""} name="bio" maxLength={500} className="dark:bg-background bg-white relative -left-0.5 min-h-30" />
-                                                {/* <Input autoFocus defaultValue={user.bio ?? ""} name="bio" maxLength={50} className="dark:bg-background bg-white relative -left-0.5" /> */}
-                                                <FieldDescription className="text-destructive-foreground">{errors?.bio}</FieldDescription>
-
-                                                <div className="flex gap-2">
-                                                    <Button
-                                                        type="submit" 
-                                                        className="cursor-pointer text-neutral-900 bg-neutral-200 hover:bg-[#e1e1e1] dark:hover:bg-neutral-100" 
-                                                        size="sm"
-                                                    >
-                                                        Submit
-                                                    </Button>
-                                                    <Button className="cursor-pointer" onClick={() => setEditing(false)} variant="destructive" size="sm">Cancel</Button>
-                                                </div>
-                                            </>
-                                        )
-                                    }
-                                    </Form>
-                                    : <div>{user.bio ? <RenderMultilineText text={user.bio} /> : "--"}</div>
-                                }
-                            </div>
-                            <EditButton what="bio" />
-                        </div>
-                        {
-                            editing === 'location'
-                            ? (
-                                <Form
-                                    errorBag="userInfo" 
-                                    className="flex flex-col gap-1"
-                                    action={updateUser({ user: user.id })}
-                                    options={{ 
-                                        preserveScroll: true,
-                                        onSuccess: () => setEditing(false)
-                                    }}
+                    <div className="w-full flex flex-col md:flex-row border bg-neutral-50 dark:bg-neutral-900 md:mx-8 rounded-lg">
+                        <div className="w-full md:w-1/4 flex flex-col p-2 gap-2 mb-2">
+                            <h2 className="text-xl font-bold mx-2 mt-2 mb-6">About</h2>
+                            
+                            {
+                                sectionLabels.map(({label, name}) => <div 
+                                    key={name}
+                                    onClick={() => setCurrentSection(name)} 
+                                    className={cn(
+                                        "font-medium py-1 px-2 rounded",
+                                        (name == currentSection) ? "bg-accent font-bold" : "cursor-pointer hover:bg-accent" 
+                                    )}
                                 >
-                                {
-                                    ({ errors }) => (<>    
-                                    <Input type="hidden" name="field" value="location" />
-                                    <h3 className="font-bold">Location</h3>
-                                    <div className="w-full flex gap-2 -ml-1 mt-2">
-                                        <div className="flex flex-col gap-2">
-                                            <Label className="ml-1">City</Label>
-                                            <Input defaultValue={user.location?.city} name="city" className="dark bg-background" />
+                                    {label}
+                                </div>)
+                            }
+                        </div>
+                        <Separator className="hidden md:inline" orientation="vertical" />
+                        <Separator className="inline md:hidden" />
+                        <div className="w-full md:w-3/4 p-4 flex flex-col gap-8">
+                        {
+                            currentSection == 'overview' && (
+                                <>
+                                    <div className="flex justify-between items-start">
+                                        <div className="flex flex-col gap-2 w-full">
+                                            <h3 className="font-bold">Status</h3>
+                                            { editing === 'status' 
+                                                ? <Form
+                                                    errorBag="userInfo"
+                                                    action={updateUser({ user: user.id })}
+                                                    options={{ 
+                                                        preserveScroll: true,
+                                                        onSuccess: () => setEditing(false)
+                                                    }} 
+                                                    className="flex grow flex-col gap-2"
+                                                >
+                                                {
+                                                    ({ errors }) => (
+                                                        <>
+                                                            <Input type="hidden" name="field" value="status" />
+                                                            <Input autoFocus defaultValue={user.status ?? ""} name="status" maxLength={50} className="dark:bg-background bg-white relative -left-0.5" />
+                                                            <FieldDescription className="text-destructive-foreground">{errors?.status}</FieldDescription>
+
+                                                            <div className="flex gap-2">
+                                                                <Button
+                                                                    type="submit" 
+                                                                    className="cursor-pointer text-neutral-900 bg-neutral-200 hover:bg-[#e1e1e1] dark:hover:bg-neutral-100" 
+                                                                    size="sm"
+                                                                >
+                                                                    Submit
+                                                                </Button>
+                                                                <Button className="cursor-pointer" onClick={() => setEditing(false)} variant="destructive" size="sm">Cancel</Button>
+                                                            </div>
+                                                        </>
+                                                    )
+                                                }
+                                                </Form>
+                                                : <div>{user.status ?? "--"}</div>
+                                            }
                                         </div>
-                                        <div className="flex flex-col gap-2">
-                                            <Label className="ml-1">Country</Label>
-                                            <EditLocation defaultValue={user.location?.country} />
+                                        <EditButton what="status" />
+                                    </div>
+                                    <div className="flex justify-between items-start">
+                                        <div className="flex flex-col gap-2 w-full">
+                                            <h3 className="font-bold">Bio</h3>
+                                            { editing === 'bio' 
+                                                ? <Form
+                                                    errorBag="userInfo"
+                                                    action={updateUser({ user: user.id })}
+                                                    options={{ 
+                                                        preserveScroll: true,
+                                                        onSuccess: () => setEditing(false)
+                                                    }} 
+                                                    className="flex grow flex-col gap-2"
+                                                >
+                                                {
+                                                    ({ errors }) => (
+                                                        <>
+                                                            <Input type="hidden" name="field" value="bio" />
+                                                            <Textarea autoFocus defaultValue={user.bio ?? ""} name="bio" maxLength={500} className="dark:bg-background bg-white relative -left-0.5 min-h-30" />
+                                                            {/* <Input autoFocus defaultValue={user.bio ?? ""} name="bio" maxLength={50} className="dark:bg-background bg-white relative -left-0.5" /> */}
+                                                            <FieldDescription className="text-destructive-foreground">{errors?.bio}</FieldDescription>
+
+                                                            <div className="flex gap-2">
+                                                                <Button
+                                                                    type="submit" 
+                                                                    className="cursor-pointer text-neutral-900 bg-neutral-200 hover:bg-[#e1e1e1] dark:hover:bg-neutral-100" 
+                                                                    size="sm"
+                                                                >
+                                                                    Submit
+                                                                </Button>
+                                                                <Button className="cursor-pointer" onClick={() => setEditing(false)} variant="destructive" size="sm">Cancel</Button>
+                                                            </div>
+                                                        </>
+                                                    )
+                                                }
+                                                </Form>
+                                                : <div>{user.bio ? <RenderMultilineText text={user.bio} /> : "--"}</div>
+                                            }
                                         </div>
+                                        <EditButton what="bio" />
                                     </div>
-                                    <FieldDescription className="text-destructive-foreground">{errors.city}</FieldDescription>
-                                    <FieldDescription className="text-destructive-foreground">{errors.country}</FieldDescription>
-                                    <div className="flex gap-2 mt-1.5">
-                                        <Button
-                                            type="submit" 
-                                            className="cursor-pointer text-neutral-900 bg-neutral-200 hover:bg-[#e1e1e1] dark:hover:bg-neutral-100" 
-                                            size="sm"
-                                        >
-                                            Submit
-                                        </Button>
-                                        <Button className="cursor-pointer" onClick={() => setEditing(false)} variant="destructive" size="sm">Cancel</Button>
-                                    </div>
-                                </>)}
-                                </Form>
-                            ) : (
-                                <div className="flex justify-between items-center">
-                                    <div className="flex items-center gap-2">
-                                        <MapPin size={19} /> {
-                                            user.location
-                                            ? <>Lives in <span className="font-bold">{renderLocation(user.location)}</span></>
-                                            : <span className="italic">Location not specified</span>
+                                    {
+                                        editing === 'location'
+                                        ? (
+                                            <Form
+                                                errorBag="userInfo" 
+                                                className="flex flex-col gap-1"
+                                                action={updateUser({ user: user.id })}
+                                                options={{ 
+                                                    preserveScroll: true,
+                                                    onSuccess: () => setEditing(false)
+                                                }}
+                                            >
+                                            {
+                                                ({ errors }) => (<>    
+                                                <Input type="hidden" name="field" value="location" />
+                                                <h3 className="font-bold">Location</h3>
+                                                <div className="w-full flex gap-2 -ml-1 mt-2">
+                                                    <div className="flex flex-col gap-2">
+                                                        <Label className="ml-1">City</Label>
+                                                        <Input defaultValue={user.location?.city} name="city" className="dark bg-background" />
+                                                    </div>
+                                                    <div className="flex flex-col gap-2">
+                                                        <Label className="ml-1">Country</Label>
+                                                        <EditLocation defaultValue={user.location?.country} />
+                                                    </div>
+                                                </div>
+                                                <FieldDescription className="text-destructive-foreground">{errors.city}</FieldDescription>
+                                                <FieldDescription className="text-destructive-foreground">{errors.country}</FieldDescription>
+                                                <div className="flex gap-2 mt-1.5">
+                                                    <Button
+                                                        type="submit" 
+                                                        className="cursor-pointer text-neutral-900 bg-neutral-200 hover:bg-[#e1e1e1] dark:hover:bg-neutral-100" 
+                                                        size="sm"
+                                                    >
+                                                        Submit
+                                                    </Button>
+                                                    <Button className="cursor-pointer" onClick={() => setEditing(false)} variant="destructive" size="sm">Cancel</Button>
+                                                </div>
+                                            </>)}
+                                            </Form>
+                                        ) : (
+                                            <div className="flex justify-between items-center">
+                                                <div className="flex items-center gap-2">
+                                                    <MapPin size={19} /> {
+                                                        user.location
+                                                        ? <>Lives in <span className="font-bold">{renderLocation(user.location)}</span></>
+                                                        : <span className="italic">Location not specified</span>
+                                                    }
+                                                </div>
+                                                <EditButton what="location" />
+                                            </div>
+                                        )
+                                    }
+                                    
+                                    <div className="flex flex-col gap-3">
+                                        <div className="flex justify-between items-center min-h-10">
+                                            <h3 className="font-bold flex items-center gap-2"><Gamepad2 size={20} /> Favorite games</h3>
+                                            <EditButton what="fav_games" />
+                                        </div>
+                                        {
+                                            editing === 'fav_games'
+                                                ? (
+                                                    <Form
+                                                        errorBag="userInfo" 
+                                                        className="flex flex-col gap-1"
+                                                        action={updateUser({ user: user.id })}
+                                                        options={{ 
+                                                            preserveScroll: true,
+                                                            onSuccess: () => setEditing(false)
+                                                        }}
+                                                    >
+                                                    {
+                                                        ({ errors }) => (<>    
+                                                            <Input type="hidden" name="field" value="fav_games" />
+                                                            <div className="flex flex-col gap-2">
+                                                                <ul>
+                                                                {
+                                                                    favGames.map((game : string, index: number) => (
+                                                                        <li className="flex gap-1.5 mb-1">
+                                                                            <Input
+                                                                                value={game}
+                                                                                onChange={({target}) => setFavGames((v) => {
+                                                                                    const temp = [...v]
+                                                                                    temp[index] = target.value
+                                                                                    return temp
+                                                                                })}
+                                                                                name="fav_games[]"
+                                                                                className="bg-background"
+                                                                            />
+                                                                            <Button
+                                                                                type="button"
+                                                                                className="cursor-pointer"
+                                                                                onClick={() => {setFavGames(() => favGames.filter((_, i) => i !== index))}}
+                                                                                variant="ghost" 
+                                                                                size="icon"
+                                                                            >
+                                                                                <Trash />
+                                                                            </Button>
+                                                                        </li>
+                                                                    ))
+                                                                }
+                                                                </ul>
+                                                            </div>
+                                                            <FieldDescription className="text-destructive-foreground">{errors.fav_games}</FieldDescription>
+                                                            <div className="flex justify-between mt-1.5">
+                                                                <Button className="cursor-pointer" type="button" onClick={() => setFavGames([...favGames, ''])} variant="ghost" size="sm"><Plus />Add another</Button>
+                                                                <div className="flex gap-2">
+                                                                    <Button
+                                                                        type="submit" 
+                                                                        className="cursor-pointer text-neutral-900 bg-neutral-200 hover:bg-[#e1e1e1] dark:hover:bg-neutral-100" 
+                                                                        size="sm"
+                                                                    >
+                                                                        Submit
+                                                                    </Button>
+                                                                    <Button 
+                                                                        className="cursor-pointer" 
+                                                                        onClick={() => {
+                                                                            setFavGames(user.meta?.fav_games ?? [])
+                                                                            setEditing(false)
+                                                                        }} 
+                                                                        variant="destructive" 
+                                                                        size="sm"
+                                                                    >
+                                                                        Cancel
+                                                                    </Button>
+                                                                </div>
+                                                            </div>
+                                                        </>)
+                                                    }
+                                                    </Form>
+                                                ) : (
+                                                    favGames.length > 1 || (favGames.length > 0 && favGames[0] !== "")  ? <ul className="flex gap-2">
+                                                    {
+                                                        favGames.map((game, index) => (
+                                                            index == (favGames.length - 1) ? <li>{game}</li> : <li>{game},</li>
+                                                        ))
+                                                    }
+                                                    </ul> : <span>--</span>
+                                                )
                                         }
                                     </div>
-                                    <EditButton what="location" />
+                                </>
+                            )
+                        }
+                        {
+                            currentSection == 'skills' && (
+                                <>
+                                    <form 
+                                        onSubmit={(e) => {
+                                            e.preventDefault()
+                                            patch(updateUser({ user: user.id }).url, {
+                                                preserveScroll: true,
+                                                onSuccess: () => setEditing(false)
+                                            })
+                                        }} 
+                                        className="flex flex-col gap-3"
+                                    >
+                                        <div className="flex flex-col gap-0">
+                                            <div className="flex justify-between items-center">
+                                                <h3 className="font-bold flex items-center gap-2"><Lightbulb size={19} /> Skills</h3>
+                                                <EditButton 
+                                                    onClick={() => {
+                                                        setData({
+                                                            ...data,
+                                                            skills: user.meta?.skills ?? []
+                                                        })
+                                                    }} 
+                                                    what='skills'
+                                                />
+                                            </div>
+                                            <span className="text-xs">Roles that I have experience working in</span>
+                                        </div>
+                                        <div className="flex gap-2">
+                                        {
+                                            editing == 'skills'
+                                            ? (data.skills.sort().map(item => (
+                                                <Badge 
+                                                    onClick={() => {
+                                                        if (editing === 'skills') {
+                                                            setData({
+                                                                ...data,
+                                                                skills: data.skills.filter(d => d !== item)
+                                                            })
+                                                        } 
+                                                    }} 
+                                                    className="text-sm cursor-pointer"
+                                                >
+                                                    {item} { editing === 'skills' && <X /> }
+                                                </Badge>
+                                            ))) : ((user.meta?.skills && (user.meta.skills.length > 0)) ? user.meta?.skills.sort().map(item => (
+                                                <Badge 
+                                                    onClick={() => {
+                                                        if (editing === 'skills') {
+                                                            setData({
+                                                                ...data,
+                                                                skills: data.skills.filter(d => d !== item)
+                                                            })
+                                                        } 
+                                                    }} 
+                                                    className="text-sm"
+                                                >
+                                                    {item} { editing === 'skills' && <X /> }
+                                                </Badge>
+                                            )) : <span className="italic">No skills specified</span>)
+                                        }
+                                        </div>
+                                        {
+                                            editing == 'skills' && 
+                                            <>
+                                                <SearchBar
+                                                    onSelectOption={(option: string) => {
+                                                        const d = {...data}
+                                                        d.skills = [ ...d.skills.filter(val => val !== option), option ]
+                                                        setData(d)
+                                                    }} 
+                                                    searchOptions={roles.map(({name, items}) => {
+                                                        return {
+                                                            heading: name,
+                                                            options: items.map((item) => {
+                                                                return {
+                                                                    label: item,
+                                                                    value: item
+                                                                }
+                                                            })
+                                                        }
+                                                    })}
+                                                />
+                                                <div className="flex gap-2">
+                                                    <Button
+                                                        type="submit" 
+                                                        className="cursor-pointer text-neutral-900 bg-neutral-200 hover:bg-[#e1e1e1] dark:hover:bg-neutral-100" 
+                                                        size="sm"
+                                                    >
+                                                        Submit
+                                                    </Button>
+                                                    <Button
+                                                        onClick={() => setEditing(false)} 
+                                                        className="cursor-pointer" 
+                                                        variant="destructive" 
+                                                        size="sm"
+                                                    >
+                                                        Cancel
+                                                    </Button>
+                                                </div>
+                                            </>
+                                        }
+                                    </form>
+
+                                    <div className="flex flex-col gap-3">
+                                        <div className="flex justify-between items-center">
+                                            <h3 className="font-bold flex items-center gap-2"><Hammer size={18} /> Tools</h3>
+                                            <EditButton />
+                                        </div>
+                                        <div className="flex gap-1.5">
+                                            <div className="size-16 rounded-md flex justify-center items-center bg-neutral-100 border dark:border-neutral-700  dark:bg-neutral-900">
+                                                <Github size={25} />
+                                            </div>
+                                            <div className="size-16 rounded-md flex justify-center items-center bg-neutral-100 border dark:border-neutral-700  dark:bg-neutral-900">
+                                                <Gitlab size={27} />
+                                            </div>
+                                            {/* <div className="size-16 rounded-md flex justify-center items-center bg-neutral-100 border dark:border-neutral-700  dark:bg-neutral-900">
+                                                <Dribbble  size={25} />
+                                            </div> */}
+                                            <div className="size-16 rounded-md flex justify-center items-center bg-neutral-100 border dark:border-neutral-700  dark:bg-neutral-900">
+                                                <Godot strokeWidth={1.1} size={39} />
+                                            </div>
+                                            <div className="size-16 rounded-md flex justify-center items-center bg-neutral-100 border dark:border-neutral-700  dark:bg-neutral-900">
+                                                <Unity strokeWidth={1.5} size={32} />
+                                            </div>
+                                            <div className="size-16 rounded-md flex justify-center items-center bg-neutral-100 border dark:border-neutral-700  dark:bg-neutral-900">
+                                                <Unreal strokeWidth={1.5} size={28} />
+                                            </div>
+                                            <div className="size-16 rounded-md flex justify-center items-center bg-neutral-100 border dark:border-neutral-700  dark:bg-neutral-900">
+                                                <Figma size={23} />
+                                            </div>
+                                        </div>
+                                        {/* <SearchBar searchOptions={[]} /> */}
+                                    </div>
+                                </>
+                            )
+                        }
+                        {
+                            currentSection == 'projects' && (
+                                <div className="w-full flex flex-col">
+                                    <div className="flex flex-col gap-3">
+                                        <div className="flex flex-col gap-0">
+                                            <div className="flex justify-between items-center">
+                                                <h3 className="font-bold flex items-center gap-2"><PencilRuler size={18} />Projects</h3>
+                                                <EditButton disabled={true} />
+                                            </div>
+                                            <span className="text-xs">Current game development projects you are working on that have not been released</span>
+                                        </div>
+                                        <NoProjects />
+                                    </div>
+                                    <Separator className="mb-5" />
+                                    <div className="flex flex-col gap-3">
+                                        <div className="flex flex-col gap-0">
+                                            <div className="flex justify-between items-center">
+                                                <h3 className="font-bold flex items-center gap-2"><Rocket size={18} />Releases</h3>
+                                                <EditButton disabled={true} />
+                                            </div>
+                                            <span className="text-xs">Completed game titles by you that are available to the public</span>
+                                        </div>
+                                        <NoReleases />
+                                    </div>
                                 </div>
                             )
                         }
-                        
-                        <div className="flex flex-col gap-3">
-                            <div className="flex justify-between items-center min-h-10">
-                                <h3 className="font-bold flex items-center gap-2"><Gamepad2 size={20} /> Favorite games</h3>
-                                <EditButton what="fav_games" />
-                            </div>
-                            {
-                                editing === 'fav_games'
-                                    ? (
-                                        <Form
-                                            errorBag="userInfo" 
-                                            className="flex flex-col gap-1"
-                                            action={updateUser({ user: user.id })}
-                                            options={{ 
-                                                preserveScroll: true,
-                                                onSuccess: () => setEditing(false)
-                                            }}
-                                        >
-                                        {
-                                            ({ errors }) => (<>    
-                                                <Input type="hidden" name="field" value="fav_games" />
-                                                <div className="flex flex-col gap-2">
-                                                    <ul>
-                                                    {
-                                                        favGames.map((game : string, index: number) => (
-                                                            <li className="flex gap-1.5 mb-1">
-                                                                <Input
-                                                                    value={game}
-                                                                    onChange={({target}) => setFavGames((v) => {
-                                                                        const temp = [...v]
-                                                                        temp[index] = target.value
-                                                                        return temp
-                                                                    })}
-                                                                    name="fav_games[]"
-                                                                    className="bg-background"
-                                                                />
-                                                                <Button
-                                                                    type="button"
-                                                                    className="cursor-pointer"
-                                                                    onClick={() => {setFavGames(() => favGames.filter((_, i) => i !== index))}}
-                                                                    variant="ghost" 
-                                                                    size="icon"
-                                                                >
-                                                                    <Trash />
-                                                                </Button>
-                                                            </li>
-                                                        ))
-                                                    }
-                                                    </ul>
-                                                </div>
-                                                <FieldDescription className="text-destructive-foreground">{errors.fav_games}</FieldDescription>
-                                                <div className="flex justify-between mt-1.5">
-                                                    <Button className="cursor-pointer" type="button" onClick={() => setFavGames([...favGames, ''])} variant="ghost" size="sm"><Plus />Add another</Button>
-                                                    <div className="flex gap-2">
-                                                        <Button
-                                                            type="submit" 
-                                                            className="cursor-pointer text-neutral-900 bg-neutral-200 hover:bg-[#e1e1e1] dark:hover:bg-neutral-100" 
-                                                            size="sm"
-                                                        >
-                                                            Submit
-                                                        </Button>
-                                                        <Button 
-                                                            className="cursor-pointer" 
-                                                            onClick={() => {
-                                                                setFavGames(user.meta?.fav_games ?? [])
-                                                                setEditing(false)
-                                                            }} 
-                                                            variant="destructive" 
-                                                            size="sm"
-                                                        >
-                                                            Cancel
-                                                        </Button>
-                                                    </div>
-                                                </div>
-                                            </>)
-                                        }
-                                        </Form>
-                                    ) : (
-                                        favGames.length > 1 || (favGames.length > 0 && favGames[0] !== "")  ? <ul className="flex gap-2">
-                                        {
-                                            favGames.map((game, index) => (
-                                                index == (favGames.length - 1) ? <li>{game}</li> : <li>{game},</li>
-                                            ))
-                                        }
-                                        </ul> : <span>--</span>
-                                    )
-                            }
-                        </div>
-                    </>
-                )
-            }
-            {
-                currentSection == 'skills' && (
-                    <>
-                        <div className="flex flex-col gap-3">
-                            <div className="flex flex-col gap-0">
-                                <div className="flex justify-between items-center">
-                                    <h3 className="font-bold flex items-center gap-2"><Lightbulb size={19} /> Skills</h3>
+                        {
+                            currentSection == 'contact' && (
+                                <div className="w-full flex justify-between">
+                                    <div className="flex flex-col gap-10">
+                                        <div className="flex flex-col gap-3">
+                                            <div className="flex justify-between items-center">
+                                                <h3 className="font-bold flex items-center gap-2">Contact</h3>
+                                            </div>
+                                            <div className="flex items-center gap-2">
+                                                <AtSign size={18} /><span>{"ishteharhussain@gmail.com"}</span>
+                                            </div>
+                                            <div className="flex items-center gap-2">
+                                                <Globe size={18} /><span>{"https://www.ishteharhussain.com"}</span>
+                                            </div>
+                                        </div>
+                                        <div className="flex flex-col gap-3">
+                                            <div className="flex justify-between items-center">
+                                                <h3 className="font-bold flex items-center gap-2">Socials</h3>
+                                            </div>
+                                            <div className="flex items-center gap-2">
+                                                <Linkedin size={18} /><span>{"/in/ishteharhussain"}</span>
+                                            </div>
+                                            <div className="flex items-center gap-2">
+                                                <Instagram size={18} /><span>{"ishteharhussain"}</span>
+                                            </div>
+                                            <div className="flex items-center gap-2">
+                                                <Dribbble size={18} /><span>{"Kreatank"}</span>
+                                            </div>
+                                            <div className="flex items-center gap-2">
+                                                <Youtube size={18} /><span>{"@XEQTIONR"}</span>
+                                            </div>
+                                            <div className="flex items-center gap-2">
+                                                <Facebook size={18} /><span>{"xeqtionr"}</span>
+                                            </div>
+                                            <div className="flex items-center gap-2">
+                                                <Twitter size={18} /><span>{"@XEQTIONR"}</span>
+                                            </div>
+                                        </div>
+                                        {/* <EditButton /> */}
+                                    </div>
                                     <EditButton />
                                 </div>
-                                <span className="text-xs">Roles that I have experience working in</span>
-                            </div>
-                            <div className="flex gap-2">
-                                <Badge className="text-sm">Level Designer</Badge>
-                                <Badge className="text-sm">Gameplay Programmer <X /></Badge>
-                            </div>
-                            <SearchBar searchOptions={[
-                                {
-                                    heading: 'Heading1',
-                                    options: [
-                                        {label: 'Xabel1', value: 1},
-                                        {label: 'xabel2', value: 2},
-                                        {label: 'Label3', value: 3},
-                                    ]
-                                },
-                                {
-                                    heading: 'Heading2',
-                                    options: [
-                                        {label: 'Xabel4', value: 1},
-                                        {label: 'xabel5', value: 2},
-                                        {label: 'Label6', value: 3},
-                                    ]
-                                }
-                                
-                            ]} />
-                        </div>
-
-                        <div className="flex flex-col gap-3">
-                            <div className="flex justify-between items-center">
-                                <h3 className="font-bold flex items-center gap-2"><Hammer size={18} /> Tools</h3>
-                                <EditButton />
-                            </div>
-                            <div className="flex gap-1.5">
-                                <div className="size-16 rounded-md flex justify-center items-center bg-neutral-100 border dark:border-neutral-700  dark:bg-neutral-900">
-                                    <Github size={25} />
-                                </div>
-                                <div className="size-16 rounded-md flex justify-center items-center bg-neutral-100 border dark:border-neutral-700  dark:bg-neutral-900">
-                                    <Gitlab size={27} />
-                                </div>
-                                {/* <div className="size-16 rounded-md flex justify-center items-center bg-neutral-100 border dark:border-neutral-700  dark:bg-neutral-900">
-                                    <Dribbble  size={25} />
-                                </div> */}
-                                <div className="size-16 rounded-md flex justify-center items-center bg-neutral-100 border dark:border-neutral-700  dark:bg-neutral-900">
-                                    <Godot strokeWidth={1.1} size={39} />
-                                </div>
-                                <div className="size-16 rounded-md flex justify-center items-center bg-neutral-100 border dark:border-neutral-700  dark:bg-neutral-900">
-                                    <Unity strokeWidth={1.5} size={32} />
-                                </div>
-                                <div className="size-16 rounded-md flex justify-center items-center bg-neutral-100 border dark:border-neutral-700  dark:bg-neutral-900">
-                                    <Unreal strokeWidth={1.5} size={28} />
-                                </div>
-                                <div className="size-16 rounded-md flex justify-center items-center bg-neutral-100 border dark:border-neutral-700  dark:bg-neutral-900">
-                                    <Figma size={23} />
-                                </div>
-                            </div>
-                            {/* <SearchBar searchOptions={[]} /> */}
-                        </div>
-                    </>
-                )
-            }
-            {
-                currentSection == 'projects' && (
-                    <div className="w-full flex flex-col">
-                        <div className="flex flex-col gap-3">
-                            <div className="flex flex-col gap-0">
-                                <div className="flex justify-between items-center">
-                                    <h3 className="font-bold flex items-center gap-2"><PencilRuler size={18} />Projects</h3>
-                                    <EditButton disabled={true} />
-                                </div>
-                                <span className="text-xs">Current game development projects you are working on that have not been released</span>
-                            </div>
-                            <NoProjects />
-                        </div>
-                        <Separator className="mb-5" />
-                        <div className="flex flex-col gap-3">
-                            <div className="flex flex-col gap-0">
-                                <div className="flex justify-between items-center">
-                                    <h3 className="font-bold flex items-center gap-2"><Rocket size={18} />Releases</h3>
-                                    <EditButton disabled={true} />
-                                </div>
-                                <span className="text-xs">Completed game titles by you that are available to the public</span>
-                            </div>
-                            <NoReleases />
+                            )
+                        }
                         </div>
                     </div>
-                )
-            }
-            {
-                currentSection == 'contact' && (
-                    <div className="w-full flex justify-between">
-                        <div className="flex flex-col gap-10">
-                            <div className="flex flex-col gap-3">
-                                <div className="flex justify-between items-center">
-                                    <h3 className="font-bold flex items-center gap-2">Contact</h3>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <AtSign size={18} /><span>{"ishteharhussain@gmail.com"}</span>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <Globe size={18} /><span>{"https://www.ishteharhussain.com"}</span>
-                                </div>
-                            </div>
-                            <div className="flex flex-col gap-3">
-                                <div className="flex justify-between items-center">
-                                    <h3 className="font-bold flex items-center gap-2">Socials</h3>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <Linkedin size={18} /><span>{"/in/ishteharhussain"}</span>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <Instagram size={18} /><span>{"ishteharhussain"}</span>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <Dribbble size={18} /><span>{"Kreatank"}</span>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <Youtube size={18} /><span>{"@XEQTIONR"}</span>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <Facebook size={18} /><span>{"xeqtionr"}</span>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <Twitter size={18} /><span>{"@XEQTIONR"}</span>
-                                </div>
-                            </div>
-                            {/* <EditButton /> */}
-                        </div>
-                        <EditButton />
-                    </div>
-                )
-            }
-            </div>
-        </div>
                 )
             default: 
                 return null
@@ -805,7 +885,7 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
                         </div>
                         <div className="flex flex-wrap gap-4 mt-4">
                         {
-                            titles.map((title) => (
+                            user.meta?.skills?.map((title) => (
                                 <span className="bg-neutral-100 dark:bg-neutral-900 text-neutral-500 px-4 py-2 rounded-full font-semibold">{title}</span>
                             ))
                         }

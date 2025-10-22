@@ -66,6 +66,8 @@ class UserProfileController extends Controller
                 return $this->updateLocation($request, $user);
             case 'fav_games':
                 return $this->updateFavoriteGames($request, $user);
+            case 'skills':
+                return $this->updateSkills($request, $user);
         }
     }
 
@@ -97,8 +99,8 @@ class UserProfileController extends Controller
 
     protected function updateBio(Request $request, User $user)
     {
-        $validated = $request->validate([
-            'bio' => 'nullable|string|max:500'
+        $validated = $request->validateWithBag('userInfo', [
+            'bio' => 'nullable|string|max:500|min:5'
         ]);
 
         $user->bio = $validated['bio'];
@@ -115,7 +117,7 @@ class UserProfileController extends Controller
 
     protected function updateLocation(Request $request, User $user)
     {
-        $validated = $request->validate([
+        $validated = $request->validateWithBag('userInfo', [
             'city' => 'nullable|string|max:20',
             'country' => 'nullable|string|required_with:city',
         ]);
@@ -139,7 +141,7 @@ class UserProfileController extends Controller
 
     protected function updateFavoriteGames(Request $request, User $user)
     {
-        $validated = $request->validate(['fav_games' => [
+        $validated = $request->validateWithBag('userInfo', ['fav_games' => [
             'list',
             Rule::doesntContain([null, ''])
         ]], [
@@ -170,6 +172,43 @@ class UserProfileController extends Controller
         ])->with('notification', [
             'type' => 'info',
             'message' => "Favorite games updated.",
+            'button' => null
+        ]);
+    }
+
+    protected function updateSkills(Request $request, User $user)
+    {
+        $validated = $request->validate(['skills' => [
+            'nullable',
+            'list',
+            Rule::doesntContain([null, ''])
+        ]]);
+
+        $meta = $user->meta;
+
+        if (!$meta) { // existing meta is empty
+            $meta = [];
+        }
+        
+        if (! array_key_exists('skills', $validated)) { // no fav games input
+            unset($meta['skills']);
+        } else {
+            $meta['skills'] = $validated['skills'];
+        }
+
+        $user->meta = $meta;
+
+        if ($meta == []) { // if existing meta is still empty
+            $user->meta = null;
+        }
+
+        $user->save();
+
+        return to_route('users.about', [
+            'user' => $user
+        ])->with('notification', [
+            'type' => 'info',
+            'message' => "Skills updated.",
             'button' => null
         ]);
     }

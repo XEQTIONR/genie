@@ -62,7 +62,7 @@ function TabbedSectionHeaders({
                             ? <span className="pt-2 pb-1.5 mx-2 border-b-2 border-foreground text-nowrap">{title}</span>
                             : <Link
                                 onClick={onTabChange} 
-                                preserveScroll 
+                                preserveScroll
                                 className={cn(
                                     className,
                                     "py-2 rounded-md flex items-center text-nowrap",
