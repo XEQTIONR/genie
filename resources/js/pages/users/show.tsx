@@ -58,6 +58,7 @@ import {
   ItemMedia,
   ItemTitle,
 } from "@/components/ui/item"
+import ProjectCard from '@/components/project-card'
 import { Separator } from '@/components/ui/separator'
 import { cn } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
@@ -69,7 +70,21 @@ import roles from '@/data/roles'
 
 type ProfileTab = NavItem & {key: string, className?: string}
 
-function RenderMultilineText({ text } : { text: string}) {
+const projects = [
+    { name: 'zombie-arg', platforms: ['ps', 'xbox', 'pc']},
+    { name: 'tenacious-aim', platforms: ['pc', 'mac']},
+    { name: 'social-you', platforms: ['pc', 'mac', 'xbox', 'ps', 'switch']},
+]
+
+const releases = [
+    { name: 'Rainbow Siege 6', platforms: ['ps', 'xbox', 'pc']},
+    { name: 'Warcraft III', platforms: ['pc', 'mac']},
+    { name: 'Dont Starve', platforms: ['pc', 'mac', 'xbox', 'ps', 'switch']},
+    { name: 'Candy Crush', platforms: ['ios', 'android']},
+    { name: 'Darkest Dungeon', platforms: ['pc', 'mac', 'ps', 'xbox', 'switch', 'ios', 'android']},
+]
+
+function RenderMultilineText({ text } : { text: string }) {
     const paragraphs = text.split('\n');
 
     return <>
@@ -361,7 +376,8 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
                 )
             case 'about':
                 return (
-                    <div className="w-full flex flex-col md:flex-row border bg-neutral-50 dark:bg-neutral-900 md:mx-8 rounded-lg">
+                    // <div className="w-full flex flex-col md:flex-row border bg-neutral-50 dark:bg-neutral-900 md:mx-8 rounded-lg">
+                    <div className="w-full flex flex-col md:flex-row md:mx-8 rounded-lg">
                         <div className="w-full md:w-1/4 flex flex-col p-2 gap-2 mb-2">
                             <h2 className="text-xl font-bold mx-2 mt-2 mb-6">About</h2>
                             
@@ -750,23 +766,38 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
                                     <div className="flex flex-col gap-3">
                                         <div className="flex flex-col gap-0">
                                             <div className="flex justify-between items-center">
-                                                <h3 className="font-bold flex items-center gap-2"><PencilRuler size={18} />Projects</h3>
-                                                <EditButton disabled={true} />
+                                                <h3 className="font-bold flex items-center gap-2">
+                                                    {/* <PencilRuler size={18} /> */}
+                                                    Projects
+                                                </h3>
+                                                <div>
+                                                    <Button variant="ghost" size="icon"><Plus /></Button>
+                                                    <EditButton disabled={true} />
+                                                </div>
                                             </div>
                                             <span className="text-xs">Current game development projects you are working on that have not been released</span>
                                         </div>
-                                        <NoProjects />
+                                        {/* <NoProjects /> */}
+                                        <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-3 mt-4 mb-6">
+                                            { projects.map(({name, platforms}) => <ProjectCard title={name} platforms={platforms} icon={PencilRuler} />) }
+                                        </div>
                                     </div>
                                     <Separator className="mb-5" />
                                     <div className="flex flex-col gap-3">
                                         <div className="flex flex-col gap-0">
                                             <div className="flex justify-between items-center">
-                                                <h3 className="font-bold flex items-center gap-2"><Rocket size={18} />Releases</h3>
+                                                <h3 className="font-bold flex items-center gap-2">
+                                                    {/* <Rocket size={18} /> */}
+                                                    Releases
+                                                </h3>
                                                 <EditButton disabled={true} />
                                             </div>
                                             <span className="text-xs">Completed game titles by you that are available to the public</span>
                                         </div>
                                         <NoReleases />
+                                        {/* <div className="w-full grid grid-cols-2 gap-3 mt-4 mb-6">
+                                            { releases.map(({name, platforms}) => <ProjectCard title={name} platforms={platforms} icon={Rocket} />) }
+                                        </div> */}
                                     </div>
                                 </div>
                             )
