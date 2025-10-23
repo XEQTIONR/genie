@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useRef, useState } from "react"
 import { Check, ChevronsUpDown } from "lucide-react"
 
 import { cn } from "@/lib/utils"
@@ -19,7 +19,7 @@ import {
 import { Input } from "@/components/ui/input"
 
 export interface Option {
-    label: string,
+    label: string | React.ReactNode,
     value: string
 }
 
@@ -28,7 +28,6 @@ export function Combobox({
     defaultValue = "",
     items = [], 
     containerClassName = "", 
-    contentClassName = "", 
     placeholder = "Select...",
     searchLabel = "Search...",
     noResultsLabel = "No results found.",
@@ -38,7 +37,6 @@ export function Combobox({
     defaultValue?: string
     items?: Option[]
     containerClassName?: string 
-    contentClassName?: string 
     placeholder?: string
     searchLabel?: string
     noResultsLabel?: string
@@ -47,12 +45,13 @@ export function Combobox({
 }) {
   const [open, setOpen] = useState(false)
   const [value, setValue] = useState(defaultValue)
+  const container = useRef<HTMLButtonElement>(null)
 
   return (
     <>
     <Input type="hidden" name={name} value={value} />
     <Popover open={open} onOpenChange={setOpen}>
-        <PopoverTrigger className={containerClassName} asChild>
+        <PopoverTrigger ref={container} className={containerClassName} asChild>
             <Button
                 variant="outline"
                 role="combobox"
@@ -65,7 +64,11 @@ export function Combobox({
                 <ChevronsUpDown className="opacity-50" />
             </Button>
         </PopoverTrigger>
-        <PopoverContent className={cn("p-0", contentClassName)}>
+        <PopoverContent
+            style={{ width: container.current?.offsetWidth }} 
+            align="start" 
+            className="p-0"
+        >
             <Command>
                 <CommandInput
                     onValueChange={(v) => {

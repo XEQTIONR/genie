@@ -111,7 +111,7 @@ function EditLocation({ defaultValue } : { defaultValue?: string}) {
                 setOptions([{label: "Not selected", value: ""}, ...opts])
             })
     }, [])
-    return <Combobox placeholder="Not selected" defaultValue={defaultValue ?? ""} name="country" items={options} containerClassName="w-64" contentClassName="w-64" />
+    return <Combobox placeholder="Not selected" defaultValue={defaultValue ?? ""} name="country" items={options} containerClassName="w-64" />
 }
 
 function CreateTeamForm () {
