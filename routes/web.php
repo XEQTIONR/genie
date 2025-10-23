@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\TeamController;
 use App\Http\Controllers\UserProfileController;
 use App\Models\Team;
@@ -57,6 +58,8 @@ Route::get('/teams/{team:slug}/members', function(Team $team) {
         'tab' => 'members'
     ]);
 })->name('teams.users.index');
+
+Route::get('/projects/create', [ProjectController::class, 'create'])->name('projects.create');
 
 Route::get('/', function () {
         return Inertia::render('dashboard');

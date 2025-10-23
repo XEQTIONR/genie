@@ -4,24 +4,27 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class Team extends Model
+class Project extends Model
 {
-
     protected $fillable = [
-        'name',
+        'title',
+        'release_title',
         'description',
-        'slug',
-        'creator_id',
-        'owner_id',
+        'excerpt',
+        'body',
+        'platforms',
+        'tools',
+        'released',
+        'released_on',
+        'status',
     ];
 
     protected function casts(): array
     {
         return [
-            'meta' => 'array'
+            'platforms' => 'array',
+            'tools' => 'array'
         ];
     }
 
@@ -35,13 +38,8 @@ class Team extends Model
         return $this->belongsTo(User::class, 'owner_id');
     }
 
-    public function users(): BelongsToMany
+    public function team(): BelongsTo
     {
-        return $this->belongsToMany(User::class);
-    }
-
-    public function projects(): HasMany
-    {
-        return $this->hasMany(Project::class);
+        return $this->belongsTo(Team::class);
     }
 }
