@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class Team extends Model
 {
@@ -40,8 +41,8 @@ class Team extends Model
         return $this->belongsToMany(User::class);
     }
 
-    public function projects(): HasMany
+    public function ownedProjects(): MorphMany
     {
-        return $this->hasMany(Project::class);
+        return $this->morphMany(Project::class, 'owner');
     }
 }

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class Project extends Model
 {
@@ -18,6 +19,9 @@ class Project extends Model
         'released',
         'released_on',
         'status',
+        'owner_id',
+        'owner_type',
+        'creator_id',
     ];
 
     protected function casts(): array
@@ -33,13 +37,8 @@ class Project extends Model
         return $this->belongsTo(User::class, 'creator_id');
     }
 
-    public function owner(): BelongsTo
+    public function owner(): MorphTo
     {
-        return $this->belongsTo(User::class, 'owner_id');
-    }
-
-    public function team(): BelongsTo
-    {
-        return $this->belongsTo(Team::class);
+        return $this->morphTo();
     }
 }

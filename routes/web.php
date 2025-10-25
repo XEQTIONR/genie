@@ -13,7 +13,11 @@ use App\Models\User;
 // })->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
+
     Route::post('/teams', [TeamController::class, 'store'])->name('teams.store');
+
+    Route::get('/projects/create', [ProjectController::class, 'create'])->name('projects.create');
+    Route::post('/projects', [ProjectController::class, 'store'])->name('projects.store');
 });
 
 Route::get('/profile/{user:username}', function(User $user) {
@@ -58,8 +62,6 @@ Route::get('/teams/{team:slug}/members', function(Team $team) {
         'tab' => 'members'
     ]);
 })->name('teams.users.index');
-
-Route::get('/projects/create', [ProjectController::class, 'create'])->name('projects.create');
 
 Route::get('/', function () {
         return Inertia::render('dashboard');

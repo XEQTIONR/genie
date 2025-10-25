@@ -6,6 +6,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
@@ -71,8 +72,8 @@ class User extends Authenticatable
         return $this->hasMany(Project::class, 'creator_id');
     }
 
-    public function ownedProjects(): HasMany
+    public function ownedProject(): MorphMany
     {
-        return $this->hasMany(Project::class, 'owner_id');
+        return $this->morphMany(Project::class, 'owner');
     }
 }

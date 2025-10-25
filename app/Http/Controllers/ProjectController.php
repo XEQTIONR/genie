@@ -3,7 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Project;
+use App\Models\Team;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 
 class ProjectController extends Controller
@@ -21,7 +26,11 @@ class ProjectController extends Controller
      */
     public function create()
     {
-        return Inertia::render('projects/create');
+        $user = Auth::user();
+
+        $teams = $user->teams;
+
+        return Inertia::render('projects/create', compact('user', 'teams'));
     }
 
     /**
@@ -29,7 +38,41 @@ class ProjectController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        Log::info('request');
+        Log::info($request);
+
+        $validated = $request->validate([
+            'title' => 'required|string|max:50',
+            'excerpt' => 'nullable|string|max:200',
+            'description' => 'nullable|string',
+            'owner_type' => 'required|in:user,team',
+            'owner_id' => 'required|integer',
+            'visibility' => 'required|in:public,private',
+            'platforms' => 'required|array',
+        ]);
+
+        $validated['owner_type'] = match ($validated['owner_type']) {
+            'user' => User::class,
+            'team' => Team::class,
+        };
+
+        $validated['platforms'] = array_filter($validated['platforms'], fn($platform) => $platform !== NULL);
+        
+        if ($validated['platforms'] === []) {
+            $validated['platforms'] = NULL;
+        }
+
+        Log::info('validated');
+        Log::info($validated);
+
+        $project = new Project([
+            ...$validated,
+            'creator_id' => Auth::id()
+        ]);
+
+        $project->save();
+
+        return to_route('home');
     }
 
     /**

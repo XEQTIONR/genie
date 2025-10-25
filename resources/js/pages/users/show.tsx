@@ -379,7 +379,7 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
                     // <div className="w-full flex flex-col md:flex-row border bg-neutral-50 dark:bg-neutral-900 md:mx-8 rounded-lg">
                     <div className="w-full flex flex-col md:flex-row md:mx-8 rounded-lg">
                         <div className="w-full md:w-1/4 flex flex-col p-2 gap-2 mb-2">
-                            <h2 className="text-xl font-bold mx-2 mt-2 mb-6">About</h2>
+                            <h2 className="text-lg font-bold mx-2 mt-2 mb-6">About</h2>
                             
                             {
                                 sectionLabels.map(({label, name}) => <div 
@@ -979,8 +979,8 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
                         }
                         </div>
                         <div className="w-full mt-8">
-                            <h2 className="font-semibold text-2xl">Bio</h2>
-                            <p className="mt-4 text-lg">
+                            <h2 className="font-semibold text-bold">Bio</h2>
+                            <p className="mt-4">
                                 I'm a full-stack developer and I'm interested in joining a team to start a new project.
                             </p>
                         </div>

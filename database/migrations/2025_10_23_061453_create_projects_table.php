@@ -21,31 +21,19 @@ return new class extends Migration
             $table->json('platforms')->nullable();
             $table->json('tools')->nullable();
             $table->boolean('released')->default(false);
-            $table->date('released_on')->nullabe();
+            $table->date('released_on')->nullable();
             $table->string('status')->nullable();
             
             //$table->foreignId('banner_id')->nullable();
             //$table->foreignId('logo_id')->nullable();
             $table->foreignId('creator_id');
-            $table->foreignId('owner_id')->nullable();
-            $table->foreignId('team_id')->nullable();
+            $table->foreignId('owner_id');
+            $table->string('owner_type');
             $table->timestamps();
 
             $table->foreign('creator_id')
                 ->references('id')
                 ->on('users')
-                ->onDelete('restrict')
-                ->onUpdate('cascade');
-            
-            $table->foreign('owner_id')
-                ->references('id')
-                ->on('users')
-                ->onDelete('restrict')
-                ->onUpdate('cascade');
-
-            $table->foreign('team_id')
-                ->references('id')
-                ->on('teams')
                 ->onDelete('restrict')
                 ->onUpdate('cascade');
         });
