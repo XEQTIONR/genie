@@ -6,9 +6,8 @@ use App\Models\Project;
 use App\Models\Team;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 
 class ProjectController extends Controller
@@ -38,9 +37,6 @@ class ProjectController extends Controller
      */
     public function store(Request $request)
     {
-        Log::info('request');
-        Log::info($request);
-
         $validated = $request->validate([
             'title' => 'required|string|max:50',
             'excerpt' => 'nullable|string|max:200',
@@ -56,17 +52,26 @@ class ProjectController extends Controller
             'team' => Team::class,
         };
 
-        $validated['platforms'] = array_filter($validated['platforms'], fn($platform) => $platform !== NULL);
+        $validated['platforms'] = [...array_filter($validated['platforms'], fn($platform) => $platform !== NULL)];
         
         if ($validated['platforms'] === []) {
             $validated['platforms'] = NULL;
         }
 
-        Log::info('validated');
-        Log::info($validated);
+        $pieces = explode(' ', Str::lower($validated['title']));
+        $pieces = preg_replace('/[^\w]/', '', $pieces);
+        $slug = implode('-', $pieces);
+        $slug = preg_replace('/--+/', '-', $slug);
+        $base = $slug;
+        $number = 1;
+        
+        while(Team::where('slug', $slug)->first()) {
+            $slug = $base . '-' . $number++;
+        }
 
         $project = new Project([
             ...$validated,
+            'slug' => $slug,
             'creator_id' => Auth::id()
         ]);
 
@@ -80,7 +85,8 @@ class ProjectController extends Controller
      */
     public function show(Project $project)
     {
-        //
+        $project->load(['owner', 'creator']);
+        return Inertia::render('projects/show', ['project' => $project]);
     }
 
     /**

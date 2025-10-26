@@ -37,11 +37,15 @@ class TeamController extends Controller
             'description' => 'nullable|string',
         ]);
 
-        $slug = preg_replace('/[^\w]/', '', Str::lower($validated['name']));
+        $pieces = explode(' ', Str::lower($validated['name']));
+        $pieces = preg_replace('/[^\w]/', '', $pieces);
+        $slug = implode('-', $pieces);
+        $slug = preg_replace('/--+/', '-', $slug);
+        $base = $slug;
         $number = 1;
-
+        
         while(Team::where('slug', $slug)->first()) {
-            $slug = preg_replace('/[^\w]/', '', Str::lower($validated['name'])) . $number++;
+            $slug = $base . '-' . $number++;
         }
 
         $userId = Auth::id();

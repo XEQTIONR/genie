@@ -8,9 +8,6 @@ import {
   FieldDescription,
   FieldGroup,
   FieldLabel,
-  FieldLegend,
-  FieldSeparator,
-  FieldSet,
 } from "@/components/ui/field"
 import { Input } from '@/components/ui/input'
 import {
@@ -18,11 +15,9 @@ import {
   ItemActions,
   ItemContent,
   ItemDescription,
-  ItemMedia,
   ItemTitle,
 } from "@/components/ui/item"
 import { Textarea } from '@/components/ui/textarea'
-import { Combobox, Option } from '@/components/ui/combobox'
 import { User, Team } from '@/types'
 import {
   Select,
@@ -86,7 +81,7 @@ export default function CreateProject({ user, teams } : { user: User, teams: Tea
             <Head title="Create new project" />
             <Form 
                 action={store()} 
-                className="w-full max-w-4xl mx-auto flex flex-col pt-4 px-4"
+                className="w-full max-w-4xl mx-auto flex flex-col pt-8 px-4"
             >
                 <h1 className="text-xl font-bold md:mx-10 mb-1.5">Create a new project</h1>
                 <span className="text-sm text-dim md:mx-10 mb-1">Projects are game development endeavors in which one or multiple people 
@@ -145,11 +140,10 @@ export default function CreateProject({ user, teams } : { user: User, teams: Tea
                                                     <div className="size-4 relative">
                                                         <PlaceholderPattern className="absolute border rounded-full inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
                                                     </div>
-                                                    {user.name}
+                                                    <span className="mr-2">{user.name}</span>
                                                 </SelectItem>
                                             </SelectGroup>
                                             <SelectGroup>
-                                                
                                                 <SelectLabel>Teams</SelectLabel>
                                                 {
                                                     teams.map(({id, name}) => (
@@ -215,7 +209,7 @@ export default function CreateProject({ user, teams } : { user: User, teams: Tea
                             <Item variant="outline">
                                 <ItemContent>
                                     <ItemTitle>Choose targetted platform</ItemTitle>
-                                    <input type="hidden" name="platforms[]" value="" />
+                                        <input type="hidden" name="platforms[]" value="" />
                                     <ItemDescription>
                                     <div className="w-full flex flex-wrap mt-1 gap-6">
                                         <div className="flex gap-1.5 items-center">

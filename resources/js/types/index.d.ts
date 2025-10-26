@@ -39,6 +39,25 @@ export interface SharedData {
     }
 }
 
+export const ProjectOwnerTypeUser = "App\\Models\\User"
+export const ProjectOwnerTypeTeam = "App\\Models\\Team"
+
+export type ProjectOwner = ProjectOwnerTypeUser | ProjectOwnerTypeTeam
+
+export interface Project {
+    id: number
+    title: string
+    slug: string
+    excerpt?: string
+    platforms: string[]
+    description: string
+    body: string
+    status: string | null
+    creator?: User
+    owner?: User | Team
+    owner_type: ProjectOwner
+}
+
 export interface Team {
     id: number
     name: string

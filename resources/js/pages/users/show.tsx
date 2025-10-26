@@ -1,4 +1,4 @@
-import { Button } from '@/components/ui/button'
+import { Button, buttonVariants } from '@/components/ui/button'
 import { PlaceholderPattern } from '@/components/ui/placeholder-pattern'
 import AppLayout from '@/layouts/app-layout'
 import { show, about } from '@/routes/users'
@@ -67,6 +67,7 @@ import { Combobox, Option } from '@/components/ui/combobox'
 import { Label } from '@/components/ui/label'
 import axios from 'axios'
 import roles from '@/data/roles'
+import { create } from '@/routes/projects'
 
 type ProfileTab = NavItem & {key: string, className?: string}
 
@@ -771,7 +772,7 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
                                                     Projects
                                                 </h3>
                                                 <div>
-                                                    <Button variant="ghost" size="icon"><Plus /></Button>
+                                                    <Link className={cn(buttonVariants({ variant: 'ghost', size: 'icon', className: "" }))} href={create().url}><Plus /></Link>
                                                     <EditButton disabled={true} />
                                                 </div>
                                             </div>

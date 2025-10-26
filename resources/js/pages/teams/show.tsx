@@ -157,12 +157,6 @@ export default function TeamProfile({ team, tab = 'activity', user_count, users 
         },
     ];
 
-    // const titles = [
-    //     'Software Engineer',
-    //     'Full Stack Developer',
-    //     'Backend Developer'
-    // ]
-
     const tabs: ProfileTab[] = [
         // { title: "Showcase", href: show({ user: user.username }), key: "showcase"},
         { title: "Activity", href: show({ team: team.slug }), key: "activity"},

@@ -7,12 +7,17 @@ import type { PropsWithChildren } from 'react';
 export default function AppHeaderLayout({
     children,
     breadcrumbs,
-    maxWidth,
-}: PropsWithChildren<{ breadcrumbs?: BreadcrumbItem[], maxWidth: string }>) {
+    maxHeaderWidth,
+    maxBodyWidth,
+}: PropsWithChildren<{ 
+    breadcrumbs?: BreadcrumbItem[],
+    maxHeaderWidth: string, 
+    maxBodyWidth: string, 
+}>) {
     return (
         <AppShell>
-            <AppHeader maxWidth={maxWidth} breadcrumbs={breadcrumbs} />
-            <AppContent maxWidth={maxWidth}>{children}</AppContent>
+            <AppHeader maxWidth={maxHeaderWidth} breadcrumbs={breadcrumbs} />
+            <AppContent maxWidth={maxBodyWidth}>{children}</AppContent>
         </AppShell>
     );
 }

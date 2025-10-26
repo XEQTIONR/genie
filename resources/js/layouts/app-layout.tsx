@@ -5,16 +5,33 @@ import { Toaster } from 'sonner';
 import { useAppearance } from '@/hooks/use-appearance';
 
 interface AppLayoutProps {
-    maxWidth?: string,
     children: ReactNode;
     breadcrumbs?: BreadcrumbItem[];
+    maxWidth?: string,
+    maxHeaderWidth?: string,
+    maxBodyWidth?: string,
 }
 
-export default ({ children, breadcrumbs, maxWidth='md:max-w-10xl', ...props }: AppLayoutProps) => {
+export default ({ 
+    children, 
+    breadcrumbs, 
+    maxWidth='md:max-w-10xl',
+    maxHeaderWidth,
+    maxBodyWidth,
+    ...props 
+}: AppLayoutProps) => {
     const { appearance } = useAppearance();
+    const hWidth = maxHeaderWidth ?? maxWidth
+    const bWidth = maxBodyWidth ?? maxWidth
     return (
-    <AppLayoutTemplate maxWidth={maxWidth} breadcrumbs={breadcrumbs} {...props}>
-        <Toaster theme={appearance} richColors position="top-right"/>
-        {children}
-    </AppLayoutTemplate>
-)};
+        <AppLayoutTemplate
+            maxHeaderWidth={hWidth}
+            maxBodyWidth={bWidth}
+            breadcrumbs={breadcrumbs} 
+            {...props}
+        >
+            <Toaster offset={{ top: '75px' }} theme={appearance} richColors position="top-center"/>
+            {children}
+        </AppLayoutTemplate>
+    )
+}

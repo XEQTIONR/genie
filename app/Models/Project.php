@@ -10,6 +10,7 @@ class Project extends Model
 {
     protected $fillable = [
         'title',
+        'slug',
         'release_title',
         'description',
         'excerpt',
@@ -28,7 +29,8 @@ class Project extends Model
     {
         return [
             'platforms' => 'array',
-            'tools' => 'array'
+            'tools' => 'array',
+            'released' => 'boolean'
         ];
     }
 
