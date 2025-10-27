@@ -54,11 +54,11 @@ export default function ShowProject({ project } : { project: Project }) {
         <AppLayout maxHeaderWidth='md:max-w-7xl' maxBodyWidth="w-full" breadcrumbs={breadcrumbs}>
             <Head title="Show Project" />
                 <div className="w-full min-h-[50vh] bg-neutral-900">
-                    <h1 className="w-1/3 text-center mx-auto text-3xl font-semibold mt-5">{project.title}</h1>
-                    <h2 className="w-1/3 text-center mx-auto mt-1">{project.excerpt}</h2>
+                    <h1 className="w-full md:w-1/3 text-center mx-auto text-2xl font-semibold mt-10">{project.title}</h1>
+                    
                     {
                         project.owner &&
-                        <div className="w-1/3 text-center block mt-3 text-sm mx-auto">
+                        <div className="w-full md:w-1/3 text-center block mt-3 text-sm mx-auto">
                             by <Link 
                                 href={project.owner_type == ProjectOwnerTypeTeam ? showTeam(project.owner) : showUser(project.owner)} 
                                 className="font-semibold ml-1 hover:underline"
@@ -68,32 +68,11 @@ export default function ShowProject({ project } : { project: Project }) {
                             
                         </div>
                     }
-                    <Carousel 
-                        className="block mx-auto w-full max-w-1/3 my-5"
-                        opts={{
-                            loop: true,
-                            duration: 100,
-                        }}
-                        plugins={[
-                            Autoplay({
-                                delay: 8000,
-                            }),
-                            Fade()
-                        ]}
-                    >
-                        <CarouselContent>
-                            {Array.from({ length: 5 }).map((_, index) => (
-                            <CarouselItem key={index}>
-                                <div className="p-1 aspect-video flex items-center justify-center border">
-                                    <span className="block m-auto text-4xl font-semibold">{index + 1}</span>
-                                </div>
-                            </CarouselItem>
-                            ))}
-                        </CarouselContent>
-                        <CarouselPrevious />
-                        <CarouselNext />
-                        {/* <CarouselDots /> */}
-                    </Carousel>
+                    <h2 className="w-full md:w-1/3 text-center mx-auto mt-1">{project.excerpt}</h2>
+                    <div className="flex flex-col gap-7 md:flex-row md:justify-center mx-auto w-full md:max-w-7xl items-stretch ">
+                        
+                    </div>
+                    
                 </div>
                
                 <div className={cn(
@@ -121,8 +100,8 @@ export default function ShowProject({ project } : { project: Project }) {
                     
                 </div>
                 <div id="kontent" className="">
-                    <div className="hidden md:flex md:w-1/4 pt-10 h-full sticky float-left top-24 bg-violet-950">Something</div>
-                    <div className="hidden md:flex md:w-1/4 pt-10 h-full sticky float-right top-24 bg-pink-950">Something</div>
+                    <div className="hidden md:flex md:w-1/4 pt-10 h-full sticky float-left top-16 bg-violet-950">Something</div>
+                    <div className="hidden md:flex md:w-1/4 pt-10 h-full sticky float-right top-16 bg-pink-950">Something</div>
                     <div className="w-full md:w-2/4 block mx-auto">
                         <p>I'm baby yuccie vape palo santo vaporware franzen. Big mood freegan copper mug blog, microdosing tousled bushwick. Man braid chillwave heirloom, hammock literally pabst raw denim swag hot chicken forage ramps. Cupping DIY distillery, sriracha hashtag edison bulb humblebrag hoodie listicle helvetica tacos hammock leggings. Whatever sriracha af cliche, portland tumeric normcore tofu messenger bag sus iceland chicharrones. Try-hard neutra ramps authentic iPhone, intelligentsia echo park art party. Vape cronut try-hard, 8-bit gatekeep brunch kombucha aesthetic mumblecore literally.</p>
 
