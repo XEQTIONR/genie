@@ -21,10 +21,21 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet"
 import { Button } from "@headlessui/react";
-import { ChartNoAxesColumnDecreasing, ChartNoAxesColumnIncreasing, ChevronDown, Menu } from "lucide-react";
+import { ChartNoAxesColumnIncreasing, ChevronDown, Menu } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 
+import { Card, CardContent } from "@/components/ui/card"
+import {
+  Carousel,
+  CarouselContent,
+  CarouselDots,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel"
+import Autoplay from "embla-carousel-autoplay"
+import Fade from 'embla-carousel-fade'
 
 export default function ShowProject({ project } : { project: Project }) {
 
@@ -57,7 +68,32 @@ export default function ShowProject({ project } : { project: Project }) {
                             
                         </div>
                     }
-                    {/* <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" /> */}
+                    <Carousel 
+                        className="block mx-auto w-full max-w-1/3 my-5"
+                        opts={{
+                            loop: true,
+                            duration: 100,
+                        }}
+                        plugins={[
+                            Autoplay({
+                                delay: 8000,
+                            }),
+                            Fade()
+                        ]}
+                    >
+                        <CarouselContent>
+                            {Array.from({ length: 5 }).map((_, index) => (
+                            <CarouselItem key={index}>
+                                <div className="p-1 aspect-video flex items-center justify-center border">
+                                    <span className="block m-auto text-4xl font-semibold">{index + 1}</span>
+                                </div>
+                            </CarouselItem>
+                            ))}
+                        </CarouselContent>
+                        <CarouselPrevious />
+                        <CarouselNext />
+                        {/* <CarouselDots /> */}
+                    </Carousel>
                 </div>
                
                 <div className={cn(
