@@ -70,7 +70,35 @@ export default function ShowProject({ project } : { project: Project }) {
                     }
                     <h2 className="w-full md:w-1/3 text-center mx-auto mt-1">{project.excerpt}</h2>
                     <div className="flex flex-col gap-7 md:flex-row md:justify-center mx-auto w-full md:max-w-7xl items-stretch ">
-                        
+                        <Carousel 
+                            className="block w-full md:w-2/3 my-5"
+                            opts={{ loop: true,
+                                duration: 60
+                             }}
+                            plugins={[
+                                Autoplay({ delay: 8000 }),
+                                Fade()
+                            ]}
+                        >
+                            <CarouselContent>
+                                {[
+                                    'https://www.youtube.com/embed/7gTmT-Kko2w?si=tKbW1693_Bo7RVCi',
+                                    'https://www.youtube.com/embed/kAiFVcd9cAA?si=vqD0MBPwIfWG_a80',
+                                    'https://www.kickstarter.com/projects/ivstudios/honors-end/widget/video.html'
+                                ].map((url, index) => (
+                                <CarouselItem key={index}>
+                                    <div className="p-1 aspect-video flex items-center justify-center border rounded-md">
+                                        <iframe id={"iframe"+index} onClick={() => console.log('iframe clicked')} className="w-full h-full rounded-md" src={url} title="YouTube video player" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen="true"></iframe>
+                                    </div>
+                                </CarouselItem>
+                                ))}
+                            </CarouselContent>
+                            <CarouselPrevious className="hidden md:flex z-60" />
+                            <CarouselNext className="hidden md:flex z-60" />
+                        </Carousel>
+                        <div className="md:w-1/3 my-5 rounded-md border mb-18">
+                                Something
+                        </div>
                     </div>
                     
                 </div>
