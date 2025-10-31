@@ -30,10 +30,26 @@ import {
 } from "@/components/ui/select"
 import { PlaceholderPattern } from '@/components/ui/placeholder-pattern'
 
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { Eye, Lock } from 'lucide-react'
+import { AlignCenter, AlignJustify, AlignLeft, AlignRight, Bold, Eye, Film, Heading1, Heading2, Image, List, ListCheck, ListChecks, ListOrdered, Lock, Video, WrapText } from 'lucide-react'
 import { Checkbox } from '@/components/ui/checkbox'
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+
+import Quill from 'quill'
+// import 'quill/dist/quill.bubble.css'
+import '/resources/css/quill.bubble.css'
+import { ButtonGroup } from '@/components/ui/button-group'
+import { Label } from '@/components/ui/label'
 
 
 function Step({step, heading, children} : {step: number, heading: string, children: React.ReactNode}) {
@@ -69,12 +85,46 @@ export default function CreateProject({ user, teams } : { user: User, teams: Tea
     const [ownerId, setOwnerId] = useState<number|null>(null)
     const [ownerLabel, setOwnerLabel] = useState<string>('public')
 
+    const [insertVideoDialogOpen, setInsertVideoDialogOpen] = useState<boolean>(false)
+    const [lastSelection, setLastSelection] = useState<number[]|null>(null)
+
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Create Project',
             href: create().url
         }
     ]
+
+    const q = useRef<Quill>(undefined)
+    const videoInput = useRef<HTMLInputElement>(null)
+
+    useEffect(() => {
+        const quill = new Quill('#editor', {
+            theme: 'bubble',
+            bounds: '#editor',
+            modules: {
+                toolbar: [
+                    ['bold', 'italic', 'underline', 'strike'],
+                    ['link'],
+                ]
+            }
+            // placeholder: 'This is the placeholder text'
+        })
+        q.current = quill
+    }, [])
+
+    const selection = () : number[] => {
+         const qll = q.current
+        const range = qll?.getSelection()
+
+        if (range) {
+            const cursorIndex = range.index
+            const selectionLength = range.length
+            return [cursorIndex, selectionLength]
+        }
+
+        return []
+    }
 
     return (
         <AppLayout maxWidth="md:max-w-7xl" breadcrumbs={breadcrumbs}>
@@ -101,9 +151,148 @@ export default function CreateProject({ user, teams } : { user: User, teams: Tea
                             <Input name="excerpt" />
                             <FieldDescription>A short description about the project</FieldDescription>
                         </Field>
-                        <Field className="gap-2">
+                        <Field className="gap-3">
                             <FieldLabel className="font-semibold">Description</FieldLabel>
-                            <Textarea name="description" className="h-28" />
+                            {/* <Textarea name="description" className="h-28" /> */}
+                            <div className='max-w-full flex justify-start'>
+                                <ButtonGroup>
+                                    <ButtonGroup>
+                                        <Button type="button" variant="outline" size="icon" onClick={() => {
+                                            const [a, b] = selection()
+                                            if (a !== undefined && b !== undefined) {
+                                                q.current?.formatLine(a, b, 'list', 'ordered')
+                                            }
+                                        }}>
+                                            <ListOrdered />
+                                        </Button>
+                                        <Button type="button" variant="outline" size="icon" onClick={() => {
+                                            const [a, b] = selection()
+                                            if (a !== undefined && b !== undefined) {
+                                                q.current?.formatLine(a, b, 'list', 'bullet')
+                                            }
+                                        }}>
+                                            <List />
+                                        </Button>
+                                        <Button type="button" variant="outline" size="icon" onClick={() => {
+                                            const [a, b] = selection()
+                                            if (a !== undefined && b !== undefined) {
+                                                q.current?.formatLine(a, b, 'list', 'checked')
+                                            }
+                                        }}>
+                                            <ListChecks />
+                                        </Button>
+                                    </ButtonGroup>
+                                    <ButtonGroup>
+                                        <Button type="button" variant="outline" size="icon" onClick={() => {
+                                            const [a, b] = selection()
+                                            if (a !== undefined && b !== undefined) {
+                                                q.current?.formatLine(a, b, 'header', 1)
+                                            }
+                                        }}>
+                                            <Heading1 />
+                                        </Button>
+                                        <Button type="button" variant="outline" size="icon" onClick={() => {
+                                            const [a, b] = selection()
+                                            if (a !== undefined && b !== undefined) {
+                                                q.current?.formatLine(a, b, 'header', 2)
+                                            }
+                                        }}>
+                                            <Heading2 />
+                                        </Button>
+                                        <Button type="button" variant="outline" size="icon" onClick={() => {
+                                            const [a, b] = selection()
+                                            if (a !== undefined && b !== undefined) {
+                                                q.current?.removeFormat(a, b)
+                                            }
+                                        }}>
+                                            <WrapText />
+                                        </Button>
+                                    </ButtonGroup>
+                                    <ButtonGroup>
+                                        <Button variant="outline" size="icon"onClick={() => {
+                                            const [a, b] = selection()
+                                            if (a !== undefined && b !== undefined) {
+                                                q.current?.formatLine(a, b, 'align', false)
+                                            }
+                                        }}> 
+                                            <AlignLeft /> 
+                                        </Button>
+                                         <Button variant="outline" size="icon"onClick={() => {
+                                            const [a, b] = selection()
+                                            if (a !== undefined && b !== undefined) {
+                                                q.current?.formatLine(a, b, 'align', 'center')
+                                            }
+                                        }}> 
+                                            <AlignCenter /> 
+                                        </Button>
+                                        <Button variant="outline" size="icon"onClick={() => {
+                                            const [a, b] = selection()
+                                            if (a !== undefined && b !== undefined) {
+                                                q.current?.formatLine(a, b, 'align', 'right')
+                                            }
+                                        }}> 
+                                            <AlignRight /> 
+                                        </Button>
+                                        <Button variant="outline" size="icon"onClick={() => {
+                                            const [a, b] = selection()
+                                            if (a !== undefined && b !== undefined) {
+                                                q.current?.formatLine(a, b, 'align', 'justify')
+                                            }
+                                        }}> 
+                                            <AlignJustify /> 
+                                        </Button>
+                                    </ButtonGroup>
+                                    <ButtonGroup>
+                                        <Dialog open={insertVideoDialogOpen} onOpenChange={setInsertVideoDialogOpen}>
+                                            <DialogTrigger asChild>
+                                                <Button type="button" variant="outline" size="icon" 
+                                                    onClick={() => {
+                                                        console.log('selektion:', selection())
+                                                        setLastSelection(selection())
+                                                    }}
+                                                >
+                                                    <Film />
+                                                </Button>
+                                            </DialogTrigger>
+                                            <DialogContent className="sm:max-w-[425px]">
+                                                <DialogHeader>
+                                                    <DialogTitle>Edit profile</DialogTitle>
+                                                    <DialogDescription>
+                                                        Make changes to your profile here. Click save when you&apos;re
+                                                        done.
+                                                    </DialogDescription>
+                                                </DialogHeader>
+                                                <div className="grid gap-4">
+                                                    <div className="grid gap-3">
+                                                    <Label htmlFor="video-url">URL</Label>
+                                                    <Input ref={videoInput} id="video-url" name="video-url" defaultValue="https://example.com/video" />
+                                                    </div>
+                                                </div>
+                                                <DialogFooter>
+                                                    <DialogClose asChild>
+                                                        <Button variant="outline">Cancel</Button>
+                                                    </DialogClose>
+                                                    <Button onClick={() => {
+                                                        const select = lastSelection
+                                                        console.log('selection', select)
+                                                        if (select && select.length > 0 && select[0] !== undefined) {
+                                                            console.log('trying to embed', videoInput.current?.value)
+                                                            
+                                                            q.current?.insertEmbed(select[0], 'video', videoInput.current?.value)
+                                                        }
+                                                        setInsertVideoDialogOpen(false)
+                                                    }}>Save changes</Button>
+                                                </DialogFooter>
+                                            </DialogContent>
+                                        </Dialog>
+                                        
+                                        <Button variant="outline" size="icon">
+                                            <Image />
+                                        </Button>
+                                    </ButtonGroup>
+                                </ButtonGroup>
+                            </div>
+                            <div onChange={(c) => console.log('change: ', c)} className='h-36 border p-0 rounded-md' id="editor" />    
                         </Field>
                     </FieldGroup>
                 </Step>
