@@ -1,6 +1,7 @@
 import AppLayout from '@/layouts/app-layout'
 import { BreadcrumbItem } from '@/types'
 import { create, store } from '@/routes/projects'
+import { store as storeImage } from '@/routes/api/uploads'
 import { Form, Head } from '@inertiajs/react'
 import { Separator } from '@/components/ui/separator'
 import {
@@ -50,7 +51,15 @@ import Quill from 'quill'
 import '/resources/css/quill.bubble.css'
 import { ButtonGroup } from '@/components/ui/button-group'
 import { Label } from '@/components/ui/label'
-
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupInput,
+  InputGroupText,
+  InputGroupTextarea,
+} from "@/components/ui/input-group"
+import axios from 'axios'
 
 function Step({step, heading, children} : {step: number, heading: string, children: React.ReactNode}) {
     return (<>
@@ -79,13 +88,14 @@ function Step({step, heading, children} : {step: number, heading: string, childr
 
 
 
-export default function CreateProject({ user, teams } : { user: User, teams: Team[] }) {
+export default function CreateProject({ user, teams, apiToken } : { user: User, teams: Team[], apiToken: string }) {
 
     const [ownerType, setOwnerType] = useState<string|null>(null)
     const [ownerId, setOwnerId] = useState<number|null>(null)
     const [ownerLabel, setOwnerLabel] = useState<string>('public')
 
     const [insertVideoDialogOpen, setInsertVideoDialogOpen] = useState<boolean>(false)
+    const [insertImageDialogOpen, setInsertImageDialogOpen] = useState<boolean>(false)
     const [lastSelection, setLastSelection] = useState<number[]|null>(null)
 
     const breadcrumbs: BreadcrumbItem[] = [
@@ -97,6 +107,8 @@ export default function CreateProject({ user, teams } : { user: User, teams: Tea
 
     const q = useRef<Quill>(undefined)
     const videoInput = useRef<HTMLInputElement>(null)
+    const imageInput = useRef<HTMLInputElement>(null)
+    const [image, setImage] = useState(null)
 
     useEffect(() => {
         const quill = new Quill('#editor', {
@@ -114,7 +126,7 @@ export default function CreateProject({ user, teams } : { user: User, teams: Tea
     }, [])
 
     const selection = () : number[] => {
-         const qll = q.current
+        const qll = q.current
         const range = qll?.getSelection()
 
         if (range) {
@@ -265,7 +277,24 @@ export default function CreateProject({ user, teams } : { user: User, teams: Tea
                                                 <div className="grid gap-4">
                                                     <div className="grid gap-3">
                                                     <Label htmlFor="video-url">URL</Label>
-                                                    <Input ref={videoInput} id="video-url" name="video-url" defaultValue="https://example.com/video" />
+                                                    {/* <Input ref={videoInput} id="video-url" name="video-url" defaultValue="https://example.com/video" /> */}
+
+                                                    <InputGroup>
+                                                        <InputGroupInput ref={videoInput} placeholder="example.com" className="!pl-1" />
+                                                        <InputGroupAddon>
+                                                        <InputGroupText>https://</InputGroupText>
+                                                        </InputGroupAddon>
+                                                        {/* <InputGroupAddon align="inline-end">
+                                                        <Tooltip>
+                                                            <TooltipTrigger asChild>
+                                                            <InputGroupButton className="rounded-full" size="icon-xs">
+                                                                <IconInfoCircle />
+                                                            </InputGroupButton>
+                                                            </TooltipTrigger>
+                                                            <TooltipContent>This is content in a tooltip.</TooltipContent>
+                                                        </Tooltip>
+                                                        </InputGroupAddon> */}
+                                                    </InputGroup>
                                                     </div>
                                                 </div>
                                                 <DialogFooter>
@@ -273,12 +302,10 @@ export default function CreateProject({ user, teams } : { user: User, teams: Tea
                                                         <Button variant="outline">Cancel</Button>
                                                     </DialogClose>
                                                     <Button onClick={() => {
-                                                        const select = lastSelection
-                                                        console.log('selection', select)
-                                                        if (select && select.length > 0 && select[0] !== undefined) {
-                                                            console.log('trying to embed', videoInput.current?.value)
-                                                            
-                                                            q.current?.insertEmbed(select[0], 'video', videoInput.current?.value)
+                                                        if (lastSelection && lastSelection.length > 0 && lastSelection[0] !== undefined) {
+                                                            q.current?.insertEmbed(lastSelection[0], 'video', videoInput.current?.value)
+                                                        } else {
+                                                            q.current?.insertEmbed(0, 'video', videoInput.current?.value)
                                                         }
                                                         setInsertVideoDialogOpen(false)
                                                     }}>Save changes</Button>
@@ -286,9 +313,62 @@ export default function CreateProject({ user, teams } : { user: User, teams: Tea
                                             </DialogContent>
                                         </Dialog>
                                         
-                                        <Button variant="outline" size="icon">
-                                            <Image />
-                                        </Button>
+                                        <Dialog open={insertImageDialogOpen} onOpenChange={setInsertImageDialogOpen}>
+                                            <DialogTrigger asChild>
+                                                <Button type="button" variant="outline" size="icon" 
+                                                    onClick={() => {
+                                                        setLastSelection(selection())
+                                                    }}
+                                                >
+                                                    <Image />
+                                                </Button>
+                                            </DialogTrigger>
+                                            <DialogContent className="sm:max-w-[425px]">
+                                                <DialogHeader>
+                                                    <DialogTitle>Upload image</DialogTitle>
+                                                    <DialogDescription>
+                                                        Add an image
+                                                    </DialogDescription>
+                                                </DialogHeader>
+                                                <div className="grid gap-4">
+                                                    <div className="grid gap-3">
+                                                        <Label htmlFor="video-url">Image</Label>
+                                                        <Input
+                                                            ref={imageInput}
+                                                            onChange={e => setImage(e.target.files[0])} 
+                                                            type="file" 
+                                                            id="image" 
+                                                            name="image"
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <DialogFooter className="mt-4">
+                                                    <DialogClose asChild>
+                                                        <Button type="button" variant="outline">Cancel</Button>
+                                                    </DialogClose>
+                                                    <Button
+                                                        onClick={() => {
+                                                            const data = new FormData()
+
+                                                            data.append('image', image)
+
+                                                            axios.post(storeImage.url(), data, {
+                                                                headers: {
+                                                                    Authorization: 'Bearer ' + apiToken
+                                                                }
+                                                            }).then((res) => {
+                                                                console.log('response:', res)
+                                                            }).catch((error) => {
+                                                                console.log('error:', error)
+                                                            })
+                                                        }} 
+                                                        type="button"
+                                                    >
+                                                        Add Image
+                                                    </Button>
+                                                </DialogFooter>
+                                            </DialogContent>
+                                        </Dialog>
                                     </ButtonGroup>
                                 </ButtonGroup>
                             </div>

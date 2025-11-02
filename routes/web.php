@@ -8,14 +8,8 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Models\User;
 
-// Route::get('/', function () {
-//     return Inertia::render('welcome');
-// })->name('home');
-
 Route::middleware(['auth', 'verified'])->group(function () {
-
     Route::post('/teams', [TeamController::class, 'store'])->name('teams.store');
-
     Route::get('/projects/create', [ProjectController::class, 'create'])->name('projects.create');
     Route::post('/projects', [ProjectController::class, 'store'])->name('projects.store');
     Route::get('/projects/{project:slug}', [ProjectController::class, 'show'])->name('projects.show');
