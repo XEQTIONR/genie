@@ -105,10 +105,10 @@ export default function CreateProject({ user, teams, apiToken } : { user: User, 
         }
     ]
 
-    const q = useRef<Quill>(undefined)
+    const editor = useRef<Quill>(undefined)
     const videoInput = useRef<HTMLInputElement>(null)
     const imageInput = useRef<HTMLInputElement>(null)
-    const [image, setImage] = useState(null)
+    const [image, setImage] = useState<Blob|null>(null)
 
     useEffect(() => {
         const quill = new Quill('#editor', {
@@ -122,12 +122,11 @@ export default function CreateProject({ user, teams, apiToken } : { user: User, 
             }
             // placeholder: 'This is the placeholder text'
         })
-        q.current = quill
+        editor.current = quill
     }, [])
 
     const selection = () : number[] => {
-        const qll = q.current
-        const range = qll?.getSelection()
+        const range = editor.current?.getSelection()
 
         if (range) {
             const cursorIndex = range.index
@@ -144,6 +143,10 @@ export default function CreateProject({ user, teams, apiToken } : { user: User, 
             <Form 
                 action={store()} 
                 className="w-full max-w-4xl mx-auto flex flex-col pt-8 px-4"
+                transform={(data) => ({
+                    ...data,
+                    description: editor.current?.root.innerHTML
+                })}
             >
                 <h1 className="text-xl font-bold md:mx-10 mb-1.5">Create a new project</h1>
                 <span className="text-sm text-dim md:mx-10 mb-1">Projects are game development endeavors in which one or multiple people 
@@ -172,7 +175,7 @@ export default function CreateProject({ user, teams, apiToken } : { user: User, 
                                         <Button type="button" variant="outline" size="icon" onClick={() => {
                                             const [a, b] = selection()
                                             if (a !== undefined && b !== undefined) {
-                                                q.current?.formatLine(a, b, 'list', 'ordered')
+                                                editor.current?.formatLine(a, b, 'list', 'ordered')
                                             }
                                         }}>
                                             <ListOrdered />
@@ -180,7 +183,7 @@ export default function CreateProject({ user, teams, apiToken } : { user: User, 
                                         <Button type="button" variant="outline" size="icon" onClick={() => {
                                             const [a, b] = selection()
                                             if (a !== undefined && b !== undefined) {
-                                                q.current?.formatLine(a, b, 'list', 'bullet')
+                                                editor.current?.formatLine(a, b, 'list', 'bullet')
                                             }
                                         }}>
                                             <List />
@@ -188,7 +191,7 @@ export default function CreateProject({ user, teams, apiToken } : { user: User, 
                                         <Button type="button" variant="outline" size="icon" onClick={() => {
                                             const [a, b] = selection()
                                             if (a !== undefined && b !== undefined) {
-                                                q.current?.formatLine(a, b, 'list', 'checked')
+                                                editor.current?.formatLine(a, b, 'list', 'checked')
                                             }
                                         }}>
                                             <ListChecks />
@@ -198,7 +201,7 @@ export default function CreateProject({ user, teams, apiToken } : { user: User, 
                                         <Button type="button" variant="outline" size="icon" onClick={() => {
                                             const [a, b] = selection()
                                             if (a !== undefined && b !== undefined) {
-                                                q.current?.formatLine(a, b, 'header', 1)
+                                                editor.current?.formatLine(a, b, 'header', 1)
                                             }
                                         }}>
                                             <Heading1 />
@@ -206,7 +209,7 @@ export default function CreateProject({ user, teams, apiToken } : { user: User, 
                                         <Button type="button" variant="outline" size="icon" onClick={() => {
                                             const [a, b] = selection()
                                             if (a !== undefined && b !== undefined) {
-                                                q.current?.formatLine(a, b, 'header', 2)
+                                                editor.current?.formatLine(a, b, 'header', 2)
                                             }
                                         }}>
                                             <Heading2 />
@@ -214,7 +217,7 @@ export default function CreateProject({ user, teams, apiToken } : { user: User, 
                                         <Button type="button" variant="outline" size="icon" onClick={() => {
                                             const [a, b] = selection()
                                             if (a !== undefined && b !== undefined) {
-                                                q.current?.removeFormat(a, b)
+                                                editor.current?.removeFormat(a, b)
                                             }
                                         }}>
                                             <WrapText />
@@ -224,7 +227,7 @@ export default function CreateProject({ user, teams, apiToken } : { user: User, 
                                         <Button variant="outline" size="icon"onClick={() => {
                                             const [a, b] = selection()
                                             if (a !== undefined && b !== undefined) {
-                                                q.current?.formatLine(a, b, 'align', false)
+                                                editor.current?.formatLine(a, b, 'align', false)
                                             }
                                         }}> 
                                             <AlignLeft /> 
@@ -232,7 +235,7 @@ export default function CreateProject({ user, teams, apiToken } : { user: User, 
                                          <Button variant="outline" size="icon"onClick={() => {
                                             const [a, b] = selection()
                                             if (a !== undefined && b !== undefined) {
-                                                q.current?.formatLine(a, b, 'align', 'center')
+                                                editor.current?.formatLine(a, b, 'align', 'center')
                                             }
                                         }}> 
                                             <AlignCenter /> 
@@ -240,7 +243,7 @@ export default function CreateProject({ user, teams, apiToken } : { user: User, 
                                         <Button variant="outline" size="icon"onClick={() => {
                                             const [a, b] = selection()
                                             if (a !== undefined && b !== undefined) {
-                                                q.current?.formatLine(a, b, 'align', 'right')
+                                                editor.current?.formatLine(a, b, 'align', 'right')
                                             }
                                         }}> 
                                             <AlignRight /> 
@@ -248,7 +251,7 @@ export default function CreateProject({ user, teams, apiToken } : { user: User, 
                                         <Button variant="outline" size="icon"onClick={() => {
                                             const [a, b] = selection()
                                             if (a !== undefined && b !== undefined) {
-                                                q.current?.formatLine(a, b, 'align', 'justify')
+                                                editor.current?.formatLine(a, b, 'align', 'justify')
                                             }
                                         }}> 
                                             <AlignJustify /> 
@@ -303,9 +306,9 @@ export default function CreateProject({ user, teams, apiToken } : { user: User, 
                                                     </DialogClose>
                                                     <Button onClick={() => {
                                                         if (lastSelection && lastSelection.length > 0 && lastSelection[0] !== undefined) {
-                                                            q.current?.insertEmbed(lastSelection[0], 'video', videoInput.current?.value)
+                                                            editor.current?.insertEmbed(lastSelection[0], 'video', videoInput.current?.value)
                                                         } else {
-                                                            q.current?.insertEmbed(0, 'video', videoInput.current?.value)
+                                                            editor.current?.insertEmbed(0, 'video', videoInput.current?.value)
                                                         }
                                                         setInsertVideoDialogOpen(false)
                                                     }}>Save changes</Button>
@@ -335,7 +338,13 @@ export default function CreateProject({ user, teams, apiToken } : { user: User, 
                                                         <Label htmlFor="video-url">Image</Label>
                                                         <Input
                                                             ref={imageInput}
-                                                            onChange={e => setImage(e.target.files[0])} 
+                                                            onChange={e => {
+                                                                if (e.target.files) {
+                                                                    setImage(e.target.files[0])
+                                                                } else {
+                                                                    setImage(null)
+                                                                }
+                                                            }} 
                                                             type="file" 
                                                             id="image" 
                                                             name="image"
@@ -347,20 +356,30 @@ export default function CreateProject({ user, teams, apiToken } : { user: User, 
                                                         <Button type="button" variant="outline">Cancel</Button>
                                                     </DialogClose>
                                                     <Button
+                                                        disabled={image === null}
                                                         onClick={() => {
-                                                            const data = new FormData()
 
-                                                            data.append('image', image)
+                                                            if ( image !== null) {
+                                                                const data = new FormData()
 
-                                                            axios.post(storeImage.url(), data, {
-                                                                headers: {
-                                                                    Authorization: 'Bearer ' + apiToken
-                                                                }
-                                                            }).then((res) => {
-                                                                console.log('response:', res)
-                                                            }).catch((error) => {
-                                                                console.log('error:', error)
-                                                            })
+                                                                data.append('image', image)
+
+                                                                axios.post(storeImage.url(), data, {
+                                                                    headers: {
+                                                                        Authorization: 'Bearer ' + apiToken
+                                                                    }
+                                                                }).then((res) => {
+                                                                    if (lastSelection && lastSelection.length > 0 && lastSelection[0] !== undefined) {
+                                                                        editor.current?.insertEmbed(lastSelection[0], 'image', res.data.upload)
+                                                                    } else {
+                                                                        editor.current?.insertEmbed(0, 'image', res.data.upload)
+                                                                    }
+                                                                    setImage(null)
+                                                                    setInsertImageDialogOpen(false)
+                                                                }).catch((error) => {
+                                                                    console.log('error:', error)
+                                                                })
+                                                            }
                                                         }} 
                                                         type="button"
                                                     >
@@ -372,7 +391,7 @@ export default function CreateProject({ user, teams, apiToken } : { user: User, 
                                     </ButtonGroup>
                                 </ButtonGroup>
                             </div>
-                            <div onChange={(c) => console.log('change: ', c)} className='h-36 border p-0 rounded-md' id="editor" />    
+                            <div onChange={(c) => console.log('change: ', c)} className='h-36 border p-0 rounded-md' id="editor" />
                         </Field>
                     </FieldGroup>
                 </Step>

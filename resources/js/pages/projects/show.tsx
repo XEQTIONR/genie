@@ -36,6 +36,7 @@ import {
 } from "@/components/ui/carousel"
 import Autoplay from "embla-carousel-autoplay"
 import Fade from 'embla-carousel-fade'
+import '/resources/css/projects.css'
 
 export default function ShowProject({ project } : { project: Project }) {
 
@@ -130,36 +131,11 @@ export default function ShowProject({ project } : { project: Project }) {
                 <div id="kontent" className="">
                     <div className="hidden md:flex md:w-1/4 pt-10 h-full sticky float-left top-16 bg-violet-950">Something</div>
                     <div className="hidden md:flex md:w-1/4 pt-10 h-full sticky float-right top-16 bg-pink-950">Something</div>
-                    <div className="w-full md:w-2/4 block mx-auto">
-                        <p>I'm baby yuccie vape palo santo vaporware franzen. Big mood freegan copper mug blog, microdosing tousled bushwick. Man braid chillwave heirloom, hammock literally pabst raw denim swag hot chicken forage ramps. Cupping DIY distillery, sriracha hashtag edison bulb humblebrag hoodie listicle helvetica tacos hammock leggings. Whatever sriracha af cliche, portland tumeric normcore tofu messenger bag sus iceland chicharrones. Try-hard neutra ramps authentic iPhone, intelligentsia echo park art party. Vape cronut try-hard, 8-bit gatekeep brunch kombucha aesthetic mumblecore literally.</p>
-
-                        <p>Retro roof party air plant, biodiesel pickled food truck PBR&B pinterest whatever flexitarian heirloom occupy. Gatekeep yr stumptown shoreditch, pour-over intelligentsia master cleanse iceland DSA normcore. Green juice enamel pin copper mug tonx quinoa hoodie freegan humblebrag kitsch knausgaard tacos pork belly cred meh pabst. Organic taiyaki bodega boys cold-pressed stumptown asymmetrical yuccie. Freegan jawn microdosing, slow-carb iceland iPhone selfies taiyaki fashion axe beard PBR&B vape activated charcoal.</p>
-
-                        <p>Cardigan iPhone disrupt 3 wolf moon shoreditch woke blog tacos tattooed chartreuse drinking vinegar. Pitchfork pork belly letterpress microdosing edison bulb. Shaman beard marxism banh mi drinking vinegar vexillologist man bun chia readymade williamsburg umami. Yr art party roof party tumeric synth DIY fixie cloud bread.</p>
-
-                        <p>Chillwave taxidermy thundercats, offal franzen cornhole lyft post-ironic mukbang. Sriracha heirloom flannel vibecession man braid williamsburg freegan single-origin coffee wayfarers farm-to-table af. Thundercats solarpunk marfa knausgaard blog gorpcore actually DSA gluten-free. Street art you probably haven't heard of them heirloom pour-over meggings schlitz small batch PBR&B plaid. Mukbang la croix vexillologist bespoke lo-fi pinterest, snackwave truffaut fanny pack austin slow-carb cupping microdosing.</p>
-
-                        <p>Farm-to-table kale chips messenger bag thundercats chartreuse actually 90's. Blackbird spyplane ugh godard tousled, blue bottle live-edge wayfarers farm-to-table heirloom marxism banjo slow-carb yuccie. Chia tote bag cronut godard, chicharrones fashion axe air plant DSA ennui vape paleo franzen ramps. Vexillologist cloud bread brunch PBR&B heirloom taxidermy enamel pin neutral milk hotel YOLO.</p>
-
-                        <p>Intelligentsia edison bulb affogato, marfa truffaut post-ironic prism church-key chia woke solarpunk single-origin coffee DSA heirloom hammock. Small batch chartreuse roof party coloring book deep v. Direct trade ennui vexillologist sartorial godard. Vice celiac shabby chic shaman blue bottle praxis cold-pressed cardigan thundercats wolf polaroid neutral milk hotel. Fanny pack solarpunk microdosing chillwave.</p>
-
-                        <p>Bicycle rights scenester cold-pressed, blog edison bulb next level chambray raw denim messenger bag asymmetrical swag. Pour-over crucifix four dollar toast yes plz photo booth semiotics. Typewriter affogato lumbersexual, poke small batch cred retro yr lomo kinfolk bruh distillery vaporware. Single-origin coffee poke fam live-edge typewriter.</p>
-
-                        <p>Actually four loko glossier banh mi live-edge marxism small batch pop-up brunch DSA taxidermy. Pok pok distillery meh bruh mumblecore, tofu synth ethical polaroid banh mi actually scenester hoodie. Locavore la croix 90's, fanny pack bespoke adaptogen before they sold out vaporware blue bottle chia meh distillery tumblr mukbang. Live-edge DIY freegan hoodie man braid taiyaki chambray everyday carry craft beer church-key. Blog shoreditch man braid try-hard, twee venmo keffiyeh freegan ugh. Big mood you probably haven't heard of them kickstarter blog synth bodega boys helvetica woke taiyaki neutra fixie sustainable palo santo same 8-bit. Bicycle rights gatekeep keffiyeh, vibecession synth pork belly hashtag neutral milk hotel poke sustainable art party.</p>
-
-                        <p>Kitsch ascot ugh pour-over waistcoat, flexitarian four loko swag ramps. Air plant marfa photo booth, sus shaman gastropub crucifix drinking vinegar hell of tacos la croix typewriter. Post-ironic jianbing put a bird on it you probably haven't heard of them seitan pug portland ascot. Retro deep v gatekeep pinterest bodega boys offal organic taxidermy wolf enamel pin hell of portland letterpress marxism listicle. Schlitz tattooed before they sold out franzen scenester chambray, meh offal try-hard activated charcoal blue bottle mlkshk. Pinterest pug activated charcoal waistcoat celiac craft beer selfies. Plaid slow-carb neutra vinyl.</p>
-
-                        <p>Paleo knausgaard four loko, gatekeep glossier celiac chia ascot flexitarian kitsch vexillologist meditation DIY. Messenger bag health goth gatekeep selvage venmo vegan. Echo park chillwave shaman iPhone craft beer, shoreditch letterpress chambray tumeric XOXO aesthetic. Fingerstache live-edge offal irony yr master cleanse, knausgaard skateboard poutine hammock.</p>
-
-                        <p>Cupping iPhone scenester everyday carry selvage snackwave cardigan marfa humblebrag. Stumptown tousled pinterest roof party, hot chicken lo-fi adaptogen vibecession vaporware iceland irony disrupt sustainable you probably haven't heard of them selfies. Meditation woke hella swag, distillery big mood locavore glossier single-origin coffee. Fingerstache ethical affogato listicle, typewriter leggings mumblecore. Trust fund cliche man bun, master cleanse vaporware tbh humblebrag subway tile kombucha fingerstache blackbird spyplane heirloom single-origin coffee fixie shoreditch.</p>
-
-                        <p>Aesthetic actually pok pok la croix. Pok pok pop-up knausgaard mukbang quinoa thundercats migas artisan cold-pressed fingerstache mixtape bushwick church-key DIY DSA. Unicorn dreamcatcher taxidermy viral authentic banjo gatekeep health goth hella. Ethical gastropub umami, kale chips flannel scenester hoodie semiotics live-edge fashion axe kogi. Umami yr direct trade single-origin coffee lomo health goth Brooklyn chia scenester semiotics everyday carry. Post-ironic tumblr readymade microdosing biodiesel prism mlkshk pug. Hoodie unicorn vibecession hashtag before they sold out, man braid tacos pok pok vaporware pour-over.</p>
-
-                        <p>Crucifix green juice adaptogen raclette health goth narwhal freegan neutral milk hotel drinking vinegar chartreuse cardigan before they sold out. Selfies venmo schlitz, truffaut four loko authentic kinfolk pok pok knausgaard sus cronut. Retro VHS JOMO green juice next level live-edge. Hexagon kombucha vibecession tousled chambray bushwick pabst intelligentsia drinking vinegar synth.</p>
-
-                        <p>Church-key copper mug man bun hexagon kogi lyft tote bag enamel pin green juice. Fixie yuccie cred woke banh mi iPhone, kombucha bitters pork belly gorpcore ascot unicorn. Pour-over cray readymade waistcoat coloring book, ramps vibecession artisan mixtape. Fashion axe fanny pack vibecession freegan. Pabst selvage wolf knausgaard, enamel pin cloud bread chia chicharrones narwhal.</p>
-
-                        <p>Man braid coloring book shaman craft beer asymmetrical aesthetic crucifix, post-ironic etsy selvage butcher +1 locavore kinfolk ramps. Put a bird on it retro selvage selfies church-key. Photo booth hammock banh mi polaroid yuccie iPhone. Chartreuse lyft vice trust fund cardigan same whatever bruh 8-bit schlitz small batch succulents meggings chambray. Portland plaid echo park gochujang salvia man bun praxis fixie thundercats mustache locavore VHS schlitz wayfarers celiac. Ramps mustache 3 wolf moon shaman. Cray cronut health goth next level plaid affogato salvia.</p>
+                    <div
+                        id="description"
+                        dangerouslySetInnerHTML={{__html: project.description}}
+                        className="w-full md:w-2/4 block mx-auto pt-4 px-4"
+                    > 
                     </div>
                     
                 </div>

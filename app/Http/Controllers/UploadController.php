@@ -21,7 +21,7 @@ class UploadController extends Controller
 
             return [
                 'status' => 'success',
-                'upload' => $fileName
+                'upload' => $url
             ];
         } catch(\Exception $e) {
             return [
