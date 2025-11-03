@@ -86,7 +86,53 @@ class ProjectController extends Controller
     public function show(Project $project)
     {
         $project->load(['owner', 'creator']);
-        return Inertia::render('projects/show', ['project' => $project]);
+
+        $dom = new \DOMDocument();
+        libxml_use_internal_errors(true);
+        $dom->loadHTML($project->description, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+        libxml_clear_errors();
+
+        foreach ($dom->getElementsByTagName('p') as $p) {
+            $existingClass = $p->getAttribute('class');
+            $newClass = trim($existingClass . ' text-pink-500');
+            $p->setAttribute('class', $newClass);
+        }
+
+        $h = [];
+        $tags = ['h1', 'h2'];
+        
+        foreach($tags as $tag) {
+            $searchOffset = 0;
+            foreach ($dom->getElementsByTagName($tag) as $t) {
+                $fragment = $t->ownerDocument->saveXML($t);
+                $offset = strpos($project->description, $fragment, $searchOffset);
+
+                if ($offset !== false) {
+                    $searchOffset = $offset;
+                }
+
+                $h[] = [
+                    'text' => $t->textContent,
+                    'offset' => $offset,
+                    'hash' => hash('crc32', $t->textContent)
+                ];
+            }
+        }
+        
+        usort($h, fn($a, $b) => $a['offset'] > $b['offset']);
+
+        foreach($tags as $tag) {
+            foreach ($dom->getElementsByTagName($tag) as $t) {
+                $t->setAttribute('id', hash('crc32', $t->textContent));
+            }
+        }
+
+        $project->description = $dom->saveHTML();
+
+        return Inertia::render('projects/show', [
+            'project' => $project,
+            'h' => $h,
+        ]);
     }
 
     /**

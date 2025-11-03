@@ -982,7 +982,7 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
                         <div className="w-full mt-8">
                             <h2 className="font-semibold text-bold">Bio</h2>
                             <p className="mt-4">
-                                I'm a full-stack developer and I'm interested in joining a team to start a new project.
+                                {user.bio}
                             </p>
                         </div>
                     </div>

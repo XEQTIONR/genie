@@ -135,7 +135,7 @@ function Carousel({
       >
         {
           autoplayIsPlaying &&
-          <div onClick={toggleAutoplay} className="absolute w-full aspect-video top-0 left-0 bg-neutral-950/10 z-60"></div>
+          <div onClick={toggleAutoplay} className="absolute w-full aspect-video top-0 left-0 bg-neutral-950/10 rounded-md z-60"></div>
         }
         {children}
         <div className="w-full flex justify-between items-center pt-4 gap-1 relative -top-3">
@@ -176,7 +176,7 @@ function CarouselContent({ className, ...props }: React.ComponentProps<"div">) {
     >
       <div
         className={cn(
-          "flex",
+          "flex rounded-md",
           orientation === "horizontal" ? "-ml-4" : "-mt-4 flex-col",
           className
         )}
