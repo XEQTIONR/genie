@@ -8,14 +8,6 @@
 
 @custom-variant dark (&:is(.dark *));
 
-@font-face {
-  font-family: "Kareem Mubarak";
-  src: url("/fonts/KareemMubarak.ttf") format("truetype");
-  font-weight: 100;
-  font-style: normal;
-  font-display: swap;
-}
-
 @theme {
     --font-sans:
         'Instrument Sans', ui-sans-serif, system-ui, sans-serif,
@@ -166,51 +158,16 @@
     }
 
     .ql-editor {
-      
-
         li [data-list=bullet] {
           padding-left: 0 !important;
           padding-right: 50px !important;
         }
-      
-      /* ol [data-list=ordered] {
-        padding-left: -10px !important;
-      } */
-      /* ol [data-list=bullet] { */
-        /* li  [data-list=bullet] {
-          margin-left: -50px !important;
-        } */
-      /* } */
 
       .ql-video {
         width: 100%;
         aspect-ratio: 16 / 9;
       }
     }
-
-    /* .ql-editor:focus-visible { */
-      /* height: 100px; */
-      /* outline-style: none; */
-      /* outline-color: black; */
-      /* box-shadow: 10px 10px 5px red; */
-      /* filter: d
-      rop-shadow(30px 10px 4px #4444dd); */
-    /* } */
-
-    /* .ql-container { */
-      /* border: 1px solid red */
-    /* } */
-
-    /* .ql-editor.ql-blank::before {
-      color: rgba(0, 0, 0, 0.6);
-      content: attr(data-placeholder);
-      font-style: italic;
-      
-      pointer-events: none;
-      position: relative;
-      top: 22px;   
-    } */
-    
 }
 
 @theme inline {

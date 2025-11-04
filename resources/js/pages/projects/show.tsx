@@ -34,6 +34,7 @@ import {
 import Autoplay from "embla-carousel-autoplay"
 import Fade from 'embla-carousel-fade'
 import '/resources/css/projects.css'
+import ThreeColLayout from "./components/three-col-layout";
 
 export default function ShowProject({ project, h } : { 
     project: Project 
@@ -51,20 +52,19 @@ export default function ShowProject({ project, h } : {
         },
     ]
 
+    const [currentTab, setCurrentTab] = useState("kontent")
     const [sidebarOpen, setSidebarOpen] = useState(false)
     const sectionNav = useRef(null)
 
     return (
         <AppLayout maxHeaderWidth='md:max-w-7xl' maxBodyWidth="w-full" breadcrumbs={breadcrumbs}>
             <Head title="Show Project" />
-                <div className="w-full min-h-[50vh] bg-neutral-900">
-                    <h1 className="w-full md:w-1/3 text-center mx-auto text-2xl font-semibold mt-10">{project.title}</h1>
-                    
-                    
-                    <h2 className="w-full md:w-1/3 text-center mx-auto mt-1">{project.excerpt}</h2>
-                    <div className="flex flex-col gap-7 md:flex-row mx-auto w-full md:max-w-7xl items-stretch">
+                <div className="w-full md:min-h-[50vh] bg-neutral-900">
+                    <h1 className="w-full md:w-1/3 text-center mx-auto text-2xl font-semibold mt-5 md:mt-10">{project.title}</h1>
+                    <h2 className="w-full md:w-1/3 text-center mx-auto mt-1 mb-3">{project.excerpt}</h2>
+                    <div className="flex flex-col md:gap-7 md:flex-row mx-auto w-full md:max-w-7xl items-stretch">
                         <Carousel 
-                            className="block w-full md:w-2/3 my-5"
+                            className="block w-full px-2 md:px-0 md:w-2/3 md:my-5"
                             opts={{ loop: true,
                                 duration: 60
                              }}
@@ -89,7 +89,7 @@ export default function ShowProject({ project, h } : {
                             <CarouselPrevious className="hidden md:flex z-60" />
                             <CarouselNext className="hidden md:flex z-60" />
                         </Carousel>
-                        <div className="md:w-1/3 my-5 mb-18 p-5 flex flex-col bg-background rounded justify-between">
+                        <div className="md:w-1/3 my-5 mb-18 p-5 hidden md:flex flex-col bg-background rounded justify-between">
                             <div>
                                 <h1 className="text-2xl font-semibold">{project.title}</h1>
                                 <h2 className="mt-5">{project.excerpt}</h2>
@@ -122,7 +122,6 @@ export default function ShowProject({ project, h } : {
                             </div>
                         </div>
                     </div>
-                    
                 </div>
                
                 <div className={cn(
@@ -131,16 +130,55 @@ export default function ShowProject({ project, h } : {
                 )}>
                     <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
                         <ul ref={sectionNav} className="flex h-full gap-4 text-sm">
-                            <li className="pt-5 px-5 font-semibold border-b-4 border-foreground flex gap-3">
-                                <SheetTrigger className="md:hidden" asChild>
+                            <li className={cn(
+                                "flex items-center px-5 font-semibold border-b-4 border-foreground gap-3",
+                                currentTab == 'kontent' ? 'border-foreground' : 'border-transparent'
+                            )}>
                                 {
-                                    sidebarOpen ? <Menu size={16} /> : <ChartNoAxesColumnIncreasing onClick={(e) => e.stopPropagation()} size={16} className="rotate-90" />
+                                    currentTab == 'kontent' && (
+                                        <SheetTrigger className="md:hidden" asChild>
+                                        {
+                                            sidebarOpen ? <Menu size={16} /> : <ChartNoAxesColumnIncreasing onClick={(e) => e.stopPropagation()} size={16} className="rotate-90" />
+                                        }
+                                        </SheetTrigger>
+                                    )
                                 }
-                                </SheetTrigger>
-                                <a className="flex gap-4" href="#kontent">Project</a>
+                                <a 
+                                    href="#kontent" 
+                                    className="flex gap-4"
+                                    onClick={() => {
+                                        setCurrentTab('kontent')
+                                    }}
+                                >
+                                    Project
+                                </a>
                             </li>
-                            <li className="pt-5 px-5 border-b-4 border-transparent">Creator</li>
-                            <li className="pt-5 px-5 border-b-4 border-transparent">Activity</li>
+                            <li className={cn(
+                                "flex items-center px-5 border-b-4",
+                                currentTab == 'second' ? 'border-foreground' : 'border-transparent'
+                            )}>
+                                <a 
+                                    href="#second"
+                                    onClick={() => {
+                                        setCurrentTab('second')
+                                    }}
+                                >
+                                    Creator
+                                </a>
+                            </li>
+                            <li className={cn(
+                                "flex items-center px-5 border-b-4 border-transparent",
+                                currentTab == 'third' ? 'border-foreground' : 'border-transparent'
+                            )}>
+                                <a 
+                                    href="#third"
+                                    onClick={() => {
+                                        setCurrentTab('third')
+                                    }}
+                                >
+                                    Activity
+                                </a>
+                            </li>
                         </ul>
                         <SheetContent side="left">
                             <SheetHeader>
@@ -172,55 +210,66 @@ export default function ShowProject({ project, h } : {
                         </SheetContent>
                     </Sheet>
                 </div>
-                <div id="kontent">
-                    <div className="hidden md:inline md:w-1/4 pt-10 h-full sticky float-left top-16">
-                        <div className="w-96 block mr-0 ml-auto pl-4 mt-3">
-                            <h4 className="mb-10 font-semibold">Contents</h4>
-                            <ul>
-                            {
-                                h.map(({hash, tag, text}) => (
-                                    <li 
-                                    onClick={() => setTimeout(() => {
-                                        if (sectionNav.current) {
-                                            window.scrollBy(0, -100)
-                                        }
-                                    }, 1000)} 
-                                    className="mb-3">
-                                        <div className="flex">
-                                            { tag == 'h2' && <div className="mr-1 mt-0.5 inline rotate-180">&not;</div>}
-                                            <a className="hover:underline" href={'#' + hash}>
-                                                {text}
-                                            </a>
-                                        </div>
-                                        
-                                    </li>
-                                ))    
+                {
+                    currentTab == 'kontent' && (
+                        <ThreeColLayout 
+                            id="kontent"
+                            leftChildren={
+                                <div className="w-96 block mr-0 ml-auto pl-4 mt-3">
+                                    <h4 className="mb-10 font-semibold">Contents</h4>
+                                    <ul>
+                                    {
+                                        h.map(({hash, tag, text}) => (
+                                            <li 
+                                            onClick={() => setTimeout(() => {
+                                                if (sectionNav.current) {
+                                                    window.scrollBy(0, -100)
+                                                }
+                                            }, 1000)} 
+                                            className="mb-3">
+                                                <div className="flex">
+                                                    { tag == 'h2' && <div className="mr-1 mt-0.5 inline rotate-180">&not;</div>}
+                                                    <a className="hover:underline" href={'#' + hash}>
+                                                        {text}
+                                                    </a>
+                                                </div>
+                                                
+                                            </li>
+                                        ))    
+                                    }
+                                    </ul>
+                                </div>
                             }
-                            </ul>
+                            rightChilren={
+                                <div className="border w-96 p-6 mt-6 mr-4">
+                                    <div className="relative size-18 rounded-full border overflow-hidden -top-14 -mb-8">
+                                        <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
+                                    </div>
+                                    <h3 className="font-bold text-lg">{project.creator?.name}</h3>
+                                    <p className="mt-5">{project.creator?.bio}</p>
+                                </div>
+                            }
+                        >
+                            <h1 className="mt-3 text-2xl ">Story</h1>
+                            <div
+                                id="description" 
+                                className="w-full mt-10"
+                                dangerouslySetInnerHTML={{__html: project.description}} 
+                            />
+                        </ThreeColLayout>
+                    )
+                }
+                {
+                    currentTab == 'second' && (
+                        <div id="other" className="w-full h-96">
+                            Other
                         </div>
-                        
-                    </div>
-                    <div className="hidden md:flex md:w-1/4 pt-10 h-full sticky float-right top-16">
-                        <div className="border w-96 p-6 mt-6 mr-4">
-                            <div className="relative size-18 rounded-full border overflow-hidden -top-14 -mb-8">
-                                <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
-                            </div>
-                            <h3 className="font-bold text-lg">{project.creator?.name}</h3>
-                            <p className="mt-5">{project.creator?.bio}</p>
-                        </div>
-                    </div>
-                    <div
-                        className="w-full md:w-2/4 block mx-auto pt-10 px-4"
-                    >
-                        <h1 className="mt-3 text-2xl ">Story</h1>
-                        <div
-                            id="description" 
-                            className="w-full mt-10"
-                            dangerouslySetInnerHTML={{__html: project.description}} 
-                        /> 
-                    </div>
-                    
-                </div>
+                    )
+                }
+                
+                {/* <div id="other" className="w-full h-96">
+                    Other
+                </div> */}
         </AppLayout>
     )
 }
