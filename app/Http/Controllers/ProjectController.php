@@ -7,8 +7,10 @@ use App\Models\Team;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\URL;
 
 class ProjectController extends Controller
 {
@@ -85,6 +87,15 @@ class ProjectController extends Controller
      */
     public function show(Project $project)
     {
+        if ($project->visibility === 'private' && !Auth::user()) {
+            session()->put('url.intended', URL::full());
+            return redirect(route('login'));
+        }
+
+        if (! Gate::allows('view-project', $project)) {
+            abort(403);
+        }
+
         $project->load(['owner', 'creator']);
 
         $dom = new \DOMDocument();

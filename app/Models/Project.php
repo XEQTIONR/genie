@@ -23,6 +23,7 @@ class Project extends Model
         'owner_id',
         'owner_type',
         'creator_id',
+        'visibility'
     ];
 
     protected function casts(): array

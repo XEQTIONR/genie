@@ -57,7 +57,7 @@ export default function ShowProject({ project, h } : {
     const sectionNav = useRef(null)
 
     return (
-        <AppLayout maxHeaderWidth='md:max-w-7xl' maxBodyWidth="w-full" breadcrumbs={breadcrumbs}>
+        <AppLayout maxBodyWidth="w-full" breadcrumbs={breadcrumbs}>
             <Head title="Show Project" />
                 <div className="w-full md:min-h-[50vh] bg-neutral-900">
                     <h1 className="w-full md:w-1/3 text-center mx-auto text-2xl font-semibold mt-5 md:mt-10">{project.title}</h1>

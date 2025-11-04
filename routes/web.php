@@ -12,8 +12,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/teams', [TeamController::class, 'store'])->name('teams.store');
     Route::get('/projects/create', [ProjectController::class, 'create'])->name('projects.create');
     Route::post('/projects', [ProjectController::class, 'store'])->name('projects.store');
-    Route::get('/projects/{project:slug}', [ProjectController::class, 'show'])->name('projects.show');
 });
+
+Route::get('/projects/{project:slug}', [ProjectController::class, 'show'])->name('projects.show');
 
 Route::get('/profile/{user:username}', function(User $user) {
     return Inertia::render('users/show', [
@@ -25,6 +26,7 @@ Route::get('/profile/{user:username}', function(User $user) {
 Route::patch('/profile/{user}', [UserProfileController::class, 'update'])->name('users.update');
 
 Route::get('/profile/{user:username}/about', function(User $user) {
+    $user->load(['ownedProjects']);
     return Inertia::render('users/show', [
         'user' => $user,
         'tab' => 'about'

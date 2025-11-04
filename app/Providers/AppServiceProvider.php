@@ -2,8 +2,13 @@
 
 namespace App\Providers;
 
+use App\Models\Project;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Sanctum\PersonalAccessToken;
+use Illuminate\Support\Facades\Gate;
+use App\Models\User;
+use Illuminate\Support\Facades\Log;
+
 class AppServiceProvider extends ServiceProvider
 {
     /**
@@ -34,6 +39,18 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        Gate::define('view-project', function(User $user, Project $project) {
+            if ($project->visibility === 'public') {
+                return true;
+            }
+
+            $owner = $project->owner;
+
+            if (get_class($owner) === User::class && $user->id === $owner->id) {
+                return true;
+            }
+
+            return false;
+        });
     }
 }
