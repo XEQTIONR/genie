@@ -92,12 +92,6 @@ class ProjectController extends Controller
         $dom->loadHTML($project->description, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
         libxml_clear_errors();
 
-        foreach ($dom->getElementsByTagName('p') as $p) {
-            $existingClass = $p->getAttribute('class');
-            $newClass = trim($existingClass . ' text-pink-500');
-            $p->setAttribute('class', $newClass);
-        }
-
         $h = [];
         $tags = ['h1', 'h2'];
         
@@ -112,6 +106,7 @@ class ProjectController extends Controller
                 }
 
                 $h[] = [
+                    'tag' => $tag,
                     'text' => $t->textContent,
                     'offset' => $offset,
                     'hash' => hash('crc32', $t->textContent)

@@ -22,14 +22,11 @@ import {
 } from "@/components/ui/sheet"
 import { Button } from "@/components/ui/button";
 import { ChartNoAxesColumnIncreasing, ChevronDown, Code, CodeXml, Facebook, Heart, Mail, Menu, Twitter } from "lucide-react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { cn } from "@/lib/utils";
-
-import { Card, CardContent } from "@/components/ui/card"
 import {
   Carousel,
   CarouselContent,
-  CarouselDots,
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
@@ -38,9 +35,14 @@ import Autoplay from "embla-carousel-autoplay"
 import Fade from 'embla-carousel-fade'
 import '/resources/css/projects.css'
 
-export default function ShowProject({ project, h } : { project: Project, h: { hash: string, text: string}[] }) {
-
-    const ProjectOwnerTypeTeam = "App\\Models\\Team"
+export default function ShowProject({ project, h } : { 
+    project: Project 
+    h: { 
+        hash: string 
+        tag: string 
+        text: string
+    }[] 
+}) {
 
     const breadcrumbs: BreadcrumbItem[] = [
         {
@@ -50,6 +52,7 @@ export default function ShowProject({ project, h } : { project: Project, h: { ha
     ]
 
     const [sidebarOpen, setSidebarOpen] = useState(false)
+    const sectionNav = useRef(null)
 
     return (
         <AppLayout maxHeaderWidth='md:max-w-7xl' maxBodyWidth="w-full" breadcrumbs={breadcrumbs}>
@@ -76,11 +79,11 @@ export default function ShowProject({ project, h } : { project: Project, h: { ha
                                     'https://www.youtube.com/embed/kAiFVcd9cAA?si=vqD0MBPwIfWG_a80',
                                     'https://www.kickstarter.com/projects/ivstudios/honors-end/widget/video.html',
                                 ].map((url, index) => (
-                                <CarouselItem key={index}>
-                                    <div className="aspect-video flex items-center justify-center border rounded-md">
-                                        <iframe id={"iframe"+index} onClick={() => console.log('iframe clicked')} className="w-full h-full rounded-md" src={url} title="YouTube video player" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen="true"></iframe>
-                                    </div>
-                                </CarouselItem>
+                                    <CarouselItem key={index}>
+                                        <div className="aspect-video flex items-center justify-center border rounded-md">
+                                            <iframe id={"iframe"+index} className="w-full h-full rounded-md" src={url} title="YouTube video player" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen="true"></iframe>
+                                        </div>
+                                    </CarouselItem>
                                 ))}
                             </CarouselContent>
                             <CarouselPrevious className="hidden md:flex z-60" />
@@ -123,43 +126,82 @@ export default function ShowProject({ project, h } : { project: Project, h: { ha
                 </div>
                
                 <div className={cn(
-                    "z-60 sticky top-0 w-full h-18 border-b dark:shadow-neutral-900/80 flex md:justify-center items-center bg-background",
+                    "z-50 sticky top-0 w-full h-18 border-b dark:shadow-neutral-900/80 flex md:justify-center items-center bg-background",
                     !sidebarOpen && "shadow-xl"
                 )}>
-                    <Sheet onOpenChange={setSidebarOpen}>
-                        <ul className="flex h-full gap-4 text-sm">
+                    <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
+                        <ul ref={sectionNav} className="flex h-full gap-4 text-sm">
                             <li className="pt-5 px-5 font-semibold border-b-4 border-foreground flex gap-3">
-                                <a className="flex gap-4" href="#kontent">
                                 <SheetTrigger className="md:hidden" asChild>
                                 {
-                                    sidebarOpen ? <Menu /> : <ChartNoAxesColumnIncreasing className="rotate-90" />
+                                    sidebarOpen ? <Menu size={16} /> : <ChartNoAxesColumnIncreasing onClick={(e) => e.stopPropagation()} size={16} className="rotate-90" />
                                 }
                                 </SheetTrigger>
-                                Project</a>
+                                <a className="flex gap-4" href="#kontent">Project</a>
                             </li>
                             <li className="pt-5 px-5 border-b-4 border-transparent">Creator</li>
                             <li className="pt-5 px-5 border-b-4 border-transparent">Activity</li>
                         </ul>
                         <SheetContent side="left">
-                            Some content
+                            <SheetHeader>
+                                <SheetTitle>Contents</SheetTitle>
+                            </SheetHeader>
+                            <ul className="px-4">
+                            {
+                                h.map(({hash, tag, text}) => (
+                                    <li 
+                                    onClick={() => {
+                                        setSidebarOpen(false)
+                                        setTimeout(() => {
+                                        if (sectionNav.current) {
+                                            window.scrollBy(0, -100)
+                                        }
+                                    }, 1000)}} 
+                                    className="mb-3">
+                                        <div className="flex">
+                                            { tag == 'h2' && <div className="mr-1 mt-0.5 inline rotate-180">&not;</div>}
+                                            <a className="hover:underline" href={'#' + hash}>
+                                                {text}
+                                            </a>
+                                        </div>
+                                        
+                                    </li>
+                                ))    
+                            }
+                            </ul>
                         </SheetContent>
                     </Sheet>
-                    
                 </div>
                 <div id="kontent">
                     <div className="hidden md:inline md:w-1/4 pt-10 h-full sticky float-left top-16">
-                        <div className="w-96 block mr-0 ml-auto">
-                            <h4 className="mb-10">Contents</h4>
-                            <ul className="">
+                        <div className="w-96 block mr-0 ml-auto pl-4 mt-3">
+                            <h4 className="mb-10 font-semibold">Contents</h4>
+                            <ul>
                             {
-                                h.map(({hash, text}) => <li className="mb-3"><a href={'#' + hash}>{text}</a></li>)    
+                                h.map(({hash, tag, text}) => (
+                                    <li 
+                                    onClick={() => setTimeout(() => {
+                                        if (sectionNav.current) {
+                                            window.scrollBy(0, -100)
+                                        }
+                                    }, 1000)} 
+                                    className="mb-3">
+                                        <div className="flex">
+                                            { tag == 'h2' && <div className="mr-1 mt-0.5 inline rotate-180">&not;</div>}
+                                            <a className="hover:underline" href={'#' + hash}>
+                                                {text}
+                                            </a>
+                                        </div>
+                                        
+                                    </li>
+                                ))    
                             }
                             </ul>
                         </div>
                         
                     </div>
                     <div className="hidden md:flex md:w-1/4 pt-10 h-full sticky float-right top-16">
-                        <div className="border w-96 p-6 mt-5">
+                        <div className="border w-96 p-6 mt-6 mr-4">
                             <div className="relative size-18 rounded-full border overflow-hidden -top-14 -mb-8">
                                 <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
                             </div>
