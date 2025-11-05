@@ -1,15 +1,7 @@
 import { PlaceholderPattern } from "@/components/ui/placeholder-pattern";
 import AppLayout from "@/layouts/app-layout";
-import { show as showTeam } from "@/routes/teams";
-import { show as showUser } from "@/routes/users";
-import { BreadcrumbItem, Project, Team } from "@/types";
+import { BreadcrumbItem, Project } from "@/types";
 import { Head, Link } from "@inertiajs/react";
-import {
-  SidebarInset,
-  SidebarProvider,
-  SidebarTrigger,
-} from "@/components/ui/sidebar"
-import { ProjectSidebar } from "@/components/project-sidebar";
 import {
   Sheet,
   SheetClose,
@@ -31,10 +23,23 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel"
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@/components/ui/avatar"
+import {
+  Item,
+  ItemContent,
+  ItemDescription,
+  ItemMedia,
+  ItemTitle,
+} from "@/components/ui/item"
 import Autoplay from "embla-carousel-autoplay"
 import Fade from 'embla-carousel-fade'
 import '/resources/css/projects.css'
 import ThreeColLayout from "./components/three-col-layout";
+import { Separator } from "@/components/ui/separator";
 
 export default function ShowProject({ project, h } : { 
     project: Project 
@@ -50,6 +55,12 @@ export default function ShowProject({ project, h } : {
             title: 'Show Project',
             href: '/'
         },
+    ]
+
+    const collaborators = [
+        { name: "John Doe", initials: "JD" },
+        { name: "Anonymous", initials: "A" },
+        { name: "Jim Schooner", initials: "JS" },
     ]
 
     const [currentTab, setCurrentTab] = useState("kontent")
@@ -240,7 +251,7 @@ export default function ShowProject({ project, h } : {
                                     </ul>
                                 </div>
                             }
-                            rightChilren={
+                            rightChildren={
                                 <div className="border w-96 p-6 mt-6 mr-4">
                                     <div className="relative size-18 rounded-full border overflow-hidden -top-14 -mb-8">
                                         <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
@@ -250,7 +261,7 @@ export default function ShowProject({ project, h } : {
                                 </div>
                             }
                         >
-                            <h1 className="mt-3 text-2xl ">Story</h1>
+                            <h1 className="text-2xl font-semibold">Story</h1>
                             <div
                                 id="description" 
                                 className="w-full mt-10"
@@ -261,9 +272,68 @@ export default function ShowProject({ project, h } : {
                 }
                 {
                     currentTab == 'second' && (
-                        <div id="other" className="w-full h-96">
-                            Other
+                        <div className="w-full flex gap-5 justify-center">
+                            <div className="h-96 w-2/4">
+                                <h1 className="text-2xl mt-10 font-semibold">About the creator</h1>
+                                <div className="flex items-center gap-3 my-6">
+                                    <Avatar className="size-20">
+                                        <AvatarImage src="" />
+                                        <AvatarFallback>{project.creator?.name.split(' ').map(word => word.charAt(0)).join("")}</AvatarFallback>
+                                    </Avatar>
+                                    <h3 className="font-semibold">{project.creator?.name}</h3>
+                                </div>
+                                <div className="w-full flex gap-10 mb-5">
+                                    <div>
+                                        <h4 className="text-lg font-semibold">Nov 5 2024</h4>
+                                        <span className="text-sm">last login</span>
+                                    </div>
+                                    <div>
+                                        <h4 className="text-lg font-semibold">Jun 28 2010</h4>
+                                        <span className="text-sm">account created</span>
+                                    </div>
+                                </div>
+                                <Separator />
+                                <p className="mt-5">{project.creator?.bio}</p>
+                            </div>
+                            <div className="h-96 w-1/4">
+                                <h2 className="text-lg mt-10 mb-4 font-semibold">Collaborators</h2>
+                                <div className="w-full flex gap-2.5 flex-col">
+                                    {
+                                        collaborators.map(({name, initials}) => (
+                                            <Item variant="outline">
+                                                <ItemMedia>
+                                                    <Avatar className="size-10">
+                                                        <AvatarImage src="" />
+                                                        <AvatarFallback>{initials}</AvatarFallback>
+                                                    </Avatar>
+                                                </ItemMedia>
+                                                <ItemContent>
+                                                    <ItemTitle>{name}</ItemTitle>
+                                                    <ItemDescription>-</ItemDescription>
+                                                </ItemContent>
+                                            </Item>
+                                        ))
+                                    }
+                                    
+                                </div>
+                                
+                            </div>
+
                         </div>
+                        // <ThreeColLayout
+                        //     id="second"
+                        //     leftChildren={<></>}
+                        //     rightChildren={<></>}
+                        // >
+                        //     <h1 className="text-2xl ">About the creator</h1>
+                        //     <div className="flex items-center gap-3 mt-4">
+                        //         <div className="relative size-18 rounded-full border overflow-hidden">
+                        //             <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
+                        //         </div>
+                        //         <h3 className="font-bold text-lg">{project.creator?.name}</h3>
+                        //     </div>
+                        //     <p className="mt-5">{project.creator?.bio}</p>
+                        // </ThreeColLayout>
                     )
                 }
                 

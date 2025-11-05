@@ -63,7 +63,7 @@ function Carousel({
   const { selectedIndex, scrollSnaps, onDotButtonClick } =
     useDotButton(api)
 
-  const { autoplayIsPlaying, toggleAutoplay, onAutoplayButtonClick } =
+  const { autoplayIsPlaying, toggleAutoplay } =
     useAutoplay(api)
     
 

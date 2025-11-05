@@ -119,7 +119,16 @@ export default function CreateProject({ user, teams, apiToken } : { user: User, 
                     ['bold', 'italic', 'underline', 'strike'],
                     ['link'],
                 ]
-            }
+            },
+            formats: [
+                'bold', 'italic', 'underline', 'strike',
+                'blockquote',
+                'header', 'list',
+                'align',
+                'image',
+                'video',
+                // Exclude 'color' and 'background' from this list
+            ]
             // placeholder: 'This is the placeholder text'
         })
         editor.current = quill
@@ -391,7 +400,7 @@ export default function CreateProject({ user, teams, apiToken } : { user: User, 
                                     </ButtonGroup>
                                 </ButtonGroup>
                             </div>
-                            <div onChange={(c) => console.log('change: ', c)} className='h-36 border p-0 rounded-md' id="editor" />
+                            <div onChange={(c) => console.log('change: ', c)} className='min-h-36 border p-0 rounded-md' id="editor" />
                         </Field>
                     </FieldGroup>
                 </Step>
