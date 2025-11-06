@@ -18,7 +18,6 @@ import {
   ItemDescription,
   ItemTitle,
 } from "@/components/ui/item"
-import { Textarea } from '@/components/ui/textarea'
 import { User, Team } from '@/types'
 import {
   Select,
@@ -33,7 +32,7 @@ import { PlaceholderPattern } from '@/components/ui/placeholder-pattern'
 
 import { useEffect, useRef, useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { AlignCenter, AlignJustify, AlignLeft, AlignRight, Bold, Eye, Film, Heading1, Heading2, Image, List, ListCheck, ListChecks, ListOrdered, Lock, Video, WrapText } from 'lucide-react'
+import { AlignCenter, AlignJustify, AlignLeft, AlignRight, Eye, Film, Heading1, Heading2, Image, List, ListChecks, ListOrdered, Lock, WrapText } from 'lucide-react'
 import { Checkbox } from '@/components/ui/checkbox'
 import {
   Dialog,
@@ -86,8 +85,6 @@ function Step({step, heading, children} : {step: number, heading: string, childr
     </>)
 }
 
-
-
 export default function CreateProject({ user, teams, apiToken } : { user: User, teams: Team[], apiToken: string }) {
 
     const [ownerType, setOwnerType] = useState<string|null>(null)
@@ -127,9 +124,8 @@ export default function CreateProject({ user, teams, apiToken } : { user: User, 
                 'align',
                 'image',
                 'video',
-                // Exclude 'color' and 'background' from this list
-            ]
-            // placeholder: 'This is the placeholder text'
+            ],
+            placeholder: 'Detailed description and information about your project'
         })
         editor.current = quill
     }, [])
@@ -400,7 +396,16 @@ export default function CreateProject({ user, teams, apiToken } : { user: User, 
                                     </ButtonGroup>
                                 </ButtonGroup>
                             </div>
-                            <div onChange={(c) => console.log('change: ', c)} className='min-h-36 border p-0 rounded-md' id="editor" />
+                            <div 
+                                onClick={() => {
+                                    const textBox: HTMLDivElement|null = document.querySelector('.ql-editor')
+                                    if (textBox) {
+                                        textBox.focus()
+                                    }
+                                }}
+                                className='min-h-36 border p-0 rounded-md' 
+                                id="editor"
+                            />
                         </Field>
                     </FieldGroup>
                 </Step>

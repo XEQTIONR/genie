@@ -87,13 +87,16 @@ class ProjectController extends Controller
      */
     public function show(Project $project)
     {
-        if ($project->visibility === 'private' && !Auth::user()) {
-            session()->put('url.intended', URL::full());
-            return redirect(route('login'));
-        }
 
-        if (! Gate::allows('view-project', $project)) {
-            abort(403);
+        if ($project->visibility === 'private') {
+            if (! Auth::user()) {
+                session()->put('url.intended', URL::full());
+                return redirect(route('login'));
+            }
+            
+            if (! Gate::allows('view-project', $project)) {
+                abort(403);
+            }
         }
 
         $project->load(['owner', 'creator']);
