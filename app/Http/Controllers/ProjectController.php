@@ -133,6 +133,11 @@ class ProjectController extends Controller
             }
         }
 
+        foreach($dom->getElementsByTagName('iframe') as $t) {
+            $class = $t->getAttribute('class');
+            $t->setAttribute('class', $class . ' w-full aspect-video');
+        }
+
         $project->description = $dom->saveHTML();
 
         return Inertia::render('projects/show', [

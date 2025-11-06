@@ -70,7 +70,7 @@ export default function ShowProject({ project, h } : {
     return (
         <AppLayout maxBodyWidth="w-full" breadcrumbs={breadcrumbs}>
             <Head title="Show Project" />
-                <div className="w-full md:min-h-[50vh] bg-neutral-900">
+                <div className="w-full md:min-h-[50vh] bg-secondary dark:bg-neutral-900">
                     <h1 className="w-full md:w-1/3 text-center mx-auto text-2xl font-semibold mt-5 md:mt-10">{project.title}</h1>
                     <h2 className="w-full md:w-1/3 text-center mx-auto mt-1 mb-3">{project.excerpt}</h2>
                     <div className="flex flex-col md:gap-7 md:flex-row mx-auto w-full md:max-w-7xl items-stretch">
@@ -91,7 +91,7 @@ export default function ShowProject({ project, h } : {
                                     'https://www.kickstarter.com/projects/ivstudios/honors-end/widget/video.html',
                                 ].map((url, index) => (
                                     <CarouselItem key={index}>
-                                        <div className="aspect-video flex items-center justify-center border rounded-md">
+                                        <div className="aspect-video flex items-center justify-center rounded-md">
                                             <iframe id={"iframe"+index} className="w-full h-full rounded-md" src={url} title="YouTube video player" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen="true"></iframe>
                                         </div>
                                     </CarouselItem>
@@ -136,14 +136,14 @@ export default function ShowProject({ project, h } : {
                 </div>
                
                 <div className={cn(
-                    "z-50 sticky top-0 w-full h-18 border-b dark:shadow-neutral-900/80 flex md:justify-center items-center bg-background",
+                    "z-70 sticky top-0 w-full h-18 border-b dark:shadow-neutral-900/80 flex md:justify-center items-center bg-background",
                     !sidebarOpen && "shadow-xl"
                 )}>
                     <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
                         <ul ref={sectionNav} className="flex h-full gap-4 text-sm">
                             <li className={cn(
-                                "flex items-center px-5 font-semibold border-b-4 border-foreground gap-3",
-                                currentTab == 'kontent' ? 'border-foreground' : 'border-transparent'
+                                "flex items-center px-5 border-b-4 gap-3",
+                                currentTab == 'kontent' ? 'border-foreground font-semibold' : 'border-transparent'
                             )}>
                                 {
                                     currentTab == 'kontent' && (
@@ -166,7 +166,7 @@ export default function ShowProject({ project, h } : {
                             </li>
                             <li className={cn(
                                 "flex items-center px-5 border-b-4",
-                                currentTab == 'second' ? 'border-foreground' : 'border-transparent'
+                                currentTab == 'second' ? 'border-foreground font-semibold' : 'border-transparent'
                             )}>
                                 <a 
                                     href="#second"
@@ -178,8 +178,8 @@ export default function ShowProject({ project, h } : {
                                 </a>
                             </li>
                             <li className={cn(
-                                "flex items-center px-5 border-b-4 border-transparent",
-                                currentTab == 'third' ? 'border-foreground' : 'border-transparent'
+                                "flex items-center px-5 border-b-4",
+                                currentTab == 'third' ? 'border-foreground font-semibold' : 'border-transparent'
                             )}>
                                 <a 
                                     href="#third"
@@ -272,8 +272,8 @@ export default function ShowProject({ project, h } : {
                 }
                 {
                     currentTab == 'second' && (
-                        <div className="w-full flex gap-5 justify-center">
-                            <div className="h-96 w-2/4">
+                        <div id="second" className="w-full flex flex-col md:flex-row gap-5 xl:gap-10 px-4 justify-center">
+                            <div className="w-full md:w-3/5 xl:w-2/4">
                                 <h1 className="text-2xl mt-10 font-semibold">About the creator</h1>
                                 <div className="flex items-center gap-3 my-6">
                                     <Avatar className="size-20">
@@ -282,7 +282,7 @@ export default function ShowProject({ project, h } : {
                                     </Avatar>
                                     <h3 className="font-semibold">{project.creator?.name}</h3>
                                 </div>
-                                <div className="w-full flex gap-10 mb-5">
+                                <div className="w-full flex gap-10">
                                     <div>
                                         <h4 className="text-lg font-semibold">Nov 5 2024</h4>
                                         <span className="text-sm">last login</span>
@@ -292,15 +292,15 @@ export default function ShowProject({ project, h } : {
                                         <span className="text-sm">account created</span>
                                     </div>
                                 </div>
-                                <Separator />
-                                <p className="mt-5">{project.creator?.bio}</p>
+                                <Separator className="my-5" />
+                                <p>{project.creator?.bio}</p>
                             </div>
-                            <div className="h-96 w-1/4">
-                                <h2 className="text-lg mt-10 mb-4 font-semibold">Collaborators</h2>
-                                <div className="w-full flex gap-2.5 flex-col">
+                            <div className="w-full md:w-2/5 xl:w-1/4">
+                                <h2 className="text-lg mt-4 md:mt-10 mb-4 font-semibold">Collaborators</h2>
+                                <div className="w-full flex gap-2.5 flex-col mb-4">
                                     {
                                         collaborators.map(({name, initials}) => (
-                                            <Item variant="outline">
+                                            <Item variant="muted">
                                                 <ItemMedia>
                                                     <Avatar className="size-10">
                                                         <AvatarImage src="" />
@@ -318,7 +318,6 @@ export default function ShowProject({ project, h } : {
                                 </div>
                                 
                             </div>
-
                         </div>
                         // <ThreeColLayout
                         //     id="second"

@@ -147,7 +147,7 @@ function Carousel({
                 onClick={() => onDotButtonClick(index)}
                 className={cn(
                   "transition-colors duration-500",
-                  index === selectedIndex ? "bg-primary" : "bg-secondary"
+                  index === selectedIndex ? "bg-primary" : "bg-neutral-300 dark:bg-secondary"
                 )}
               />
             ))}
@@ -155,7 +155,7 @@ function Carousel({
           <div className="w-1/12 flex justify-end">
             <Button variant="ghost" size="icon" onClick={toggleAutoplay}>
               {
-                autoplayIsPlaying ? <Pause /> : <Play />
+                autoplayIsPlaying ? <Pause className="fill-foreground" /> : <Play className="fill-foreground" />
               }
             </Button>
           </div>
