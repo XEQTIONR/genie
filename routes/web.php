@@ -3,6 +3,7 @@
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\TeamController;
 use App\Http\Controllers\UserProfileController;
+use App\Models\Project;
 use App\Models\Team;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -15,6 +16,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 
 Route::get('/projects/{project:slug}', [ProjectController::class, 'show'])->name('projects.show');
+Route::get('/projects/{project:slug}/members/create', function(Project $project) {
+    return Inertia::render('team-members/create', [
+        'project' => $project
+    ]);
+})->name('projects.members.create');
 
 Route::get('/profile/{user:username}', function(User $user) {
     return Inertia::render('users/show', [

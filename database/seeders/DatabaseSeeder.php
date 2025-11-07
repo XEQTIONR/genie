@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Team;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -14,15 +15,29 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
-
-        User::firstOrCreate(
-            ['email' => 'test@example.com'],
+        $me = User::firstOrCreate(
+            ['email' => 'x.e.q.tionrz@gmail.com'],
             [
-                'name' => 'Test User',
+                'name' => 'Ovi Hussain',
+                'username' => 'xeqtionr',
                 'password' => Hash::make('password'),
                 'email_verified_at' => now(),
             ]
         );
+
+        $users1 = User::factory(10)->create();
+        $users2 = User::factory(10)->create();
+
+        $teams = Team::factory(3, [
+            'creator_id' => $me->id,
+            'owner_id' => $me->id,
+        ])->create();
+
+        $teams->each(function(Team $team) use ($me, $users2) {
+            $team->users()->saveMany([
+                $me,
+                ...$users2,
+            ]);
+        });
     }
 }

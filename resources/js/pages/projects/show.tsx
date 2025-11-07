@@ -1,4 +1,3 @@
-import { PlaceholderPattern } from "@/components/ui/placeholder-pattern";
 import AppLayout from "@/layouts/app-layout";
 import { BreadcrumbItem, Project } from "@/types";
 import { Head, Link } from "@inertiajs/react";
@@ -40,6 +39,7 @@ import Fade from 'embla-carousel-fade'
 import '/resources/css/projects.css'
 import ThreeColLayout from "./components/three-col-layout";
 import { Separator } from "@/components/ui/separator";
+import { TEAMMODEL } from "@/types/values";
 
 export default function ShowProject({ project, h } : { 
     project: Project 
@@ -253,10 +253,11 @@ export default function ShowProject({ project, h } : {
                             }
                             rightChildren={
                                 <div className="border w-96 p-6 mt-6 mr-4">
-                                    <div className="relative size-18 rounded-full border overflow-hidden -top-14 -mb-8">
-                                        <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
-                                    </div>
-                                    <h3 className="font-bold text-lg">{project.creator?.name}</h3>
+                                    <Avatar variant={project.owner_type === TEAMMODEL ? "square" : "rounded"} className="relative size-18 overflow-hidden -top-14 -mb-8">
+                                        <AvatarImage src="" />
+                                        <AvatarFallback variant={project.owner_type === TEAMMODEL ? "square" : "rounded"}>{project.owner?.name.split(' ').map(word => word.charAt(0)).join("")}</AvatarFallback>
+                                    </Avatar>
+                                    <h3 className="font-bold text-lg">{project.owner?.name}</h3>
                                     <p className="mt-5">{project.creator?.bio}</p>
                                 </div>
                             }
@@ -276,11 +277,11 @@ export default function ShowProject({ project, h } : {
                             <div className="w-full md:w-3/5 xl:w-2/4">
                                 <h1 className="text-2xl mt-10 font-semibold">About the creator</h1>
                                 <div className="flex items-center gap-3 my-6">
-                                    <Avatar className="size-20">
+                                    <Avatar variant={project.owner_type === TEAMMODEL ? "square" : "rounded"} className="size-20">
                                         <AvatarImage src="" />
-                                        <AvatarFallback>{project.creator?.name.split(' ').map(word => word.charAt(0)).join("")}</AvatarFallback>
+                                        <AvatarFallback variant={project.owner_type === TEAMMODEL ? "square" : "rounded"}>{project.owner?.name.split(' ').map(word => word.charAt(0)).join("")}</AvatarFallback>
                                     </Avatar>
-                                    <h3 className="font-semibold">{project.creator?.name}</h3>
+                                    <h3 className="font-semibold">{project.owner?.name}</h3>
                                 </div>
                                 <div className="w-full flex gap-10">
                                     <div>

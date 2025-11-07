@@ -1,6 +1,6 @@
 import { InertiaLinkProps } from '@inertiajs/react';
 import { LucideIcon } from 'lucide-react';
-
+import { USERMODEL, TEAMMODEL } from './values'
 export interface Auth {
     user: User;
 }
@@ -39,9 +39,8 @@ export interface SharedData {
     }
 }
 
-export const ProjectOwnerTypeUser = "App\\Models\\User"
-export const ProjectOwnerTypeTeam = "App\\Models\\Team"
-
+type ProjectOwnerTypeUser = typeof USERMODEL
+type ProjectOwnerTypeTeam = typeof TEAMMODEL
 export type ProjectOwner = ProjectOwnerTypeUser | ProjectOwnerTypeTeam
 
 export interface Project {
