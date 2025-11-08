@@ -13,14 +13,24 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/teams', [TeamController::class, 'store'])->name('teams.store');
     Route::get('/projects/create', [ProjectController::class, 'create'])->name('projects.create');
     Route::post('/projects', [ProjectController::class, 'store'])->name('projects.store');
+    Route::get('/projects/{project:slug}/members/create', function(Project $project) {
+        $owner = $project->owner;
+        
+        $default_members = [];
+
+        if ($owner instanceof Team) {
+            $default_members = $owner->users;
+        }
+
+        return Inertia::render('project-members/create', [
+            'project' => $project,
+            'owner' => $owner,
+            'defaultMembers' => $default_members
+        ]);
+    })->name('projects.members.create');
 });
 
 Route::get('/projects/{project:slug}', [ProjectController::class, 'show'])->name('projects.show');
-Route::get('/projects/{project:slug}/members/create', function(Project $project) {
-    return Inertia::render('team-members/create', [
-        'project' => $project
-    ]);
-})->name('projects.members.create');
 
 Route::get('/profile/{user:username}', function(User $user) {
     return Inertia::render('users/show', [

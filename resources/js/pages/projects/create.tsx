@@ -32,7 +32,7 @@ import { PlaceholderPattern } from '@/components/ui/placeholder-pattern'
 
 import { useEffect, useRef, useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { AlignCenter, AlignJustify, AlignLeft, AlignRight, Eye, Film, Heading1, Heading2, Image, List, ListChecks, ListOrdered, Lock, WrapText } from 'lucide-react'
+import { AlignCenter, AlignJustify, AlignLeft, AlignRight, Eye, Film, Heading1, Heading2, Image, List, ListChecks, ListOrdered, Lock, PencilRuler, WrapText } from 'lucide-react'
 import { Checkbox } from '@/components/ui/checkbox'
 import {
   Dialog,
@@ -153,7 +153,10 @@ export default function CreateProject({ user, teams, apiToken } : { user: User, 
                     description: editor.current?.root.innerHTML
                 })}
             >
-                <h1 className="text-xl font-bold md:mx-10 mb-1.5">Create a new project</h1>
+                <div className="flex items-center gap-3 mb-1">
+                    <PencilRuler size={25} />
+                    <h1 className="text-xl font-bold"> Create a new project</h1>
+                </div>
                 <span className="text-sm text-dim md:mx-10 mb-1">Projects are game development endeavors in which one or multiple people 
                     participate in with the goal of creating a finished product that can be called
                     a game.
