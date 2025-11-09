@@ -87,7 +87,6 @@ class ProjectController extends Controller
      */
     public function show(Project $project)
     {
-
         if ($project->visibility === 'private') {
             if (! Auth::user()) {
                 session()->put('url.intended', URL::full());

@@ -77,4 +77,9 @@ class User extends Authenticatable
     {
         return $this->morphMany(Project::class, 'owner');
     }
+
+    public function projects(): BelongsToMany
+    {
+        return $this->belongsToMany(Project::class)->withTimestamps();
+    }
 }

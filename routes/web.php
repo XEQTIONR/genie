@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\ProjectMembershipController;
 use App\Http\Controllers\TeamController;
 use App\Http\Controllers\UserProfileController;
 use App\Models\Project;
@@ -13,21 +14,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/teams', [TeamController::class, 'store'])->name('teams.store');
     Route::get('/projects/create', [ProjectController::class, 'create'])->name('projects.create');
     Route::post('/projects', [ProjectController::class, 'store'])->name('projects.store');
-    Route::get('/projects/{project:slug}/members/create', function(Project $project) {
-        $owner = $project->owner;
-        
-        $default_members = [];
+    Route::get('/projects/{project:slug}/members/create', [ProjectMembershipController::class, 'create'])
+        ->name('projects.members.create');
 
-        if ($owner instanceof Team) {
-            $default_members = $owner->users;
-        }
-
-        return Inertia::render('project-members/create', [
-            'project' => $project,
-            'owner' => $owner,
-            'defaultMembers' => $default_members
-        ]);
-    })->name('projects.members.create');
+    Route::post('/projects/{project:slug}/members', [ProjectMembershipController::class, 'store'])
+        ->name('project.members.store');
 });
 
 Route::get('/projects/{project:slug}', [ProjectController::class, 'show'])->name('projects.show');
