@@ -59,6 +59,7 @@ import {
   ItemTitle,
 } from "@/components/ui/item"
 import ProjectCard from '@/components/project-card'
+import NoProjects from '@/components/no-projects'
 
 type ProfileTab = NavItem & {key: string, className?: string}
 
@@ -219,13 +220,11 @@ export default function TeamProfile({
                 )
 
             case 'projects':
-                return <div className="flex w-full h-full flex-col gap-6 mx-2 md:mx-8">
-                    <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-                    {
-                        projects.map((project) => <ProjectCard title={project.title} platforms={project.platforms} icon={PencilRuler} />)
-                    }
-                    </div>
-                </div> 
+                return projects.length > 0
+                    ? (<div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 w-full h-full mx-2 md:mx-8">
+                        { projects.map((project) => <ProjectCard title={project.title} platforms={project.platforms} icon={PencilRuler} />) }
+                    </div>)
+                    : <NoProjects />
         }
     }
 
@@ -298,7 +297,7 @@ export default function TeamProfile({
                         }}
                     />
                 </div>
-                <div className="w-full relative h-full md:min-h-[50vh] flex overflow-hidden border-sidebar-border/70 dark:border-sidebar-border">
+                <div className="w-full h-full md:min-h-[50vh] flex overflow-hidden">
                     {
                         loading 
                             ? <Spinner className="block mx-auto size-6" />
