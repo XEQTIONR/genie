@@ -62,10 +62,21 @@ Route::get('/teams/{team:slug}/members', function(Team $team) {
     return Inertia::render('teams/show', [
         'team' => $team,
         'users' => $users,
-        'user_count' => $users->count(),
+        'user_count' => $users->count(), // cache this later
         'tab' => 'members'
     ]);
 })->name('teams.users.index');
+
+Route::get('/teams/{team:slug}/projects', function(Team $team) {
+    $projects = $team->projects()->get();
+
+    return Inertia::render('teams/show', [
+        'team' => $team,
+        'projects' => $projects,
+        'user_count' => $team->users()->count(), // cache this later
+        'tab' => 'projects'
+    ]);
+})->name('teams.projects.index');
 
 Route::get('/', function () {
         return Inertia::render('dashboard');

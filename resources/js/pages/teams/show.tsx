@@ -1,12 +1,14 @@
 import { Button } from '@/components/ui/button'
 import { PlaceholderPattern } from '@/components/ui/placeholder-pattern'
 import AppLayout from '@/layouts/app-layout'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { show } from '@/routes/teams'
 import { show as showUser } from '@/routes/users'
-import { index } from '@/routes/teams/users'
-import { NavItem, Team, User, type BreadcrumbItem } from '@/types'
+import { index as membersIndex } from '@/routes/teams/users'
+import { index as projectsIndex } from '@/routes/teams/projects'
+import { NavItem, Project, Team, User, type BreadcrumbItem } from '@/types'
 import { Head, Link } from '@inertiajs/react'
-import { EllipsisVertical, Mail, MapPin, UserPlus, Users } from 'lucide-react'
+import { EllipsisVertical, Mail, MapPin, PencilRuler, Rocket, UserPlus, Users } from 'lucide-react'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,6 +20,7 @@ import {
 import { TabbedSectionHeaders } from '@/components/ui/tabbed-sections'
 import { type SharedData } from '@/types'
 import { usePage } from '@inertiajs/react'
+import { useInitials } from '@/hooks/use-initials';
 import { Form } from '@inertiajs/react'
 import { ArrowUpRightIcon } from "lucide-react"
 import {
@@ -55,6 +58,7 @@ import {
   ItemMedia,
   ItemTitle,
 } from "@/components/ui/item"
+import ProjectCard from '@/components/project-card'
 
 type ProfileTab = NavItem & {key: string, className?: string}
 
@@ -144,7 +148,20 @@ type ProfileTab = NavItem & {key: string, className?: string}
 //     )
 // }
 
-export default function TeamProfile({ team, tab = 'activity', user_count, users = [] } : { team: Team, tab: string, user_count: number, users?: User[] }) {
+export default function TeamProfile({ 
+    team, 
+    tab = 'activity', 
+    user_count, 
+    users = [],
+    projects = [] 
+
+} : { 
+    team: Team 
+    tab: string
+    user_count: number
+    users?: User[]
+    projects?: Project[] 
+}) {
 
     const [loading, setLoading] = useState(false)
 
@@ -157,14 +174,60 @@ export default function TeamProfile({ team, tab = 'activity', user_count, users 
         },
     ];
 
+    const initialize = useInitials();
+
     const tabs: ProfileTab[] = [
         // { title: "Showcase", href: show({ user: user.username }), key: "showcase"},
         { title: "Activity", href: show({ team: team.slug }), key: "activity"},
-        { title: "Projects", href: "/", key: "projects" },
+        { title: "Projects", href: projectsIndex({ team: team.slug }), key: "projects" },
         { title: "Releases", href: "/", key: "releases" },
-        { title: "Members", href: index({ team: team.slug }), key: "members" },
+        { title: "Members", href: membersIndex({ team: team.slug }), key: "members" },
         { title: "Openings", href: "/", key: "openings" },
     ]
+
+    function showTab(tab: string) {
+        switch(tab) {
+            case 'members':
+                return (
+                    <div className="flex w-full h-full flex-col gap-6 mx-2 md:mx-8">
+                        <ItemGroup className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+                            {users.map((member) => (
+                            <Item key={member.id} variant="outline" asChild role="listitem">
+                                <Link href={showUser({ user: member.username })}>
+                                    <ItemMedia variant="image">
+                                        <Avatar className="size-10 overflow-hidden rounded-full">
+                                            <AvatarImage
+                                                src={member.avatar}
+                                                alt={member.name}
+                                            />
+                                            <AvatarFallback className="rounded-lg bg-neutral-200 text-black dark:bg-neutral-700 dark:text-white">
+                                                {initialize(member.name)}
+                                            </AvatarFallback>
+                                        </Avatar>
+                                    </ItemMedia>
+                                    <ItemContent className="h-full">
+                                        <ItemTitle className="line-clamp-1">
+                                            {member.name}
+                                        </ItemTitle>
+                                        <ItemDescription className="text-ellipsis">{"-"}</ItemDescription>
+                                    </ItemContent>
+                                </Link>
+                            </Item>
+                            ))}
+                        </ItemGroup>
+                    </div>
+                )
+
+            case 'projects':
+                return <div className="flex w-full h-full flex-col gap-6 mx-2 md:mx-8">
+                    <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+                    {
+                        projects.map((project) => <ProjectCard title={project.title} platforms={project.platforms} icon={PencilRuler} />)
+                    }
+                    </div>
+                </div> 
+        }
+    }
 
     if ( auth.user?.id === team.owner_id ) {
         tabs.push({ title: "Add to team", href: "/", key: "invite", icon: UserPlus, className: "ml-2 border" })
@@ -209,8 +272,9 @@ export default function TeamProfile({ team, tab = 'activity', user_count, users 
                             </div>
                         </div>
                         <div className="flex items-center gap-6 mt-2 text-neutral-400 font-medium">
-                            <div className="flex items-center gap-2"> <MapPin size={16} /> Dhaka, Bangladesh </div>
-                            <Link preserveScroll href={index({ team: team.slug })} className="flex items-center gap-2 hover:underline"> <Users size={16} /> {user_count} </Link>
+                            <Link preserveScroll href={membersIndex({ team: team.slug })} className="flex items-center gap-2 hover:underline"> <Users size={16} /> {user_count} </Link>
+                            <Link preserveScroll className="flex items-center gap-2 hover:underline"> <PencilRuler size={16} /> {user_count} </Link>
+                            <Link preserveScroll className="flex items-center gap-2 hover:underline"> <Rocket size={16} /> {user_count} </Link>
                         </div>
                         <div className="flex flex-wrap gap-4 mt-4">
                         {/* {
@@ -238,36 +302,7 @@ export default function TeamProfile({ team, tab = 'activity', user_count, users 
                     {
                         loading 
                             ? <Spinner className="block mx-auto size-6" />
-                            : (tab == 'members' 
-                                && (<div className="flex w-full h-full flex-col gap-6 mx-2 md:mx-8">
-                                    <ItemGroup className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-                                        {users.map((member) => (
-                                        <Item key={member.id} variant="outline" asChild role="listitem">
-                                            <Link href={showUser({ user: member.username })}>
-                                                <ItemMedia variant="image">
-                                                    <div className="w-16 h-16 relative">
-                                                        <PlaceholderPattern className="absolute rounded-full inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
-                                                    </div>
-                                                </ItemMedia>
-                                                <ItemContent className="h-full">
-                                                    <ItemTitle className="line-clamp-1">
-                                                        {member.name}
-                                                
-                                                    </ItemTitle>
-                                                    <ItemDescription className="text-ellipsis">{"-"}</ItemDescription>
-                                                </ItemContent>
-                                                {/* <ItemContent className="flex-none text-center">
-                                                    <ItemDescription>
-                                                        {team.users_count} 
-                                                        <span className="ml-1.5">{team.users_count > 1 ? "members" : "member"}</span>
-                                                    </ItemDescription>
-                                                </ItemContent> */}
-                                            </Link>
-                                        </Item>
-                                        ))}
-                                    </ItemGroup>
-                                </div>
-                            ))
+                            : showTab(tab)
                     }
                 </div>
             </div>

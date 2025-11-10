@@ -7,6 +7,7 @@ use App\Models\Team;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Arr;
 
 class ProjectMembershipController extends Controller
 {
@@ -35,7 +36,11 @@ class ProjectMembershipController extends Controller
         $attach = [];
 
         foreach ($validated['members'] as $member) {
-            $attach[$member['id']] = ['role' => $member['role']];
+            if (Arr::exists($member, 'id')) {
+                $attach[$member['id']] = ['role' => $member['role']];
+            } else {
+                // send an email invitation
+            }
         }
 
 

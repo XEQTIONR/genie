@@ -44,7 +44,7 @@ class Team extends Model
         return $this->belongsToMany(User::class);
     }
 
-    public function ownedProjects(): MorphMany
+    public function projects(): MorphMany
     {
         return $this->morphMany(Project::class, 'owner');
     }
