@@ -79,8 +79,8 @@ class ProjectController extends Controller
 
         $project->save();
 
-        return to_route('home');
-    }
+        return to_route('projects.members.create', ['project' => $project]);
+}
 
     /**
      * Display the specified resource.
@@ -98,7 +98,7 @@ class ProjectController extends Controller
             }
         }
 
-        $project->load(['owner', 'creator']);
+        $project->load(['owner', 'creator', 'members']);
 
         $dom = new \DOMDocument();
         libxml_use_internal_errors(true);

@@ -1,5 +1,5 @@
 import AppLayout from "@/layouts/app-layout";
-import { BreadcrumbItem, Project } from "@/types";
+import { BreadcrumbItem, Project, ProjectMember } from "@/types";
 import { Head, Link } from "@inertiajs/react";
 import {
   Sheet,
@@ -47,7 +47,7 @@ export default function ShowProject({ project, h } : {
         hash: string 
         tag: string 
         text: string
-    }[] 
+    }[]
 }) {
 
     const breadcrumbs: BreadcrumbItem[] = [
@@ -275,8 +275,8 @@ export default function ShowProject({ project, h } : {
                     currentTab == 'second' && (
                         <div id="second" className="w-full flex flex-col md:flex-row gap-5 xl:gap-10 px-4 justify-center">
                             <div className="w-full md:w-3/5 xl:w-2/4">
-                                <h1 className="text-2xl mt-10 font-semibold">About the creator</h1>
-                                <div className="flex items-center gap-3 my-6">
+                                <h1 className="text-2xl mt-10 mb-6 font-semibold">About the creator</h1>
+                                <div className="flex items-center gap-3 mb-6">
                                     <Avatar variant={project.owner_type === TEAMMODEL ? "square" : "rounded"} className="size-20">
                                         <AvatarImage src="" />
                                         <AvatarFallback variant={project.owner_type === TEAMMODEL ? "square" : "rounded"}>{project.owner?.name.split(' ').map(word => word.charAt(0)).join("")}</AvatarFallback>
@@ -294,7 +294,26 @@ export default function ShowProject({ project, h } : {
                                     </div>
                                 </div>
                                 <Separator className="my-5" />
-                                <p>{project.creator?.bio}</p>
+                                <h1 className="text-xl mt-10 mb-6 font-semibold">Contributors</h1>
+                                <div className="w-full grid gap-2.5 grid-cols-2 mb-4">
+                                    {
+                                        project.members?.map(({name, pivot}) => (
+                                            <Item variant="muted">
+                                                <ItemMedia>
+                                                    <Avatar className="size-10">
+                                                        <AvatarImage src="" />
+                                                        <AvatarFallback>{name.split(' ').map(word => word.charAt(0)).join("")}</AvatarFallback>
+                                                    </Avatar>
+                                                </ItemMedia>
+                                                <ItemContent>
+                                                    <ItemTitle>{name}</ItemTitle>
+                                                    <ItemDescription>{pivot.role}</ItemDescription>
+                                                </ItemContent>
+                                            </Item>
+                                        ))
+                                    }
+                                    
+                                </div>
                             </div>
                             <div className="w-full md:w-2/5 xl:w-1/4">
                                 <h2 className="text-lg mt-4 md:mt-10 mb-4 font-semibold">Collaborators</h2>

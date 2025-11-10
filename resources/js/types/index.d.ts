@@ -55,6 +55,7 @@ export interface Project {
     creator?: User
     owner?: User | Team
     owner_type: ProjectOwner
+    members?: ProjectMember[]
 }
 
 export interface Team {
@@ -86,4 +87,10 @@ export interface User {
         skills?: string[]
     } | null
     [key: string]: unknown // This allows for additional properties...
+}
+
+export type ProjectMember = User & {
+    pivot: {
+        role: string
+    }
 }
