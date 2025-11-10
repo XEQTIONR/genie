@@ -86,6 +86,7 @@ export interface User {
         fav_games?: string[]
         skills?: string[]
     } | null
+    owned_projects?: Project[]
     [key: string]: unknown // This allows for additional properties...
 }
 

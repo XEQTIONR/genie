@@ -68,7 +68,9 @@ import { Label } from '@/components/ui/label'
 import axios from 'axios'
 import roles from '@/data/roles'
 import { create } from '@/routes/projects'
+import { show as showProject } from '@/routes/projects'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import NoProjects from '@/components/no-projects'
 
 type ProfileTab = NavItem & {key: string, className?: string}
 
@@ -197,38 +199,6 @@ function NoTeams() {
                     </a>
                 </Button>
             </Empty>
-    )
-}
-
-function NoProjects() {
-    return (
-        <Empty>
-            <EmptyHeader>
-                <EmptyMedia variant="icon">
-                    <PencilRuler />
-                </EmptyMedia>
-                <EmptyTitle>No projects</EmptyTitle>
-                <EmptyDescription>
-                    You don&apos;t have any projects. You are free to create one.
-                </EmptyDescription>
-            </EmptyHeader>
-            <EmptyContent>
-                <div className="flex gap-2"> 
-                    <Button className="cursor-pointer">Create a new project</Button>
-                    {/* <Button className="cursor-pointer" variant="outline">Join existing team</Button> */}
-                </div>
-            </EmptyContent>
-            <Button
-                variant="link"
-                asChild
-                className="text-muted-foreground"
-                size="sm"
-            >
-                <a href="#">
-                Learn More <ArrowUpRightIcon />
-                </a>
-            </Button>
-        </Empty>
     )
 }
 
@@ -379,7 +349,7 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
             case 'about':
                 return (
                     // <div className="w-full flex flex-col md:flex-row border bg-neutral-50 dark:bg-neutral-900 md:mx-8 rounded-lg">
-                    <div className="w-full flex flex-col md:flex-row md:mx-8 rounded-lg">
+                    <div className="w-full flex flex-col md:flex-row md:mx-8 rounded-lg border">
                         <div className="w-full md:w-1/4 flex flex-col p-2 gap-2 mb-2">
                             <h2 className="text-lg font-bold mx-2 mt-2 mb-6">About</h2>
                             
@@ -769,30 +739,34 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
                                         <div className="flex flex-col gap-0">
                                             <div className="flex justify-between items-center">
                                                 <h3 className="font-bold flex items-center gap-2">
-                                                    {/* <PencilRuler size={18} /> */}
                                                     Projects
                                                 </h3>
                                                 <div>
-                                                    <Link className={cn(buttonVariants({ variant: 'ghost', size: 'icon', className: "" }))} href={create().url}><Plus /></Link>
-                                                    <EditButton disabled={true} />
+                                                    <Link className={cn(buttonVariants({ variant: 'ghost', size: 'icon', className: "" }))} href={create().url}>
+                                                        <Plus />
+                                                    </Link>
                                                 </div>
                                             </div>
                                             <span className="text-xs">Current game development projects you are working on that have not been released</span>
                                         </div>
-                                        {/* <NoProjects /> */}
-                                        <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-3 mt-4 mb-6">
-                                            { projects.map(({name, platforms}) => <ProjectCard title={name} platforms={platforms} icon={PencilRuler} />) }
-                                        </div>
+                                        {
+                                            user.owned_projects && user.owned_projects.length > 0
+                                                ? (<div className="w-full grid grid-cols-1 md:grid-cols-2 gap-3 mt-4 mb-6">
+                                                    { user.owned_projects.map(({title, excerpt, platforms, slug}) => <ProjectCard href={showProject(slug).url} title={title} excerpt={excerpt} platforms={platforms} icon={PencilRuler} />) }
+                                                </div>)
+                                                : <NoProjects />
+                                        }  
                                     </div>
                                     <Separator className="mb-5" />
                                     <div className="flex flex-col gap-3">
                                         <div className="flex flex-col gap-0">
                                             <div className="flex justify-between items-center">
                                                 <h3 className="font-bold flex items-center gap-2">
-                                                    {/* <Rocket size={18} /> */}
                                                     Releases
                                                 </h3>
-                                                <EditButton disabled={true} />
+                                                <Link className={cn(buttonVariants({ variant: 'ghost', size: 'icon', className: "" }))} href={create().url}>
+                                                    <Plus />
+                                                </Link>
                                             </div>
                                             <span className="text-xs">Completed game titles by you that are available to the public</span>
                                         </div>

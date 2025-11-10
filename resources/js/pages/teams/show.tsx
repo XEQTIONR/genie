@@ -4,6 +4,7 @@ import AppLayout from '@/layouts/app-layout'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { show } from '@/routes/teams'
 import { show as showUser } from '@/routes/users'
+import { show as showProject } from '@/routes/projects'
 import { index as membersIndex } from '@/routes/teams/users'
 import { index as projectsIndex } from '@/routes/teams/projects'
 import { NavItem, Project, Team, User, type BreadcrumbItem } from '@/types'
@@ -222,7 +223,10 @@ export default function TeamProfile({
             case 'projects':
                 return projects.length > 0
                     ? (<div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 w-full h-full mx-2 md:mx-8">
-                        { projects.map((project) => <ProjectCard title={project.title} platforms={project.platforms} icon={PencilRuler} />) }
+                        { projects.map((project) => (
+                            <ProjectCard href={showProject(project.slug).url} title={project.title} platforms={project.platforms} icon={PencilRuler} />
+                            )) 
+                        }
                     </div>)
                     : <NoProjects />
         }
