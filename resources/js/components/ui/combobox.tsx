@@ -23,6 +23,10 @@ export interface Option {
     value: string
 }
 
+export interface GroupedOptions {
+    [key: string]: Option[]
+}
+
 export function Combobox({
     name = "default-combobox-name",
     defaultValue = "",
@@ -35,7 +39,7 @@ export function Combobox({
 } : {
     name?: string
     defaultValue?: string
-    items?: Option[]
+    items?: Option[]|GroupedOptions
     containerClassName?: string 
     placeholder?: string
     searchLabel?: string
@@ -58,9 +62,13 @@ export function Combobox({
                 aria-expanded={open}
                 className="justify-between"
             >
-                {value
-                ? items.find((items) => items.value === value)?.label
-                : placeholder}
+            {
+                value
+                    ? Array.isArray(items)
+                        ? items.find((item) => item.value === value)?.label
+                        : Object.values(items).flat().find((item) => item.value === value)?.label
+                    : placeholder
+            }
                 <ChevronsUpDown className="opacity-50" />
             </Button>
         </PopoverTrigger>
@@ -81,26 +89,51 @@ export function Combobox({
                 />
                 <CommandList>
                     <CommandEmpty>{noResultsLabel}</CommandEmpty>
-                    <CommandGroup>
                     {
-                        items.map((item) => (
-                            <CommandItem
-                                key={item.value}
-                                value={item.value}
-                                onSelect={(currentValue) => {
-                                setValue(currentValue === value ? "" : currentValue)
-                                setOpen(false)
-                            }}>
-                                {item.label}
-                                <Check className={cn(
-                                        "ml-auto",
-                                        value === item.value ? "opacity-100" : "opacity-0"
-                                    )}
-                                />
-                            </CommandItem>
-                        ))
+                        Array.isArray(items)
+                            ? <CommandGroup>
+                            {
+                                items.map((item) => (
+                                    <CommandItem
+                                        key={item.value}
+                                        value={item.value}
+                                        onSelect={(currentValue) => {
+                                        setValue(currentValue === value ? "" : currentValue)
+                                        setOpen(false)
+                                    }}>
+                                        {item.label}
+                                        <Check className={cn(
+                                                "ml-auto",
+                                                value === item.value ? "opacity-100" : "opacity-0"
+                                            )}
+                                        />
+                                    </CommandItem>
+                                ))
+                            }
+                            </CommandGroup>
+                            : Object.keys(items).map(key => (
+                                <CommandGroup heading={key}>
+                                {
+                                    items[key].map((item) => (
+                                        <CommandItem
+                                            key={item.value}
+                                            value={item.value}
+                                            onSelect={(currentValue) => {
+                                            setValue(currentValue === value ? "" : currentValue)
+                                            setOpen(false)
+                                        }}>
+                                            {item.label}
+                                            <Check className={cn(
+                                                    "ml-auto",
+                                                    value === item.value ? "opacity-100" : "opacity-0"
+                                                )}
+                                            />
+                                        </CommandItem>
+                                    ))
+                                }
+                                </CommandGroup>
+                            ))
                     }
-                    </CommandGroup>
                 </CommandList>
             </Command>
         </PopoverContent>

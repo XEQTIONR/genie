@@ -63,7 +63,7 @@ import { Separator } from '@/components/ui/separator'
 import { cn } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
 import SearchBar from '@/components/ui/search-bar'
-import { Combobox, Option } from '@/components/ui/combobox'
+import { Combobox, GroupedOptions, Option } from '@/components/ui/combobox'
 import { Label } from '@/components/ui/label'
 import axios from 'axios'
 import roles from '@/data/roles'
@@ -100,19 +100,25 @@ function RenderMultilineText({ text } : { text: string }) {
 
 function EditLocation({ defaultValue } : { defaultValue?: string}) {
 
-    const [options, setOptions] = useState<Option[]>([])
+    const [options, setOptions] = useState<Option[]|GroupedOptions>([])
 
-    useEffect(() => {
-        axios.get('https://restcountries.com/v3.1/all?fields=name,flag')
+    useEffect(() => {        
+        axios.get('https://restcountries.com/v3.1/all?fields=name,flag,region')
             .then(({data}) => {
-                const opts = data.map(({name, flag} : { name: { common: string }, flag: string}) => {
-                    return { name: name.common, flag }
+                const opts = data.map(({name, flag, region} : { name: { common: string }, flag: string, region: string}) => {
+                    return { name: name.common, flag, region }
                 }).sort((a: {name: string}, b: {name: string}) => a.name.localeCompare(b.name))
-                .filter(({name} : {name: string}) => name !== 'Israel') // filter out fake countries
-                .map(({ name, flag } : { name: string, flag: string }) => {
-                    return { label: flag + ' ' + name, value: name }
+                .filter(({name} : {name: string}) => name !== 'Israel')
+                .map(({ name, flag, region } : { name: string, flag: string, region: string }) => {
+                    return { label: flag + ' ' + name, value: name, region }
                 })
-                setOptions([{label: "Not selected", value: ""}, ...opts])
+
+                const grouped = Object.groupBy(opts, (opt : {region: string}) => opt.region)
+
+                setOptions({
+                    None: [{label: "Not selected", value: ""}],
+                    ...grouped
+                })
             })
     }, [])
     return <Combobox placeholder="Not selected" defaultValue={defaultValue ?? ""} name="country" items={options} containerClassName="w-64" />
