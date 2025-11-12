@@ -22,35 +22,8 @@ import { TabbedSectionHeaders } from '@/components/ui/tabbed-sections'
 import { type SharedData } from '@/types'
 import { usePage } from '@inertiajs/react'
 import { useInitials } from '@/hooks/use-initials';
-import { Form } from '@inertiajs/react'
-import { ArrowUpRightIcon } from "lucide-react"
-import {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@/components/ui/empty"
 import { Spinner } from '@/components/ui/spinner'
 import { useState } from 'react'
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog"
-import {
-  Field,
-  FieldDescription,
-  FieldLabel,
-} from "@/components/ui/field"
-import { Input } from "@/components/ui/input"
-import { Textarea } from '@/components/ui/textarea'
 import {
   Item,
   ItemContent,
