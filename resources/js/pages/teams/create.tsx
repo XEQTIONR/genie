@@ -111,7 +111,8 @@ export default function CreateTeam({ apiToken } : { apiToken: string }) {
                             username: data.username,
                             name: data.name,
                             email: data.email,
-                            roles: ['Collaborator']
+                            roles: ['Collaborator'],
+                            avatar: data.avatar
                         })
                     } else { // new user not found
                         const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
@@ -140,7 +141,8 @@ export default function CreateTeam({ apiToken } : { apiToken: string }) {
                 id: auth.user.id,
                 username: auth.user.username,
                 email: auth.user.email,
-                name: auth.user.name, 
+                name: auth.user.name,
+                avatar: auth.user.avatar, 
                 roles: ['Founder'] 
             },
         ]
@@ -148,7 +150,7 @@ export default function CreateTeam({ apiToken } : { apiToken: string }) {
 
     return (
         <AppLayout maxWidth="md:max-w-7xl" breadcrumbs={breadcrumbs}>
-            <Head title="Create new project" />
+            <Head title="Create new team" />
             <form 
                 className="w-full max-w-4xl mx-auto flex flex-col pt-8 px-4"
                 onSubmit={(e) => {
@@ -317,7 +319,6 @@ export default function CreateTeam({ apiToken } : { apiToken: string }) {
                                                                 </div>
                                                             </>
                                                     }
-                                                    
                                                 </div>
                                             </TableCell>
                                             <TableCell>

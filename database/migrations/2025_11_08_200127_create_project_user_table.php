@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('project_user', function (Blueprint $table) {
             $table->foreignId('project_id');
             $table->foreignId('user_id');
-            $table->string('role');
+            $table->json('roles');
             $table->timestamps();
 
             $table->foreign('project_id')->references('id')->on('projects');

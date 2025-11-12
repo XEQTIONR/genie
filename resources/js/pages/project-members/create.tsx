@@ -1,10 +1,10 @@
+import allRoles from '@/data/roles'
 import AppLayout from '@/layouts/app-layout'
 import { BreadcrumbItem, Project, User } from '@/types'
 import { create } from '@/routes/projects'
 import { Head, useForm, usePage } from '@inertiajs/react'
 import { useRef, useState } from 'react'
 import { Button } from '@/components/ui/button'
-import roles from '@/data/roles'
 import { index } from '@/routes/api/users'
 import { store } from '@/routes/project/members'
 
@@ -22,20 +22,25 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
-import { ChevronRight, CircleCheck, CircleX, PencilRuler, Plus, Send, Trash, UserRoundPlus, Users, UsersRound } from 'lucide-react'
+import { ChevronRight, CircleCheck, CircleX, Mail, PencilRuler, Plus, Send, Trash, UserRoundPlus, Users, UsersRound, X } from 'lucide-react'
 import { useDebouncedCallback } from 'use-debounce'
 import axios from 'axios'
 import { type SharedData } from '@/types';
+import { useInitials } from '@/hooks/use-initials'
+import { Badge } from '@/components/ui/badge'
+import SearchBar from '@/components/ui/search-bar'
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
 
 interface Member {
     id?: number
     username?: string
     email: string
     name?: string
-    role: string
+    roles: string[]
+    avatar?: string
 }
 
-export default function AddTeamMembers({ project, defaultMembers = [], apiToken } : { project: Project, defaultMembers?: User[], apiToken: string }) {
+export default function AddProjectMembers({ project, defaultMembers = [], apiToken } : { project: Project, defaultMembers?: User[], apiToken: string }) {
     const { auth } = usePage<SharedData>().props
 
     const breadcrumbs: BreadcrumbItem[] = [
@@ -46,10 +51,16 @@ export default function AddTeamMembers({ project, defaultMembers = [], apiToken 
     ]
 
     const { data, setData, post } = useForm<{ members: Member[] }>({
-        members: defaultMembers.map(({id, username, email, name}) => ({
-            id, username, name, email, role: 'Collaborator'
+        members: defaultMembers.map(({id, username, email, name, avatar}) => ({
+            id, 
+            username, 
+            name, 
+            email, 
+            roles: id === auth.user.id ? ['Founder'] : ['Collaborator'], 
+            avatar
         }))
     })
+    const getInitials = useInitials()
 
     const input = useRef<HTMLInputElement>(null)
 
@@ -90,7 +101,8 @@ export default function AddTeamMembers({ project, defaultMembers = [], apiToken 
                             username: data.username,
                             name: data.name,
                             email: data.email,
-                            role: 'Collaborator'
+                            avatar: data.avatar,
+                            roles: ['Collaborator']
                         })
                     } else { // new user not found
                         const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
@@ -158,7 +170,7 @@ export default function AddTeamMembers({ project, defaultMembers = [], apiToken 
                                             setData('members', [
                                                 {
                                                     email: newEmail,
-                                                    role: 'Collaborator'
+                                                    roles: ['Collaborator']
                                                 },
                                                 ...data.members,
                                             ])
@@ -229,41 +241,96 @@ export default function AddTeamMembers({ project, defaultMembers = [], apiToken 
                         </TableHeader>
                         <TableBody>
                             {
-                                data.members.map(({id, name, username, role, email}, index) => (
+                                data.members.map(({id, name, username, roles, email, avatar}, index) => (
                                     <TableRow className="hover:bg-transparent" key={id}>
-                                        <TableCell>
-                                            {name ?? email} <br />
+                                        <TableCell className="flex items-start">
+                                            <div className="flex items-center gap-1.5 my-1">
                                             {
-                                                username
-                                                    ? <span className="text-dim text-xs">{username}</span>
-                                                    : <span className="text-dim text-xs italic">Email invitation to be sent</span>
+                                                id !== undefined
+                                                    ? (<>
+                                                        <Avatar className="size-8 overflow-hidden rounded-full">
+                                                            <AvatarImage
+                                                                src={avatar}
+                                                                alt={name}
+                                                            />
+                                                            <AvatarFallback className="rounded-lg bg-neutral-200 text-black dark:bg-neutral-700 dark:text-white font-medium">
+                                                                {getInitials(name ?? "")}
+                                                            </AvatarFallback>
+                                                        </Avatar>
+                                                        <div className="flex flex-col">
+                                                            <span>{name}</span>
+                                                            <span className="text-dim">{username}</span>
+                                                        </div>
+                                                    </>)
+                                                    : <>
+                                                        <Avatar className="size-8 overflow-hidden rounded-full">
+                                                            <AvatarImage
+                                                                src=""
+                                                                alt={email}
+                                                            />
+                                                            <AvatarFallback className="rounded-lg bg-neutral-200 text-black dark:bg-neutral-700 dark:text-white">
+                                                                <Mail size={17} />
+                                                            </AvatarFallback>
+                                                        </Avatar>
+                                                        <div className="flex flex-col">
+                                                            <span>{email}</span>
+                                                            <span className="text-dim italic text-xs">An invitation will be emailed</span>
+                                                        </div>
+                                                    </>
                                             }
+                                            </div>
                                         </TableCell>
                                         <TableCell>
-                                            <Select onValueChange={(value) => {
-                                                setData('members', data.members.map((m, i) => {
-                                                    if (i === index) {
-                                                        m.role = value
+                                            <div className="flex flex-col">
+                                                    {
+                                                        roles.length > 0 &&
+                                                        <div className="flex flex-wrap gap-2 my-2">
+                                                        {
+                                                            roles.map(r => (
+                                                                <Badge className="cursor-pointer" onClick={() => {
+                                                                    setData('members', data.members.map((m, i) => {
+                                                                        if (i !== index) {
+                                                                            return m
+                                                                        } else {
+                                                                            const set = new Set([...m.roles])
+                                                                            set.delete(r)
+                                                                            m.roles = [...set.values()]
+                                                                            return m
+                                                                        }
+                                                                    }))
+                                                                }}>
+                                                                    {r} <X />
+                                                                </Badge>
+                                                            )) 
+                                                        }
+                                                        </div>
                                                     }
-                                                    return m
-                                                }))
-                                            }} value={role}>
-                                                <SelectTrigger>
-                                                    <SelectValue placeholder={<span className="mr-2">Select a role</span>}/>
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                {
-                                                    roles.map(({name, items}) => (
-                                                        <SelectGroup>
-                                                            <SelectLabel>{name}</SelectLabel>
-                                                            {
-                                                                items.map((item) => <SelectItem value={item}>{item}</SelectItem>)
+                                                    <SearchBar
+                                                        placeholder="Add roles..."
+                                                        onSelectOption={(val) => {
+                                                            setData('members', data.members.map((m, i) => {
+                                                                if (i !== index) {
+                                                                    return m
+                                                                } else {
+                                                                    const set = new Set([...m.roles, val])
+                                                                    m.roles = [...set.values()]
+                                                                    return m
+                                                                }
+                                                            }))
+                                                        }} 
+                                                        searchOptions={allRoles.map(({name, items}) => {
+                                                            return {
+                                                                heading: name,
+                                                                options: items.map((item) => {
+                                                                    return {
+                                                                        label: item,
+                                                                        value: item
+                                                                    }
+                                                                })
                                                             }
-                                                        </SelectGroup>
-                                                    ))
-                                                }
-                                                </SelectContent>
-                                            </Select>
+                                                        })}
+                                                    />
+                                                </div>
                                         </TableCell>
                                         <TableCell className="flex justify-center">
                                         {

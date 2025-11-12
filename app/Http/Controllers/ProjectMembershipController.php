@@ -4,9 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Project;
 use App\Models\Team;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Arr;
 
 class ProjectMembershipController extends Controller
@@ -19,6 +19,8 @@ class ProjectMembershipController extends Controller
 
         if ($owner instanceof Team) {
             $default_members = $owner->users;
+        } else {
+            $default_members = [$owner];
         }
 
         return Inertia::render('project-members/create', [
@@ -33,18 +35,14 @@ class ProjectMembershipController extends Controller
             'members' => 'required|array'
         ]);
 
-        $attach = [];
+        $existing_users = Arr::where($validated['members'], fn(array $value) => Arr::has($value, 'id'));
+        $invitees = Arr::where($validated['members'], fn(array $value) => !Arr::has($value, 'id'));
+        $keyed = Arr::mapWithKeys($existing_users, fn(array $item) => [$item['id'] => $item['roles']]);
 
-        foreach ($validated['members'] as $member) {
-            if (Arr::exists($member, 'id')) {
-                $attach[$member['id']] = ['role' => $member['role']];
-            } else {
-                // send an email invitation
-            }
-        }
+        $users = User::whereIn('id', array_keys($keyed))->get();
+        $roles = $users->map(fn(User $user) => ['roles' => $keyed[$user->id]]);
 
-
-        $project->members()->attach($attach);
+        $project->members()->saveMany($users, $roles->toArray());
 
         return redirect(route('projects.show', ['project' => $project]));
     }
