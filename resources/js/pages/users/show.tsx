@@ -3,11 +3,11 @@ import { PlaceholderPattern } from '@/components/ui/placeholder-pattern'
 import AppLayout from '@/layouts/app-layout'
 import { show, about } from '@/routes/users'
 import { show as showTeam } from '@/routes/teams'
-import { store } from '@/actions/App/Http/Controllers/TeamController'
+import { create as createTeam } from '@/routes/teams'
 import { update as updateUser } from '@/actions/App/Http/Controllers/UserProfileController'
 import { index as showTeams } from '@/routes/users/teams'
 import { NavItem, Team, User, type BreadcrumbItem } from '@/types'
-import { Head, Link } from '@inertiajs/react'
+import { Head, Link, router } from '@inertiajs/react'
 import { AtSign, Dribbble, EllipsisVertical, Facebook, Figma, Gamepad2, Github, Gitlab, Globe, Hammer, Instagram, Lightbulb, Linkedin, LinkIcon, Mail, MapPin, Pencil, PencilRuler, Plus, Rocket, Slack, Trash, Twitch, Twitter, UserPlus, Users, X, Youtube } from 'lucide-react'
 import { Godot, Unity, Unreal } from '@/components/icons/create'
 import {
@@ -124,58 +124,6 @@ function EditLocation({ defaultValue } : { defaultValue?: string}) {
     return <Combobox placeholder="Not selected" defaultValue={defaultValue ?? ""} name="country" items={options} containerClassName="w-64" />
 }
 
-function CreateTeamForm () {
-    return (
-        <Dialog>
-            <DialogTrigger asChild>
-                <Button className="cursor-pointer">Create a new team</Button>
-            </DialogTrigger>
-            
-                <DialogContent className="sm:max-w-[425px]">
-                        <DialogHeader>
-                            <DialogTitle>Create New Team</DialogTitle>
-                            <DialogDescription>
-                                Add a name a description for your team. 
-                                You can add more details after creation.
-                            </DialogDescription>
-                        </DialogHeader>
-                        <Form 
-                            className="grid gap-4"
-                            errorBag="newTeam"
-                            action={store()}
-                            options={{
-                                preserveScroll: true,
-                            }}
-                        >
-                            {({ errors }) => (
-                                <>
-                                    <div className="grid gap-4">
-                                        <Field>
-                                            <FieldLabel htmlFor="name">Team Name</FieldLabel>
-                                            <Input tabIndex={1} name="name" id="name" autoComplete="off" />
-                                            { <FieldDescription className="text-destructive-foreground">{errors?.name}</FieldDescription> }
-                                        </Field>
-                                        <Field>
-                                            <FieldLabel htmlFor="description">Team Description</FieldLabel>
-                                            <Textarea tabIndex={2} name="description" className="h-28 min-h-28 max-h-28" id="description" placeholder="" />
-                                            { <FieldDescription className="text-destructive-foreground">{errors?.description}</FieldDescription> }
-                                        </Field>
-                                    </div>
-                                    <DialogFooter>
-                                        <DialogClose asChild>
-                                            <Button className="cursor-pointer" tabIndex={3} variant="outline">Cancel</Button>
-                                        </DialogClose>
-                                        <Button onClick={() => console.log('something')} className="cursor-pointer" tabIndex={4} type="submit">Save changes</Button>
-                                    </DialogFooter>
-                                </>
-                            )}
-                        </Form>
-                </DialogContent>
-            
-        </Dialog>
-    )
-}
-
 function NoTeams() {
     return (
             <Empty>
@@ -190,7 +138,14 @@ function NoTeams() {
                 </EmptyHeader>
                 <EmptyContent>
                     <div className="flex gap-2"> 
-                        <CreateTeamForm />
+                        <Button 
+                            onClick={() => {
+                                router.visit(createTeam())
+                            }} 
+                            className="cursor-pointer"
+                        >
+                            Create a new team
+                        </Button>
                         <Button className="cursor-pointer" variant="outline">Join existing team</Button>
                     </div>
                 </EmptyContent>
@@ -346,9 +301,8 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
                             </Item>
                             ))}
                         </ItemGroup>
-                        {/* The teams.length key removes the CreateTeamForm when it changes */}
-                        <div key={teams.length} className="flex justify-end">
-                            <CreateTeamForm />
+                        <div className="w-full flex justify-end">
+                            <Button className="cursor-pointer" onClick={() => router.visit(createTeam())}>Create a new team</Button>
                         </div>
                     </div>
                 )

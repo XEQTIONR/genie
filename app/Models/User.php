@@ -65,7 +65,10 @@ class User extends Authenticatable
 
     public function teams(): BelongsToMany
     {
-        return $this->belongsToMany(Team::class);
+        return $this->belongsToMany(Team::class)
+            ->using(TeamMembership::class)
+            ->withPivot(['roles'])
+            ->withTimestamps();
     }
 
     public function createdProjects(): HasMany

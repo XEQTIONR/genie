@@ -5,8 +5,9 @@ interface RoleGroup {
 
 const roles : RoleGroup[] = [
     {
-        name: 'Default',
+        name: 'General',
         items: [
+            'Founder',
             'Collaborator',
         ]
     },

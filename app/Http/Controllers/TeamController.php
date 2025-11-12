@@ -8,6 +8,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use Inertia\Inertia;
+use Illuminate\Support\Arr;
 
 class TeamController extends Controller
 {
@@ -24,7 +26,7 @@ class TeamController extends Controller
      */
     public function create()
     {
-        //
+        return Inertia::render('teams/create');
     }
 
     /**
@@ -32,9 +34,10 @@ class TeamController extends Controller
      */
     public function store(Request $request)
     {
-        $validated = $request->validateWithBag('newTeam', [
+        $validated = $request->validate([
             'name' => 'required|string|min:2',
             'description' => 'nullable|string',
+            'members' => 'required|array'
         ]);
 
         $pieces = explode(' ', Str::lower($validated['name']));
@@ -60,12 +63,16 @@ class TeamController extends Controller
 
         $team->save();
 
-        $user->teams()->save($team);
+        $existing_users = Arr::where($validated['members'], fn(array $value) => Arr::has($value, 'id'));
+        $invitees = Arr::where($validated['members'], fn(array $value) => !Arr::has($value, 'id'));
+        $keyed = Arr::mapWithKeys($existing_users, fn(array $item) => [$item['id'] => $item['roles']]);
 
-        return redirect(route('users.teams.index', [ 'user' => $user ]))->with('notification', [
-            'type' => 'info',
-            'message' => "New team created - $team->name",
-            'button' => null
-        ]);
+        $users = User::whereIn('id', array_keys($keyed))->get();
+        $roles = $users->map(fn(User $user) => ['roles' => $keyed[$user->id]]);
+
+
+        $team->users()->saveMany($users, $roles->toArray());
+
+        return to_route('teams.show', ['team' => $team]);
     }
 }

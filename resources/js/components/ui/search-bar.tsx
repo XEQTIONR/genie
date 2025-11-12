@@ -74,7 +74,6 @@ export default function SearchBar({
                                                 options.map(({label, value, disabled = false}: SearchOption) => { 
                                                     return <CommandItem disabled={disabled} onSelect={() => {
                                                         if (timer.current) {
-                                                            console.log('cleared timeout')
                                                             clearTimeout(timer.current)
                                                         }
                                                         setFocus(true)
