@@ -61,6 +61,7 @@ export interface Project {
 export interface Team {
     id: number
     name: string
+    avatar: string
     description: string
     slug: string
     created_at: string

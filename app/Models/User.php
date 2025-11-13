@@ -30,7 +30,8 @@ class User extends Authenticatable
         'status',
         'bio',
         'location',
-        'meta'
+        'meta',
+        'avatar'
     ];
 
     /**

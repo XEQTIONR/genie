@@ -34,19 +34,7 @@ import {
 import { Spinner } from '@/components/ui/spinner'
 import { useEffect, useState } from 'react'
 import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog"
-import {
-  Field,
   FieldDescription,
-  FieldLabel,
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { Textarea } from '@/components/ui/textarea'
@@ -280,14 +268,14 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
                                     team: team.slug
                                 })}>
                                     <ItemMedia variant="image">
-                                        <div className="w-16 h-16 relative">
-                                            <PlaceholderPattern className="absolute rounded-full inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
-                                        </div>
+                                        <Avatar className="size-16">
+                                            <AvatarImage src={team.avatar} />
+                                            <AvatarFallback className="text-3xl">{team.avatar.split(' ').map(word => word.charAt(0)).join("")}</AvatarFallback>
+                                        </Avatar>
                                     </ItemMedia>
                                     <ItemContent className="h-full">
                                         <ItemTitle className="line-clamp-1">
                                             {team.name}
-                                        {/* <span className="text-muted-foreground">STH</span> */}
                                         </ItemTitle>
                                         <ItemDescription className="text-ellipsis">{team.description ?? "-"}</ItemDescription>
                                     </ItemContent>
@@ -872,7 +860,7 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
                 </div>
                 <div className="w-full relative -top-22 md:-top-28 -mb-22 md:-mb-28 flex flex-col gap-8">
                     <Avatar className="size-36 sm:size-44 md:size-48 ml-[50%] -translate-x-1/2 md:translate-x-0 md:ml-12">
-                        <AvatarImage src="" />
+                        <AvatarImage src={user.avatar} />
                         <AvatarFallback className="text-3xl">{user.name.split(' ').map(word => word.charAt(0)).join("")}</AvatarFallback>
                     </Avatar>
                     <div className="md:mx-8">

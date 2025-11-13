@@ -42,6 +42,7 @@ class RegisteredUserController extends Controller
             'username' => $request->username,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'avatar' => 'https://api.dicebear.com/9.x/bottts-neutral/svg?seed=Felix' . $request->username,
         ]);
 
         event(new Registered($user));

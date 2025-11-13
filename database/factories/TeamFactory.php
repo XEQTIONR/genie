@@ -17,9 +17,11 @@ class TeamFactory extends Factory
      */
     public function definition(): array
     {
+        $slug = fake()->slug();
         return [
             'name' => fake()->company(),
-            'slug' => fake()->slug(),
+            'slug' => $slug,
+            'avatar' => 'https://api.dicebear.com/9.x/shapes/svg?seed=' . $slug,
             'creator_id' => User::factory(),
             'owner_id' => User::factory(),
         ];

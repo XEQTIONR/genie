@@ -59,6 +59,7 @@ class TeamController extends Controller
         $team = new Team([
             ...$validated,
             'slug' => $slug,
+            'avatar' => 'https://api.dicebear.com/9.x/shapes/svg?seed=' . $slug,
             'creator_id' => $userId,
             'owner_id' => $userId,
         ]);

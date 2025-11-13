@@ -135,9 +135,10 @@ export default function TeamProfile({
                         </div>
                 </div>
                 <div className="w-full relative -top-22 md:-top-28 -mb-22 md:-mb-28 flex flex-col gap-8">
-                    <div className="w-36 sm:w-44 md:w-48 ml-[50%] -translate-x-1/2 md:translate-x-0 md:ml-12 rounded-xl aspect-square relative border border-sidebar-border/70 dark:border-sidebar-border">
-                        <PlaceholderPattern className="absolute rounded-xl inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
-                    </div>
+                    <Avatar variant="square" className="size-36 sm:size-44 md:size-48 ml-[50%] -translate-x-1/2 md:translate-x-0 md:ml-12">
+                        <AvatarImage src={team.avatar} />
+                        <AvatarFallback className="text-3xl">{team.name.split(' ').map(word => word.charAt(0)).join("")}</AvatarFallback>
+                    </Avatar>
                     <div className="md:mx-8">
                         <div className="w-full flex justify-between items-center">
                             <div className="text-2xl sm:text-5xl font-bold flex items-center gap-4 max-w-4/5">

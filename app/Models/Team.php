@@ -20,6 +20,7 @@ class Team extends Model
         'slug',
         'creator_id',
         'owner_id',
+        'avatar'
     ];
 
     protected function casts(): array

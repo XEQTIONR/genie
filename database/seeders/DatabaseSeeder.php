@@ -22,6 +22,7 @@ class DatabaseSeeder extends Seeder
                 'username' => 'xeqtionr',
                 'password' => Hash::make('password'),
                 'email_verified_at' => now(),
+                'avatar' => 'https://api.dicebear.com/9.x/bottts-neutral/svg?seed=xeqtionr'
             ]
         );
 

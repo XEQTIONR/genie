@@ -23,9 +23,11 @@ class UserFactory extends Factory
      */
     public function definition(): array
     {
+        $username = fake()->userName();
         return [
             'name' => fake()->name(),
-            'username' => fake()->userName(),
+            'username' => $username,
+            'avatar' => 'https://api.dicebear.com/9.x/bottts-neutral/svg?seed=Felix' . $username,
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
