@@ -70,6 +70,17 @@ export interface Team {
     owner_id: number
 }
 
+export interface TeamInvitation {
+    id: string
+    team: Team
+    inviter: User
+    invitee?: User
+    team_id: number
+    inviter_id: number
+    invitee_id: number
+    roles: string[]
+}
+
 export interface User {
     id: number
     username: string

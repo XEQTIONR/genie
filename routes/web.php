@@ -13,7 +13,6 @@ use App\Models\User;
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/teams', [TeamController::class, 'store'])->name('teams.store');
     Route::get('/teams/create', [TeamController::class, 'create'])->name('teams.create');
-    Route::get('/teams/invitation/{invitation}', [TeamInvitationController::class, 'show'])->name('teamInvitation.show');
     
     Route::get('/projects/create', [ProjectController::class, 'create'])->name('projects.create');
     Route::post('/projects', [ProjectController::class, 'store'])->name('projects.store');
@@ -24,6 +23,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 
 Route::get('/projects/{project:slug}', [ProjectController::class, 'show'])->name('projects.show');
+Route::get('/teams/invitation/{invitation}', [TeamInvitationController::class, 'show'])->name('teamInvitation.show');
 
 Route::get('/profile/{user:username}', function(User $user) {
     return Inertia::render('users/show', [

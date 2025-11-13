@@ -10,7 +10,7 @@ use Illuminate\Notifications\Notification;
 use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Arr;
 
-class NewUserTeamInvitation extends Notification
+class NewUserTeamInvitation extends Notification implements ShouldQueue
 {
     use Queueable;
 
@@ -43,7 +43,7 @@ class NewUserTeamInvitation extends Notification
             ->subject(Lang::get("Invitation to join $team->name team."))
             ->line("You have been invited to join $team->name by $inviter->name.")
             ->line("Roles: " . $roles_str)
-            ->action("Join $team->name", url('/'));
+            ->action("Join $team->name", url(route('teamInvitation.show', ['invitation' => $this->invitation])));
     }
 
     /**
