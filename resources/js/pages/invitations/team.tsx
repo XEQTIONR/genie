@@ -4,6 +4,7 @@ import { Head, Link, router, useForm, usePage } from '@inertiajs/react'
 import { show } from '@/routes/teamInvitation'
 import { login, register } from '@/routes'
 import { useInitials } from '@/hooks/use-initials'
+import { update } from '@/routes/teamInvitation'
 import {
   Empty,
   EmptyContent,
@@ -29,6 +30,8 @@ export default function TeamInvitation({ invitation, mine } : { invitation: Team
     ]
 
     const getInitials = useInitials();
+
+    const { put } = useForm();
 
     return (
         <AppLayout maxWidth="md:max-w-7xl" breadcrumbs={breadcrumbs}>
@@ -66,7 +69,14 @@ export default function TeamInvitation({ invitation, mine } : { invitation: Team
                     <div className="flex gap-2">
                     {
                         mine ? (
-                            <Button type="button" className="cursor-pointer" size="sm">
+                            <Button
+                                onClick={() => {
+                                    put(update(invitation).url)
+                                }} 
+                                type="button" 
+                                className="cursor-pointer" 
+                                size="sm"
+                            >
                                 Accept Invitation
                             </Button>
                         ) : auth.user 

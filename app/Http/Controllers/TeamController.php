@@ -67,16 +67,32 @@ class TeamController extends Controller
         $team->save();
 
         $existing_users = Arr::where($validated['members'], fn(array $value) => Arr::has($value, 'id'));
-        $invitees = Arr::where($validated['members'], fn(array $value) => !Arr::has($value, 'id'));
+        $new_users = Arr::where($validated['members'], fn(array $value) => !Arr::has($value, 'id'));
         $keyed = Arr::mapWithKeys($existing_users, fn(array $item) => [$item['id'] => $item['roles']]);
 
         $users = User::whereIn('id', array_keys($keyed))->get();
-        $roles = $users->map(fn(User $user) => ['roles' => $keyed[$user->id]]);
 
+        foreach ($existing_users as $invitee)
+        {
+            if ($userId == $invitee['id']) {
+                $team->users()->save($user, ['roles' => $invitee['roles']]);
+            } else {
+                $invitation = new TeamInvitation([
+                    'team_id' => $team->id,
+                    'inviter_id' => $userId,
+                    'invitee_id' => $invitee['id'],
+                    'to_email' => $users->first(fn($value) => $value['id'] === $invitee['id'])->email,
+                    'roles' => $invitee['roles'],
+                ]);
 
-        $team->users()->saveMany($users, $roles->toArray());
+                $invitation->save();
+
+                Notification::route('mail', $invitation->to_email)
+                    ->notify(new NewUserTeamInvitation($invitation));
+            }
+        }
         
-        foreach ($invitees as $invitee)
+        foreach ($new_users as $invitee)
         {
             $invitation = new TeamInvitation([
                 'team_id' => $team->id,

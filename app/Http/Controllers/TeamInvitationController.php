@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\TeamInvitation;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\URL;
@@ -31,6 +32,12 @@ class TeamInvitationController extends Controller
 
     public function update(TeamInvitation $invitation)
     {
-        
+        $team = $invitation->team;
+        $roles = $invitation->roles;
+        $user = User::where('email', $invitation->to_email)->first();
+
+        $team->users()->save($user, ['roles' => $roles]);
+
+        return to_route('teams.show', ['team' => $team]);
     }
 }

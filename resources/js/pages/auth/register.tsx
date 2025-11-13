@@ -59,7 +59,6 @@ export default function Register({ email } : { email?: string }) {
                             <div className="grid gap-2">
                                 <Label htmlFor="email">Email address</Label>
                                 <Input
-                                    disabled={!!email}
                                     defaultValue={email}
                                     id="email"
                                     type="email"

@@ -23,7 +23,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 
 Route::get('/projects/{project:slug}', [ProjectController::class, 'show'])->name('projects.show');
-Route::get('/teams/invitation/{invitation}', [TeamInvitationController::class, 'show'])->name('teamInvitation.show');
+Route::get('/teams/invitations/{invitation}', [TeamInvitationController::class, 'show'])->name('teamInvitation.show');
+Route::put('/teams/invitations/{invitation}', [TeamInvitationController::class, 'update'])->name('teamInvitation.update');
 
 Route::get('/profile/{user:username}', function(User $user) {
     return Inertia::render('users/show', [
