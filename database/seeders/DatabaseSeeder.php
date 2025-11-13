@@ -15,7 +15,7 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        $me = User::firstOrCreate(
+        User::firstOrCreate(
             ['email' => 'x.e.q.tionrz@gmail.com'],
             [
                 'name' => 'Ovi Hussain',
@@ -26,19 +26,6 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
-        $users1 = User::factory(10)->create();
-        $users2 = User::factory(10)->create();
-
-        $teams = Team::factory(3, [
-            'creator_id' => $me->id,
-            'owner_id' => $me->id,
-        ])->create();
-
-        $teams->each(function(Team $team) use ($me, $users2) {
-            $team->users()->saveMany([
-                $me,
-                ...$users2,
-            ]);
-        });
+        User::factory(10)->create();
     }
 }

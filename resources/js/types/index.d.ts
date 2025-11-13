@@ -72,6 +72,7 @@ export interface Team {
 
 export interface TeamInvitation {
     id: string
+    to_email: string
     team: Team
     inviter: User
     invitee?: User
