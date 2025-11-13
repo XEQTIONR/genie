@@ -3,13 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Models\Team;
+use App\Models\TeamInvitation;
 use App\Models\User;
+use App\Notifications\NewUserTeamInvitation;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
-use Illuminate\Support\Arr;
 
 class TeamController extends Controller
 {
@@ -72,6 +74,21 @@ class TeamController extends Controller
 
 
         $team->users()->saveMany($users, $roles->toArray());
+        
+        foreach ($invitees as $invitee)
+        {
+            $invitation = new TeamInvitation([
+                'team_id' => $team->id,
+                'inviter_id' => $userId,
+                'to_email' => $invitee['email'],
+                'roles' => $invitee['roles'],
+            ]);
+
+            $invitation->save();
+
+            Notification::route('mail', $invitation->to_email)
+                ->notify(new NewUserTeamInvitation($invitation));
+        }
 
         return to_route('teams.show', ['team' => $team]);
     }
