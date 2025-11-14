@@ -2,19 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\TeamInvitation;
+use App\Models\ProjectInvitation;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\URL;
 use Inertia\Inertia;
 
-class TeamInvitationController extends Controller
+class ProjectInvitationController extends Controller
 {
-
-    public function show(TeamInvitation $invitation)
-    {   
-        $invitation->load(['team', 'inviter', 'invitee']);
+    public function show(ProjectInvitation $invitation)
+    {
+        $invitation->load(['project', 'inviter', 'invitee']);
         $mine = false;
 
         $user = Auth::user();
@@ -22,23 +21,23 @@ class TeamInvitationController extends Controller
         if ($user) {
             $mine = $user->id == $invitation->invitee_id || $user->email == $invitation->to_email;
         }
-        
+
         session()->put('url.intended', URL::full());
 
-        return Inertia::render('invitations/team', [
+        return Inertia::render('invitations/project', [
             'invitation' => $invitation,
-            'mine' => $mine
+            'mine' => $mine,
         ]);
     }
 
-    public function update(TeamInvitation $invitation)
+    public function update(ProjectInvitation $invitation)
     {
-        $team = $invitation->team;
+        $project = $invitation->project;
         $roles = $invitation->roles;
         $user = User::where('email', $invitation->to_email)->first();
 
-        $team->users()->save($user, ['roles' => $roles]);
+        $project->members()->save($user, ['roles' => $roles]);
 
-        return to_route('teams.show', ['team' => $team]);
+        return to_route('projects.show', ['project' => $project]);
     }
 }

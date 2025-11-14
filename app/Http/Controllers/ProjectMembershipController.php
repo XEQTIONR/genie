@@ -3,11 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Models\Project;
+use App\Models\ProjectInvitation;
 use App\Models\Team;
 use App\Models\User;
+use App\Notifications\ProjectInvitationNotification;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Notification;
 
 class ProjectMembershipController extends Controller
 {
@@ -35,14 +39,49 @@ class ProjectMembershipController extends Controller
             'members' => 'required|array'
         ]);
 
+        $userId = Auth::id();
+        $user = User::find($userId);   
+
         $existing_users = Arr::where($validated['members'], fn(array $value) => Arr::has($value, 'id'));
-        $invitees = Arr::where($validated['members'], fn(array $value) => !Arr::has($value, 'id'));
+        $new_users = Arr::where($validated['members'], fn(array $value) => !Arr::has($value, 'id'));
         $keyed = Arr::mapWithKeys($existing_users, fn(array $item) => [$item['id'] => $item['roles']]);
 
         $users = User::whereIn('id', array_keys($keyed))->get();
-        $roles = $users->map(fn(User $user) => ['roles' => $keyed[$user->id]]);
 
-        $project->members()->saveMany($users, $roles->toArray());
+        foreach ($existing_users as $invitee)
+        {
+            if ($userId == $invitee['id']) {
+                $project->members()->save($user, ['roles' => $invitee['roles']]);
+            } else {
+                $invitation = new ProjectInvitation([
+                    'project_id' => $project->id,
+                    'inviter_id' => $userId,
+                    'invitee_id' => $invitee['id'],
+                    'to_email' => $users->first(fn($value) => $value['id'] === $invitee['id'])->email,
+                    'roles' => $invitee['roles'],
+                ]);
+
+                $invitation->save();
+
+                Notification::route('mail', $invitation->to_email)
+                    ->notify(new ProjectInvitationNotification($invitation));
+            }
+        }
+
+        foreach ($new_users as $invitee)
+        {
+            $invitation = new ProjectInvitation([
+                'project_id' => $project->id,
+                'inviter_id' => $userId,
+                'to_email' => $invitee['email'],
+                'roles' => $invitee['roles'],
+            ]);
+
+            $invitation->save();
+
+            Notification::route('mail', $invitation->to_email)
+                    ->notify(new ProjectInvitationNotification($invitation));
+        }
 
         return redirect(route('projects.show', ['project' => $project]));
     }

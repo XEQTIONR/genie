@@ -58,6 +58,18 @@ export interface Project {
     members?: ProjectMember[]
 }
 
+export interface ProjectInvitation {
+    id: string
+    to_email: string
+    project: Project
+    inviter: User
+    invitee?: User
+    project_id: number
+    inviter_id: number
+    invitee_id: number
+    roles: string[]
+}
+
 export interface Team {
     id: number
     name: string

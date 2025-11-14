@@ -1,9 +1,9 @@
 import AppLayout from '@/layouts/app-layout'
-import { BreadcrumbItem, TeamInvitation as TeamInvitationType } from '@/types'
+import { BreadcrumbItem, ProjectInvitation as ProjectInvitationType } from '@/types'
 import { Head, router, useForm, usePage } from '@inertiajs/react'
 import { login, register } from '@/routes'
 import { useInitials } from '@/hooks/use-initials'
-import { show, update } from '@/routes/teamInvitation'
+import { show, update } from '@/routes/projectInvitation'
 import {
   Empty,
   EmptyContent,
@@ -17,7 +17,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { ShieldX } from 'lucide-react'
 import { type SharedData } from '@/types';
 
-export default function TeamInvitation({ invitation, mine } : { invitation: TeamInvitationType, mine: boolean  }) {
+export default function ProjectInvitation({ invitation, mine } : { invitation: ProjectInvitationType, mine: boolean  }) {
 
     const { auth } = usePage<SharedData>().props;
 
@@ -42,21 +42,21 @@ export default function TeamInvitation({ invitation, mine } : { invitation: Team
                         mine || !auth.user ? (
                             <Avatar variant="square" className="size-12">
                                 <AvatarImage
-                                    src={invitation.team.avatar}
+                                    src=""
                                 />
-                                <AvatarFallback>{getInitials(invitation.team.name)}</AvatarFallback>
+                                <AvatarFallback>{getInitials(invitation.project.title)}</AvatarFallback>
                             </Avatar>
                         ) : <ShieldX />
                     }
                     </EmptyMedia>
                     <EmptyTitle>
-                        { "Invitation to join " + invitation.team.name } 
+                        { "Invitation to join " + invitation.project.title } 
                     </EmptyTitle>
                     <EmptyDescription>
                     {
                         (mine || !auth.user)
                             ? <>
-                                 You&apos;ve been invited to join <b>{invitation.team.name}</b> by <b>{invitation.inviter.name}</b> <br />
+                                 You&apos;ve been invited to join <b>{invitation.project.title}</b> by <b>{invitation.inviter.name}</b> <br />
                                  Assigned roles: <i>{invitation.roles.join(', ')}</i>
                             </>
                             : "This invitation is not meant for you"
