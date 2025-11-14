@@ -254,7 +254,7 @@ export default function ShowProject({ project, h } : {
                             rightChildren={
                                 <div className="border w-96 p-6 mt-6 mr-4">
                                     <Avatar variant={project.owner_type === TEAMMODEL ? "square" : "rounded"} className="relative size-18 overflow-hidden -top-14 -mb-8">
-                                        <AvatarImage src="" />
+                                        <AvatarImage src={project.owner?.avatar} />
                                         <AvatarFallback variant={project.owner_type === TEAMMODEL ? "square" : "rounded"}>{project.owner?.name.split(' ').map(word => word.charAt(0)).join("")}</AvatarFallback>
                                     </Avatar>
                                     <h3 className="font-bold text-lg">{project.owner?.name}</h3>
@@ -278,7 +278,7 @@ export default function ShowProject({ project, h } : {
                                 <h1 className="text-2xl mt-10 mb-6 font-semibold">About the creator</h1>
                                 <div className="flex items-center gap-3 mb-6">
                                     <Avatar variant={project.owner_type === TEAMMODEL ? "square" : "rounded"} className="size-20">
-                                        <AvatarImage src="" />
+                                        <AvatarImage src={project.owner?.avatar} />
                                         <AvatarFallback variant={project.owner_type === TEAMMODEL ? "square" : "rounded"}>{project.owner?.name.split(' ').map(word => word.charAt(0)).join("")}</AvatarFallback>
                                     </Avatar>
                                     <h3 className="font-semibold">{project.owner?.name}</h3>
@@ -297,17 +297,17 @@ export default function ShowProject({ project, h } : {
                                 <h1 className="text-xl mt-10 mb-6 font-semibold">Contributors</h1>
                                 <div className="w-full grid gap-2.5 grid-cols-2 mb-4">
                                     {
-                                        project.members?.map(({name, pivot}) => (
+                                        project.members?.map(({avatar, name, pivot}) => (
                                             <Item variant="muted">
                                                 <ItemMedia>
                                                     <Avatar className="size-10">
-                                                        <AvatarImage src="" />
+                                                        <AvatarImage src={avatar} />
                                                         <AvatarFallback>{name.split(' ').map(word => word.charAt(0)).join("")}</AvatarFallback>
                                                     </Avatar>
                                                 </ItemMedia>
                                                 <ItemContent>
                                                     <ItemTitle>{name}</ItemTitle>
-                                                    <ItemDescription>{pivot.role}</ItemDescription>
+                                                    <ItemDescription>{pivot.roles.join(", ")}</ItemDescription>
                                                 </ItemContent>
                                             </Item>
                                         ))

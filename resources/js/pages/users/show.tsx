@@ -274,15 +274,15 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
                                         </Avatar>
                                     </ItemMedia>
                                     <ItemContent className="h-full">
-                                        <ItemTitle className="line-clamp-1">
+                                        <ItemTitle className="line-clamp-1 font-medium">
                                             {team.name}
                                         </ItemTitle>
                                         <ItemDescription className="text-ellipsis">{team.description ?? "-"}</ItemDescription>
                                     </ItemContent>
-                                    <ItemContent className="flex-none text-center">
-                                        <ItemDescription>
-                                            {team.users_count} 
-                                            <span className="ml-1.5">{team.users_count > 1 ? "members" : "member"}</span>
+                                    <ItemContent>
+                                        <ItemDescription className="flex gap-3">
+                                            <div className="flex items-center gap-1"><Users size={12} />{team.users_count}</div>
+                                            <div className="flex items-center gap-1"><PencilRuler size={12} />{team.projects_count}</div>
                                         </ItemDescription>
                                     </ItemContent>
                                 </Link>

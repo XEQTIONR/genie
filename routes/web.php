@@ -44,7 +44,7 @@ Route::get('/profile/{user:username}/about', function(User $user) {
 })->name('users.about');
 
 Route::get('/profile/{user:username}/teams', function(User $user) {
-    $teams = $user->teams()->withCount('users')->get();
+    $teams = $user->teams()->withCount(['users', 'projects'])->get();
     return Inertia::render('users/show', [
         'user' => $user,
         'teams' => $teams,

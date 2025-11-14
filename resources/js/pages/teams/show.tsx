@@ -7,7 +7,7 @@ import { show as showUser } from '@/routes/users'
 import { show as showProject } from '@/routes/projects'
 import { index as membersIndex } from '@/routes/teams/users'
 import { index as projectsIndex } from '@/routes/teams/projects'
-import { NavItem, Project, Team, User, type BreadcrumbItem } from '@/types'
+import { NavItem, Project, ProjectMember, Team, User, type BreadcrumbItem } from '@/types'
 import { Head, Link } from '@inertiajs/react'
 import { EllipsisVertical, Mail, MapPin, PencilRuler, Rocket, UserPlus, Users } from 'lucide-react'
 import {
@@ -48,7 +48,7 @@ export default function TeamProfile({
     team: Team 
     tab: string
     user_count: number
-    users?: User[]
+    users?: ProjectMember[]
     projects?: Project[] 
 }) {
 
@@ -98,7 +98,12 @@ export default function TeamProfile({
                                         <ItemTitle className="line-clamp-1">
                                             {member.name}
                                         </ItemTitle>
-                                        <ItemDescription className="text-ellipsis">{"-"}</ItemDescription>
+                                        <ItemDescription className="text-ellipsis">
+                                        {
+                                            member.pivot.roles.length > 0
+                                                ? member.pivot.roles.join(", ")
+                                                : "-"
+                                        }</ItemDescription>
                                     </ItemContent>
                                 </Link>
                             </Item>
@@ -111,7 +116,13 @@ export default function TeamProfile({
                 return projects.length > 0
                     ? (<div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 w-full h-full mx-2 md:mx-8">
                         { projects.map((project) => (
-                            <ProjectCard href={showProject(project.slug).url} title={project.title} platforms={project.platforms} icon={PencilRuler} />
+                            <ProjectCard
+                                excerpt={project.excerpt} 
+                                href={showProject(project.slug).url} 
+                                icon={PencilRuler} 
+                                title={project.title} 
+                                platforms={project.platforms} 
+                            />
                             )) 
                         }
                     </div>)

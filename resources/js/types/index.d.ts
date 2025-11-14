@@ -105,6 +105,6 @@ export interface User {
 
 export type ProjectMember = User & {
     pivot: {
-        role: string
+        roles: string[]
     }
 }
