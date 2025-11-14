@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Team;
 use App\Models\TeamInvitation;
 use App\Models\User;
-use App\Notifications\NewUserTeamInvitation;
+use App\Notifications\TeamInvitationNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
@@ -88,7 +88,7 @@ class TeamController extends Controller
                 $invitation->save();
 
                 Notification::route('mail', $invitation->to_email)
-                    ->notify(new NewUserTeamInvitation($invitation));
+                    ->notify(new TeamInvitationNotification($invitation));
             }
         }
         
@@ -104,7 +104,7 @@ class TeamController extends Controller
             $invitation->save();
 
             Notification::route('mail', $invitation->to_email)
-                ->notify(new NewUserTeamInvitation($invitation));
+                ->notify(new TeamInvitationNotification($invitation));
         }
 
         return to_route('teams.show', ['team' => $team]);
