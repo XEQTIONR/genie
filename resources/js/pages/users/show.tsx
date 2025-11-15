@@ -59,6 +59,7 @@ import { create } from '@/routes/projects'
 import { show as showProject } from '@/routes/projects'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import NoProjects from '@/components/no-projects'
+import { useDebouncedCallback } from 'use-debounce'
 
 type ProfileTab = NavItem & {key: string, className?: string}
 
@@ -193,6 +194,15 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
 
     const [currentSection, setCurrentSection] = useState('overview')
 
+    const [windowWidth, setWindowWidth] = useState(window.innerWidth)
+
+    const rz = useDebouncedCallback(() => {setWindowWidth(window.innerWidth)}, 100)
+
+    useEffect(() => {
+        window.addEventListener("resize", rz)
+        return () => window.removeEventListener("resize", rz)
+    }, [rz])
+
     const sectionLabels = [
         {label: 'Overview', name: 'overview'},
         {label: 'Skills & tools', name: 'skills'},
@@ -216,11 +226,11 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
         { title: "Teams / Studios", href: showTeams({ user: user.username }).url, key: "teams"},
     ]
 
-    if ( auth.user?.id === user.id ) {
-        tabs.push({ title: "Invite", href: "/", key: "invite", icon: Mail, className: "ml-2 border" })
-    } else {
-        tabs.push({ title: "Add to team", href: "/", key: "invite", icon: UserPlus, className: "ml-2 border" })
-    }
+    // if ( auth.user?.id === user.id ) {
+    //     tabs.push({ title: "Invite", href: "/", key: "invite", icon: Mail, className: "ml-2 border" })
+    // } else {
+    //     tabs.push({ title: "Add to team", href: "/", key: "invite", icon: UserPlus, className: "ml-2 border" })
+    // }
 
     const isPro = true
 
@@ -297,7 +307,7 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
             case 'about':
                 return (
                     // <div className="w-full flex flex-col md:flex-row border bg-neutral-50 dark:bg-neutral-900 md:mx-8 rounded-lg">
-                    <div className="w-full flex flex-col md:flex-row md:mx-8 rounded-lg border">
+                    <div className="w-full flex flex-col md:flex-row md:mx-8 rounded-lg">
                         <div className="w-full md:w-1/4 flex flex-col p-2 gap-2 mb-2">
                             <h2 className="text-lg font-bold mx-2 mt-2 mb-6">About</h2>
                             
@@ -850,33 +860,36 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
     }
     
     return (
-        <AppLayout maxWidth='md:max-w-7xl' breadcrumbs={breadcrumbs}>
+        <AppLayout maxWidth='md:max-w-full' maxHeaderWidth='md:max-w-10xl' breadcrumbs={breadcrumbs}>
             <Head title="Profile" />
-            <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
-                <div className="h-full md:h-[400px] flex gap-4 justify-between rounded-xl border-sidebar-border/70 dark:border-sidebar-border">
-                        <div className="w-full relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
-                            <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
-                        </div>
+            <div className="flex h-full flex-1 flex-col overflow-x-auto">
+                <div className="h-45 md:h-[350px] flex gap-4 justify-between border-sidebar-border/70 dark:border-sidebar-border">
+                    <div className="w-full h-full relative overflow-hidden border border-sidebar-border/70 dark:border-sidebar-border">
+                        <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
+                    </div>
                 </div>
-                <div className="w-full relative -top-22 md:-top-28 -mb-22 md:-mb-28 flex flex-col gap-8">
-                    <Avatar className="size-36 sm:size-44 md:size-48 ml-[50%] -translate-x-1/2 md:translate-x-0 md:ml-12">
-                        <AvatarImage src={user.avatar} />
-                        <AvatarFallback className="text-3xl">{user.name.split(' ').map(word => word.charAt(0)).join("")}</AvatarFallback>
-                    </Avatar>
-                    <div className="md:mx-8">
-                        <div className="w-full flex justify-between items-center mb-2">
-                            <div className="text-2xl sm:text-5xl font-bold flex items-center gap-4 max-w-4/5">
-                                {user.name}
-                                {isPro && <span className="text-sm bg-primary text-background px-2 py-0.5 rounded">PRO</span>}
+                <div className="w-full flex flex-col gap-0 items-center">
+                    <div className="flex flex-col md:flex-row md:gap-4 relative -top-11 -mb-11 w-full md:max-w-10xl px-4">
+                        <Avatar className="size-32 md:size-36 ring-8 ring-background">
+                            <AvatarImage src={user.avatar} />
+                            <AvatarFallback className="text-3xl">{user.name.split(' ').map(word => word.charAt(0)).join("")}</AvatarFallback>
+                        </Avatar>
+                        <div className="relative md:top-12 md:mb-12 flex flex-col md:flex-row gap-4 grow items-start justify-between mt-4">
+                            <div className="flex flex-col gap-2">
+                                <div className="text-4xl font-semibold flex items-center gap-4">
+                                    {user.name}
+                                    {isPro && <span className="text-xs bg-primary text-background px-2 py-0.5 rounded">PRO</span>}
+                                </div>
+                                <span>I am a product designer based in Melbourne.</span>
                             </div>
-                            <div className="flex gap-2 items-center">
+                            <div className="flex flex-row-reverse md:flex-row gap-2 items-center shrink-0">
                                 <span className="hidden lg:inline mr-3 text-sm">Let's build something together</span>
-                                <Button className="hidden lg:inline cursor-pointer">Get in touch</Button>
+                                <Button className="cursor-pointer">Get in touch</Button>
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
                                         <Button className="cursor-pointer" variant="outline" size="icon"><EllipsisVertical /></Button>
                                     </DropdownMenuTrigger>
-                                    <DropdownMenuContent sideOffset={10} className="dark:bg-neutral-900" align="end">
+                                    <DropdownMenuContent sideOffset={10} className="dark:bg-neutral-900" align={windowWidth >= 768 ? "end" : "start"}>
                                         <DropdownMenuLabel>Options</DropdownMenuLabel>
                                         <DropdownMenuSeparator />
                                         <DropdownMenuItem className="cursor-pointer">Contact</DropdownMenuItem>
@@ -886,7 +899,14 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
                                 </DropdownMenu>
                             </div>
                         </div>
-                        <div className="flex flex-col md:flex-row gap-2 md:gap-5 text-xs md:text-base">
+                    </div>
+                    
+                    <div className="md:ml-8">
+                        <div className="w-full flex justify-between items-center mb-2">
+                            
+                            
+                        </div>
+                        {/* <div className="flex flex-col md:flex-row gap-2 md:gap-5 text-xs md:text-base">
                             {
                                 user.location &&
                                 <div className="flex items-center gap-2 text-neutral-400 font-medium"><MapPin size={16} /> {renderLocation(user.location)}</div>
@@ -895,7 +915,7 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
                                 user.status &&
                                 <div className="flex text-neutral-400 font-medium"><span className="font-bold text-nowrap mr-1">Status :</span> {user.status}</div>
                             }
-                        </div>
+                        </div> */}
                         <div className="flex flex-wrap gap-4 mt-4">
                         {
                             user.meta?.skills?.map((title) => (
@@ -903,14 +923,10 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
                             ))
                         }
                         </div>
-                        <div className="w-full mt-8">
-                            <h2 className="font-semibold text-bold">Bio</h2>
-                            <p className="mt-4">
-                                {user.bio}
-                            </p>
-                        </div>
                     </div>
+                    
                     <TabbedSectionHeaders
+                        className="w-full md:max-w-10xl"
                         current={tab}
                         headers={tabs}
                         onTabChange={() => {

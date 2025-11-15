@@ -12,10 +12,12 @@ function TabbedSectionHeaders({
     headers,
     current,
     onTabChange,
+    className = "",
 }: {
     headers: TabbedSectionHeaderItem[],
     current?: string,
     onTabChange: () => void
+    className?: string
 }) {
 
     const div = useRef<HTMLUListElement>(null)
@@ -39,7 +41,10 @@ function TabbedSectionHeaders({
     }, [div, fn])
 
     return (
-        <section className="mt-10 mr-2 md:mx-8 max-w-full">
+        <section className={cn(
+            "mr-2 md:mx-8",
+            className
+        )}>
             {
                 (scrollLeft ?? 0) > 0 && <div className="relative top-10 -mt-10 float-left flex items-center bg-neutral-50/50 dark:bg-neutral-900/50 size-10">
                     <ChevronLeft onClick={() => div.current.scrollLeft -= 200 } className="block mx-auto" />
