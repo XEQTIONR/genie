@@ -270,8 +270,8 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
             case 'teams':
                 return (teams.length == 0 
                     ? <NoTeams />
-                    : <div className="flex size-full flex-col gap-6 mx-2 md:mx-8">
-                        <ItemGroup className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+                    : <div className="flex size-full flex-col gap-6 mx-2 md:mx-4">
+                        <ItemGroup className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 pt-5">
                             {teams.map((team) => (
                             <Item key={team.id} variant="outline" asChild role="listitem">
                                 <Link href={showTeam({
@@ -307,7 +307,7 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
             case 'about':
                 return (
                     // <div className="w-full flex flex-col md:flex-row border bg-neutral-50 dark:bg-neutral-900 md:mx-8 rounded-lg">
-                    <div className="w-full flex flex-col md:flex-row md:mx-8 rounded-lg">
+                    <div className="w-full flex flex-col md:flex-row rounded-lg ml-2 mr-2 md:mr-0">
                         <div className="w-full md:w-1/4 flex flex-col p-2 gap-2 mb-2">
                             <h2 className="text-lg font-bold mx-2 mt-2 mb-6">About</h2>
                             
@@ -862,14 +862,14 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
     return (
         <AppLayout maxWidth='md:max-w-full' maxHeaderWidth='md:max-w-10xl' breadcrumbs={breadcrumbs}>
             <Head title="Profile" />
-            <div className="flex h-full flex-1 flex-col overflow-x-auto">
+            <div className="flex h-full flex-col overflow-x-auto">
                 <div className="h-45 md:h-[350px] flex gap-4 justify-between border-sidebar-border/70 dark:border-sidebar-border">
                     <div className="w-full h-full relative overflow-hidden border border-sidebar-border/70 dark:border-sidebar-border">
                         <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
                     </div>
                 </div>
-                <div className="w-full flex flex-col gap-0 items-center">
-                    <div className="flex flex-col md:flex-row md:gap-4 relative -top-11 -mb-11 w-full md:max-w-10xl px-4">
+                <div className="w-full flex flex-col md:max-w-8xl mx-auto gap-0 items-center">
+                    <div className="flex flex-col md:flex-row md:gap-4 relative -top-11 -mb-11 w-full md:max-w-10xl px-4 md:mx-0">
                         <Avatar className="size-32 md:size-36 ring-8 ring-background">
                             <AvatarImage src={user.avatar} />
                             <AvatarFallback className="text-3xl">{user.name.split(' ').map(word => word.charAt(0)).join("")}</AvatarFallback>
@@ -880,7 +880,7 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
                                     {user.name}
                                     {isPro && <span className="text-xs bg-primary text-background px-2 py-0.5 rounded">PRO</span>}
                                 </div>
-                                <span>I am a product designer based in Melbourne.</span>
+                                <span>{user.status}</span>
                             </div>
                             <div className="flex flex-row-reverse md:flex-row gap-2 items-center shrink-0">
                                 <span className="hidden lg:inline mr-3 text-sm">Let's build something together</span>
@@ -901,12 +901,12 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
                         </div>
                     </div>
                     
-                    <div className="md:ml-8">
+                    {/* <div className="md:ml-8">
                         <div className="w-full flex justify-between items-center mb-2">
                             
                             
                         </div>
-                        {/* <div className="flex flex-col md:flex-row gap-2 md:gap-5 text-xs md:text-base">
+                        <div className="flex flex-col md:flex-row gap-2 md:gap-5 text-xs md:text-base">
                             {
                                 user.location &&
                                 <div className="flex items-center gap-2 text-neutral-400 font-medium"><MapPin size={16} /> {renderLocation(user.location)}</div>
@@ -915,7 +915,7 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
                                 user.status &&
                                 <div className="flex text-neutral-400 font-medium"><span className="font-bold text-nowrap mr-1">Status :</span> {user.status}</div>
                             }
-                        </div> */}
+                        </div>
                         <div className="flex flex-wrap gap-4 mt-4">
                         {
                             user.meta?.skills?.map((title) => (
@@ -923,18 +923,20 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
                             ))
                         }
                         </div>
-                    </div>
+                    </div> */}
                     
                     <TabbedSectionHeaders
-                        className="w-full md:max-w-10xl"
+                        className="w-full md:max-w-8xl px-3 mt-5"
                         current={tab}
                         headers={tabs}
                         onTabChange={() => {
                             setLoading(true)
                         }}
                     />
+                    <Separator />
                 </div>
-                <div className="w-full relative h-full md:min-h-[50vh] flex overflow-hidden border-sidebar-border/70 dark:border-sidebar-border">
+                
+                <div className="w-full md:max-w-8xl mx-auto relative h-full md:min-h-[50vh] flex overflow-hidden border-sidebar-border/70 dark:border-sidebar-border">
                 {
                     loading 
                         ? <Spinner className="block m-auto size-6" />

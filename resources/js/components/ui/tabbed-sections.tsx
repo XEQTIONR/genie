@@ -42,36 +42,36 @@ function TabbedSectionHeaders({
 
     return (
         <section className={cn(
-            "mr-2 md:mx-8",
             className
         )}>
             {
-                (scrollLeft ?? 0) > 0 && <div className="relative top-10 -mt-10 float-left flex items-center bg-neutral-50/50 dark:bg-neutral-900/50 size-10">
+                (scrollLeft ?? 0) > 0 && <div className="relative top-13 -mt-10 float-left flex items-center bg-neutral-50/50 dark:bg-neutral-900/50 size-10">
                     <ChevronLeft onClick={() => div.current.scrollLeft -= 200 } className="block mx-auto" />
                 </div> 
             }
 
             {
-                div.current && (scrollLength > 0) && (scrollLength - (scrollLeft ?? 0) > scrollThresh) && <div className="relative top-10 -mt-10 float-right flex items-center bg-neutral-50/50 dark:bg-neutral-900/50 size-10">
+                div.current && (scrollLength > 0) && (scrollLength - (scrollLeft ?? 0) > scrollThresh) && <div className="relative top-13 -mt-10 float-right flex items-center bg-neutral-50/50 dark:bg-neutral-900/50 size-10">
                     <ChevronRight onClick={() => div.current.scrollLeft += 200 } className="block mx-auto" />
                 </div>
             }
             
             
-            <ul onScroll={fn} ref={div} id="tabbedSectionHeaderContent" className="scroll-smooth flex items-center gap-1 w-full overflow-scroll scrollbar-hide">
+            <ul onScroll={fn} ref={div} id="tabbedSectionHeaderContent" className="scroll-smooth flex items-center gap-3 w-full overflow-x-scroll scrollbar-hide pt-5">
             {
                 headers.map(({title, key, href, icon, className}) => (
-                    <li className="font-bold mb-4 md:mb-0" key={key}>
+                    <li className="font-bold mb-2.5" key={key}>
                     {
                         current == key
-                            ? <span className="pt-2 pb-1.5 mx-2 border-b-2 border-foreground text-nowrap">{title}</span>
+                            ? <span className="p-2.5 my-2 border-b-2 border-foreground text-nowrap">
+                                {title}
+                            </span>
                             : <Link
                                 onClick={onTabChange} 
                                 preserveScroll
                                 className={cn(
                                     className,
-                                    "py-2 rounded-md flex items-center text-nowrap",
-                                    "hover:bg-accent  px-3 gap-1.5"
+                                    "p-2.5 my-2 hover:bg-accent rounded-md text-nowrap",
                                 )} 
                                 href={href}>
                                 {icon && (
@@ -80,7 +80,7 @@ function TabbedSectionHeaders({
                                         className="h-4 w-4"
                                     />
                                 )}
-                                <span>{title}</span>
+                                {title}
                             </Link>
                     }
                     </li>
