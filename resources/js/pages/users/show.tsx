@@ -1,39 +1,31 @@
-import { Button, buttonVariants } from '@/components/ui/button'
-import { PlaceholderPattern } from '@/components/ui/placeholder-pattern'
 import AppLayout from '@/layouts/app-layout'
-import Cropper, { Area, Point } from 'react-easy-crop'
-import { show, about } from '@/routes/users'
-import { show as showTeam } from '@/routes/teams'
-import { create as createTeam } from '@/routes/teams'
-import { update as updateUser } from '@/actions/App/Http/Controllers/UserProfileController'
-import { index as showTeams } from '@/routes/users/teams'
-import { NavItem, Team, User, type BreadcrumbItem } from '@/types'
-import { Head, Link, router } from '@inertiajs/react'
+import { ArrowUpRightIcon } from "lucide-react"
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { AtSign, Camera, Dribbble, EllipsisVertical, Facebook, Figma, Gamepad2, Github, Gitlab, Globe, Hammer, Instagram, Lightbulb, Linkedin, LinkIcon, Mail, MapPin, Pencil, PencilRuler, Plus, Rocket, Slack, Trash, Twitch, Twitter, UserPlus, Users, X, Youtube } from 'lucide-react'
-import { Godot, Unity, Unreal } from '@/components/icons/create'
+import axios from 'axios'
+import { Badge } from '@/components/ui/badge'
+import { Button, buttonVariants } from '@/components/ui/button'
+import { Combobox, GroupedOptions, Option } from '@/components/ui/combobox'
+import { cn } from '@/lib/utils'
+import { create } from '@/routes/projects'
+import { create as createTeam } from '@/routes/teams'
+import Cropper, { Area, Point } from 'react-easy-crop'
 import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
+    Dialog,
+    DialogClose,
+    DialogContent,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
 } from "@/components/ui/dialog"
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { TabbedSectionHeaders } from '@/components/ui/tabbed-sections'
-import { type SharedData } from '@/types'
-import { usePage } from '@inertiajs/react'
-import { Form, useForm } from '@inertiajs/react'
-import { ArrowUpRightIcon } from "lucide-react"
 import {
   Empty,
   EmptyContent,
@@ -42,13 +34,12 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@/components/ui/empty"
-import { Spinner } from '@/components/ui/spinner'
-import { useEffect, useState } from 'react'
-import {
-  FieldDescription,
-} from "@/components/ui/field"
+import { FieldDescription } from "@/components/ui/field"
+import { Form, useForm, usePage } from '@inertiajs/react'
+import { Godot, Unity, Unreal } from '@/components/icons/create'
+import { Head, Link, router } from '@inertiajs/react'
+import { index as showTeams } from '@/routes/users/teams'
 import { Input } from "@/components/ui/input"
-import { Textarea } from '@/components/ui/textarea'
 import {
   Item,
   ItemContent,
@@ -57,37 +48,28 @@ import {
   ItemMedia,
   ItemTitle,
 } from "@/components/ui/item"
-import ProjectCard from '@/components/project-card'
-import { Separator } from '@/components/ui/separator'
-import { cn } from '@/lib/utils'
-import { Badge } from '@/components/ui/badge'
-import SearchBar from '@/components/ui/search-bar'
-import { Combobox, GroupedOptions, Option } from '@/components/ui/combobox'
 import { Label } from '@/components/ui/label'
-import axios from 'axios'
-import roles from '@/data/roles'
-import { create } from '@/routes/projects'
-import { show as showProject } from '@/routes/projects'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { NavItem, Team, User, type BreadcrumbItem } from '@/types'
 import NoProjects from '@/components/no-projects'
+import { PlaceholderPattern } from '@/components/ui/placeholder-pattern'
+import ProjectCard from '@/components/project-card'
+import roles from '@/data/roles'
+import SearchBar from '@/components/ui/search-bar'
+import { Separator } from '@/components/ui/separator'
+import { type SharedData } from '@/types'
+import { show, about } from '@/routes/users'
+import { show as showProject } from '@/routes/projects'
+import { show as showTeam } from '@/routes/teams'
+import { Spinner } from '@/components/ui/spinner'
+import { store as storeImage } from '@/routes/api/uploads'
+import { update as updateUser } from '@/actions/App/Http/Controllers/UserProfileController'
+import { TabbedSectionHeaders } from '@/components/ui/tabbed-sections'
+import { Textarea } from '@/components/ui/textarea'
+import { useEffect, useState } from 'react'
 import { useDebouncedCallback } from 'use-debounce'
 import { Slider } from '@/components/ui/slider'
 
 type ProfileTab = NavItem & {key: string, className?: string}
-
-const projects = [
-    { name: 'zombie-arg', platforms: ['ps', 'xbox', 'pc']},
-    { name: 'tenacious-aim', platforms: ['pc', 'mac']},
-    { name: 'social-you', platforms: ['pc', 'mac', 'xbox', 'ps', 'switch']},
-]
-
-const releases = [
-    { name: 'Rainbow Siege 6', platforms: ['ps', 'xbox', 'pc']},
-    { name: 'Warcraft III', platforms: ['pc', 'mac']},
-    { name: 'Dont Starve', platforms: ['pc', 'mac', 'xbox', 'ps', 'switch']},
-    { name: 'Candy Crush', platforms: ['ios', 'android']},
-    { name: 'Darkest Dungeon', platforms: ['pc', 'mac', 'ps', 'xbox', 'switch', 'ios', 'android']},
-]
 
 function RenderMultilineText({ text } : { text: string }) {
     const paragraphs = text.split('\n');
@@ -196,12 +178,32 @@ function NoReleases() {
     )
 }
 
-function AvatarDialog({ image, open, onOpenChange } : { image: string, open: boolean, onOpenChange: (o: boolean) => void }) {
+function AvatarDialog({ image, open, onOpenChange, close } : { 
+    image: string
+    open: boolean
+    onOpenChange: (o: boolean) => void
+    close: () => void 
+}) {
     
+    const { auth, apiToken } = usePage<SharedData>().props;
+
     const [crop, setCrop] = useState<Point>({ x: 0, y: 0 })
     const [zoom, setZoom] = useState(1)
     const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area|undefined>(undefined)
-    const [out, setOut] = useState<string>("")
+    // const [out, setOut] = useState<string>("")
+    const [fileUrl, setFileUrl] = useState<string>(image)
+
+    const {data, setData, patch} = useForm({
+        field: "avatar",
+        avatar: ""
+    })
+
+    useEffect(() => {
+        console.log('avatar link changed:', data.avatar)
+        if (data.avatar.length > 0) {
+            patch(updateUser({ user: auth.user.id }).url)
+        }
+    }, [data.avatar, auth.user.id, patch]);
 
     const createImage = (url: string) => new Promise((resolve, reject) => {
         const image = new Image()
@@ -214,10 +216,8 @@ function AvatarDialog({ image, open, onOpenChange } : { image: string, open: boo
     const getCroppedImage = async (
         imgSrc: string,
         pixelCrop: Area,
-    ) => {
+    ) : Promise<Blob|null> => {
         const image = await createImage(imgSrc)
-        console.log('after createImage(url):', image)
-        console.log('typeof:', typeof image)
         const canvas = document.createElement('canvas')
         const ctx = canvas.getContext('2d')
 
@@ -231,9 +231,9 @@ function AvatarDialog({ image, open, onOpenChange } : { image: string, open: boo
         ctx.drawImage(image, pixelCrop.x, pixelCrop.y, pixelCrop.width, pixelCrop.height, 0, 0, canvas.width, canvas.height)
 
         return new Promise((resolve) => {
-            canvas.toBlob((file) => {
-                if (file !== null) {
-                    resolve(URL.createObjectURL(file))
+            canvas.toBlob((f) => {
+                if (f !== null) { // @TODO
+                    resolve(f)
                 }
             }, 'image/jpeg')
         })
@@ -241,46 +241,82 @@ function AvatarDialog({ image, open, onOpenChange } : { image: string, open: boo
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="md:max-w-6xl">
+            <DialogContent>
                 <DialogHeader>
                     <DialogTitle>Profile photo</DialogTitle>
                 </DialogHeader>
-                <div className='h-[50vh] relative'>
                 {
-                    <Cropper
-                        aspect={1} 
-                        crop={crop} 
-                        cropShape="round" 
-                        image={image} 
-                        onCropChange={setCrop}
-                        onCropComplete={(_, croppedAreaPixels) => {
-                            console.log('croppedAreaPixels:', croppedAreaPixels)
-                            setCroppedAreaPixels(croppedAreaPixels)
+                    fileUrl
+                    ? <div className='h-[50vh] relative'>
+                        <Cropper
+                            aspect={1} 
+                            crop={crop} 
+                            cropShape="round" 
+                            image={fileUrl} 
+                            onCropChange={setCrop}
+                            onCropComplete={(_, croppedAreaPixels) => {
+                                //console.log('croppedAreaPixels:', croppedAreaPixels)
+                                setCroppedAreaPixels(croppedAreaPixels)
+                            }} 
+                            showGrid={false}
+                            zoom={zoom} 
+                        />
+                    </div>
+                    : <Input 
+                        onChange={async (e) => {
+                            const fyl = e.target.files[0]
+                            const url = await URL.createObjectURL(fyl)
+                            setFileUrl(url)
                         }} 
-                        showGrid={false}
-                        zoom={zoom} 
+                        className="my-5" 
+                        type="file"
                     />
                 }
-                    
-                </div>
+                {/* <img className="size-10" src={out} /> */}
+                
                 <DialogFooter>
                     <div className="w-full flex flex-col">
-                        <div className="w-full my-10 flex justify-center">
-                            <Slider min={1} max={2} step={0.01} onValueChange={(e) => setZoom(e[0])} />
-                        </div>
-                        <div className="flex justify-end gap-3">
-                            <DialogClose asChild>
-                                <Button className="cursor-pointer" variant="outline">Cancel</Button>
-                            </DialogClose>
-                            <Button onClick={async () => {
-                                // console.log('image:', image, 'croppedAreaPixels:', croppedAreaPixels)
-                                const x = await getCroppedImage(image, croppedAreaPixels)
-                                setOut(x)
-                            }} className="cursor-pointer" type="button">Save changes</Button>
-                        </div>
+                        {   fileUrl &&
+                            <div className="w-full my-10 flex justify-center">
+                                <Slider min={1} max={2} step={0.01} onValueChange={(e) => setZoom(e[0])} />
+                            </div>
+                        }
+                        <div className="flex flex-col md:flex-row gap-10 justify-between">
+                            {
+                                fileUrl &&
+                                <Button variant="outline" onClick={() => setFileUrl(undefined)}>Clear Image</Button>
+                            }
+                            <div className="flex flex-col md:flex-row justify-end gap-3 grow">
+                                <DialogClose asChild>
+                                    <Button className="cursor-pointer" variant="outline">Cancel</Button>
+                                </DialogClose>
+                                <Button onClick={async () => {
+                                    const x: Blob|null = await getCroppedImage(fileUrl, croppedAreaPixels)
+                                    if (x !== null) {
+                                        const formData = new FormData()
+                                        formData.append('image', x)
+                                        axios.post(storeImage().url, formData, {
+                                            headers: {
+                                                Authorization: 'Bearer ' + apiToken
+                                            }
+                                        }).then((res) => {
+                                            console.log('res:',res)
+                                            const link = res.data.upload
+                                            console.log('link:', link)
+                                            setData('avatar', link)
+                                            close()
 
+                                        }).catch((err) => {
+                                            console.log('File upload error:', err)
+                                        })
+                                    } else {
+                                        console.log('file is undefined')
+                                    }
+                                    
+                                }} className="cursor-pointer" type="button">Save changes</Button>
+                            </div>
+                        </div>
                     </div>
-                    
                 </DialogFooter>
             </DialogContent>
         </Dialog>
@@ -963,14 +999,16 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
         }
         return null
     }
-
-    const [crop, setCrop] = useState({ x: 0, y: 0 })
-    const [zoom, setZoom] = useState(1)
     
     return (
         <AppLayout maxWidth='md:max-w-full' maxHeaderWidth='md:max-w-10xl' breadcrumbs={breadcrumbs}>
             <Head title="Profile" />
-            <AvatarDialog image={user.avatar ?? ""} open={showAvatarDialog} onOpenChange={setShowAvatarDialog} />
+            <AvatarDialog 
+                image={user.avatar ?? ""} 
+                open={showAvatarDialog} 
+                onOpenChange={setShowAvatarDialog}
+                close={() => setShowAvatarDialog(false)} 
+            />
             <div className="flex h-full flex-col overflow-x-auto">
                 <div className="h-45 md:h-[350px] flex gap-4 justify-between border-sidebar-border/70 dark:border-sidebar-border">
                     <div className="w-full h-full relative overflow-hidden border border-sidebar-border/70 dark:border-sidebar-border">

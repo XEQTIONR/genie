@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
 
 class UserProfileController extends Controller
@@ -53,8 +54,10 @@ class UserProfileController extends Controller
      */
     public function update(Request $request, User $user)
     {
+        Log::info($request);
+        
         $validated = $request->validate([
-            'field' => 'required|string|in:status,bio,location,fav_games,skills,contact,socials',
+            'field' => 'required|string|in:status,bio,location,fav_games,skills,contact,socials,avatar',
         ]);
 
         switch ($validated['field']) {
@@ -68,6 +71,8 @@ class UserProfileController extends Controller
                 return $this->updateFavoriteGames($request, $user);
             case 'skills':
                 return $this->updateSkills($request, $user);
+            case 'avatar':
+                return $this->updateAvatar($request, $user);
         }
     }
 
@@ -77,6 +82,24 @@ class UserProfileController extends Controller
     public function destroy(string $id)
     {
         //
+    }
+
+    protected function updateAvatar(Request $request, User $user)
+    {
+        $validated = $request->validateWithBag('userInfo', [
+            'avatar' => 'required|string'
+        ]);
+
+        $user->avatar = $validated['avatar'];
+        $user->save();
+
+        return to_route('users.about', [
+            'user' => $user
+        ])->with('notification', [
+            'type' => 'info',
+            'message' => "Avatar updated.",
+            'button' => null
+        ]);
     }
 
     protected function updateStatus(Request $request, User $user)
