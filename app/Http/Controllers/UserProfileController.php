@@ -87,7 +87,7 @@ class UserProfileController extends Controller
     protected function updateAvatar(Request $request, User $user)
     {
         $validated = $request->validateWithBag('userInfo', [
-            'avatar' => 'required|string'
+            'avatar' => 'nullable|string'
         ]);
 
         $user->avatar = $validated['avatar'];

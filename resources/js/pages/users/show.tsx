@@ -190,20 +190,24 @@ function AvatarDialog({ image, open, onOpenChange, close } : {
     const [crop, setCrop] = useState<Point>({ x: 0, y: 0 })
     const [zoom, setZoom] = useState(1)
     const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area|undefined>(undefined)
-    // const [out, setOut] = useState<string>("")
-    const [fileUrl, setFileUrl] = useState<string>(image)
+    const [fileUrl, setFileUrl] = useState<string|undefined>(image)
 
     const {data, setData, patch} = useForm({
         field: "avatar",
-        avatar: ""
+        avatar: image
     })
 
     useEffect(() => {
+        setFileUrl(image)
+        setZoom(1)
+    }, [image])
+
+    useEffect(() => {
         console.log('avatar link changed:', data.avatar)
-        if (data.avatar.length > 0) {
+        if (data.avatar !== image) {
             patch(updateUser({ user: auth.user.id }).url)
         }
-    }, [data.avatar, auth.user.id, patch]);
+    }, [data.avatar, auth.user.id, patch, image]);
 
     const createImage = (url: string) => new Promise((resolve, reject) => {
         const image = new Image()
@@ -240,7 +244,12 @@ function AvatarDialog({ image, open, onOpenChange, close } : {
     }
 
     return (
-        <Dialog open={open} onOpenChange={onOpenChange}>
+        <Dialog open={open} onOpenChange={(o) => {
+            if (!o) {
+                setFileUrl(image)
+            }
+            onOpenChange(o)
+        }}>
             <DialogContent>
                 <DialogHeader>
                     <DialogTitle>Profile photo</DialogTitle>
@@ -255,7 +264,6 @@ function AvatarDialog({ image, open, onOpenChange, close } : {
                             image={fileUrl} 
                             onCropChange={setCrop}
                             onCropComplete={(_, croppedAreaPixels) => {
-                                //console.log('croppedAreaPixels:', croppedAreaPixels)
                                 setCroppedAreaPixels(croppedAreaPixels)
                             }} 
                             showGrid={false}
@@ -272,7 +280,6 @@ function AvatarDialog({ image, open, onOpenChange, close } : {
                         type="file"
                     />
                 }
-                {/* <img className="size-10" src={out} /> */}
                 
                 <DialogFooter>
                     <div className="w-full flex flex-col">
@@ -288,11 +295,17 @@ function AvatarDialog({ image, open, onOpenChange, close } : {
                             }
                             <div className="flex flex-col md:flex-row justify-end gap-3 grow">
                                 <DialogClose asChild>
-                                    <Button className="cursor-pointer" variant="outline">Cancel</Button>
+                                    <Button 
+                                        className="cursor-pointer" 
+                                        variant="outline"
+                                    >
+                                        Cancel
+                                    </Button>
                                 </DialogClose>
                                 <Button onClick={async () => {
-                                    const x: Blob|null = await getCroppedImage(fileUrl, croppedAreaPixels)
-                                    if (x !== null) {
+                                    if (fileUrl) {
+                                        const x: Blob|null = await getCroppedImage(fileUrl, croppedAreaPixels)
+                                        console.log('x:', x)
                                         const formData = new FormData()
                                         formData.append('image', x)
                                         axios.post(storeImage().url, formData, {
@@ -309,8 +322,9 @@ function AvatarDialog({ image, open, onOpenChange, close } : {
                                         }).catch((err) => {
                                             console.log('File upload error:', err)
                                         })
-                                    } else {
-                                        console.log('file is undefined')
+                                    } else { // fileurl == undefined
+                                        setData("avatar", "")
+                                        close()
                                     }
                                     
                                 }} className="cursor-pointer" type="button">Save changes</Button>
