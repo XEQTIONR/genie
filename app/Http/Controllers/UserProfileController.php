@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Upload;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 
 class UserProfileController extends Controller
@@ -53,9 +55,7 @@ class UserProfileController extends Controller
      * Update the specified resource in storage.
      */
     public function update(Request $request, User $user)
-    {
-        Log::info($request);
-        
+    {   
         $validated = $request->validate([
             'field' => 'required|string|in:status,bio,location,fav_games,skills,contact,socials,avatar',
         ]);
@@ -90,8 +90,17 @@ class UserProfileController extends Controller
             'avatar' => 'nullable|string'
         ]);
 
+        $old_avatar = $user->avatar;
         $user->avatar = $validated['avatar'];
         $user->save();
+
+        if ($old_avatar) {
+            $upload = Upload::where('url', $old_avatar)->first();
+            if ($upload) {
+                Storage::disk('public')->delete($upload->name);
+                $upload->delete();
+            }
+        }
 
         return to_route('users.about', [
             'user' => $user
