@@ -1,6 +1,7 @@
 import { Button, buttonVariants } from '@/components/ui/button'
 import { PlaceholderPattern } from '@/components/ui/placeholder-pattern'
 import AppLayout from '@/layouts/app-layout'
+import Cropper, { Area, Point } from 'react-easy-crop'
 import { show, about } from '@/routes/users'
 import { show as showTeam } from '@/routes/teams'
 import { create as createTeam } from '@/routes/teams'
@@ -8,8 +9,18 @@ import { update as updateUser } from '@/actions/App/Http/Controllers/UserProfile
 import { index as showTeams } from '@/routes/users/teams'
 import { NavItem, Team, User, type BreadcrumbItem } from '@/types'
 import { Head, Link, router } from '@inertiajs/react'
-import { AtSign, Dribbble, EllipsisVertical, Facebook, Figma, Gamepad2, Github, Gitlab, Globe, Hammer, Instagram, Lightbulb, Linkedin, LinkIcon, Mail, MapPin, Pencil, PencilRuler, Plus, Rocket, Slack, Trash, Twitch, Twitter, UserPlus, Users, X, Youtube } from 'lucide-react'
+import { AtSign, Camera, Dribbble, EllipsisVertical, Facebook, Figma, Gamepad2, Github, Gitlab, Globe, Hammer, Instagram, Lightbulb, Linkedin, LinkIcon, Mail, MapPin, Pencil, PencilRuler, Plus, Rocket, Slack, Trash, Twitch, Twitter, UserPlus, Users, X, Youtube } from 'lucide-react'
 import { Godot, Unity, Unreal } from '@/components/icons/create'
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -60,6 +71,7 @@ import { show as showProject } from '@/routes/projects'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import NoProjects from '@/components/no-projects'
 import { useDebouncedCallback } from 'use-debounce'
+import { Slider } from '@/components/ui/slider'
 
 type ProfileTab = NavItem & {key: string, className?: string}
 
@@ -184,7 +196,100 @@ function NoReleases() {
     )
 }
 
+function AvatarDialog({ image, open, onOpenChange } : { image: string, open: boolean, onOpenChange: (o: boolean) => void }) {
+    
+    const [crop, setCrop] = useState<Point>({ x: 0, y: 0 })
+    const [zoom, setZoom] = useState(1)
+    const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area|undefined>(undefined)
+    const [out, setOut] = useState<string>("")
+
+    const createImage = (url: string) => new Promise((resolve, reject) => {
+        const image = new Image()
+        image.addEventListener('load', () => resolve(image))
+        image.addEventListener('error', (error) => reject(error))
+        image.setAttribute('crossOrigin', 'anonymous') // needed to avoid cross-origin issues on CodeSandbox
+        image.src = url
+    })
+
+    const getCroppedImage = async (
+        imgSrc: string,
+        pixelCrop: Area,
+    ) => {
+        const image = await createImage(imgSrc)
+        console.log('after createImage(url):', image)
+        console.log('typeof:', typeof image)
+        const canvas = document.createElement('canvas')
+        const ctx = canvas.getContext('2d')
+
+        if (!ctx) {
+            return null
+        }
+
+        canvas.width = 200
+        canvas.height = 200
+
+        ctx.drawImage(image, pixelCrop.x, pixelCrop.y, pixelCrop.width, pixelCrop.height, 0, 0, canvas.width, canvas.height)
+
+        return new Promise((resolve) => {
+            canvas.toBlob((file) => {
+                if (file !== null) {
+                    resolve(URL.createObjectURL(file))
+                }
+            }, 'image/jpeg')
+        })
+    }
+
+    return (
+        <Dialog open={open} onOpenChange={onOpenChange}>
+            <DialogContent className="md:max-w-6xl">
+                <DialogHeader>
+                    <DialogTitle>Profile photo</DialogTitle>
+                </DialogHeader>
+                <div className='h-[50vh] relative'>
+                {
+                    <Cropper
+                        aspect={1} 
+                        crop={crop} 
+                        cropShape="round" 
+                        image={image} 
+                        onCropChange={setCrop}
+                        onCropComplete={(_, croppedAreaPixels) => {
+                            console.log('croppedAreaPixels:', croppedAreaPixels)
+                            setCroppedAreaPixels(croppedAreaPixels)
+                        }} 
+                        showGrid={false}
+                        zoom={zoom} 
+                    />
+                }
+                    
+                </div>
+                <DialogFooter>
+                    <div className="w-full flex flex-col">
+                        <div className="w-full my-10 flex justify-center">
+                            <Slider min={1} max={2} step={0.01} onValueChange={(e) => setZoom(e[0])} />
+                        </div>
+                        <div className="flex justify-end gap-3">
+                            <DialogClose asChild>
+                                <Button className="cursor-pointer" variant="outline">Cancel</Button>
+                            </DialogClose>
+                            <Button onClick={async () => {
+                                // console.log('image:', image, 'croppedAreaPixels:', croppedAreaPixels)
+                                const x = await getCroppedImage(image, croppedAreaPixels)
+                                setOut(x)
+                            }} className="cursor-pointer" type="button">Save changes</Button>
+                        </div>
+
+                    </div>
+                    
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+    )
+}
+
 export default function Profile({ user, tab = 'showcase', teams } : { user: User, tab: string, teams: Team[] }) {
+
+    const [showAvatarDialog, setShowAvatarDialog] = useState(false)
 
     const [loading, setLoading] = useState(false)
 
@@ -858,10 +963,14 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
         }
         return null
     }
+
+    const [crop, setCrop] = useState({ x: 0, y: 0 })
+    const [zoom, setZoom] = useState(1)
     
     return (
         <AppLayout maxWidth='md:max-w-full' maxHeaderWidth='md:max-w-10xl' breadcrumbs={breadcrumbs}>
             <Head title="Profile" />
+            <AvatarDialog image={user.avatar ?? ""} open={showAvatarDialog} onOpenChange={setShowAvatarDialog} />
             <div className="flex h-full flex-col overflow-x-auto">
                 <div className="h-45 md:h-[350px] flex gap-4 justify-between border-sidebar-border/70 dark:border-sidebar-border">
                     <div className="w-full h-full relative overflow-hidden border border-sidebar-border/70 dark:border-sidebar-border">
@@ -871,6 +980,12 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
                 <div className="w-full flex flex-col md:max-w-8xl mx-auto gap-0 items-center">
                     <div className="flex flex-col md:flex-row md:gap-4 relative -top-11 -mb-11 w-full md:max-w-10xl px-4 md:mx-0">
                         <Avatar className="size-32 md:size-36 ring-8 ring-background">
+                            {
+                                auth.user && auth.user.id === user.id &&
+                                <div onClick={() => setShowAvatarDialog(true)} className="cursor-pointer size-full flex items-center justify-center absolute bg-neutral-950/50 z-50 opacity-0 hover:opacity-100">
+                                    <Camera className="opacity-90 stroke-white" size={25} />
+                                </div>
+                            }
                             <AvatarImage src={user.avatar} />
                             <AvatarFallback className="text-3xl">{user.name.split(' ').map(word => word.charAt(0)).join("")}</AvatarFallback>
                         </Avatar>
