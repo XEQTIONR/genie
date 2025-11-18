@@ -10,7 +10,7 @@ import { index as membersIndex } from '@/routes/teams/users'
 import { index as projectsIndex } from '@/routes/teams/projects'
 import { NavItem, Project, ProjectMember, Team, type BreadcrumbItem } from '@/types'
 import { Head, Link } from '@inertiajs/react'
-import { Camera, EllipsisVertical, PencilRuler, Rocket, UserPlus, Users } from 'lucide-react'
+import { Camera, EllipsisVertical, Eraser, Pencil, PencilRuler, Rocket, UserPlus, Users } from 'lucide-react'
 import {
     Dialog,
     DialogClose,
@@ -52,6 +52,7 @@ import { Slider } from '@/components/ui/slider'
 import { update } from '@/routes/teams'
 import { useDebouncedCallback } from 'use-debounce'
 import { Separator } from '@/components/ui/separator'
+import { cn } from '@/lib/utils'
 
 type ProfileTab = NavItem & {key: string, className?: string}
 
@@ -165,6 +166,138 @@ function AvatarDialog({ aspect = 1, image, imageHeight, imageWidth, open, onOpen
                                             })
                                         } else { // fileurl == undefined
                                             setData("avatar", "")
+                                            close()
+                                        }
+                                        
+                                    }} 
+                                    className="cursor-pointer" 
+                                    type="button"
+                                >
+                                    Save changes
+                                </Button>
+                            </div>
+                        </div>
+                    </div>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+    )
+}
+
+function BannerDialog({ aspect = 5, image, imageHeight, imageWidth, open, onOpenChange, close, team } : { 
+    aspect?: number
+    image: string
+    imageHeight: number
+    imageWidth: number
+    open: boolean
+    onOpenChange: (o: boolean) => void
+    close: () => void
+    team: Team 
+}) {
+
+    const { apiToken } = usePage<SharedData>().props;
+
+    const [crop, setCrop] = useState<Point>({ x: 0, y: 0 })
+    const [zoom, setZoom] = useState(1)
+    const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area|undefined>(undefined)
+    const [fileUrl, setFileUrl] = useState<string|undefined>(image)
+
+    const {data, setData, patch} = useForm({
+        field: 'banner',
+        banner: image
+    })
+
+    useEffect(() => {
+        setFileUrl(image)
+        setZoom(1)
+    }, [image])
+
+    useEffect(() => {
+        if (data.banner !== image) {
+            patch(update({ team: team.id }).url)
+        }
+    }, [data.banner, team, patch, image])
+
+    return (
+        <Dialog open={open} onOpenChange={(o) => {
+            if (!o) {
+                setFileUrl(image)
+            }
+            onOpenChange(o)
+        }}>
+            <DialogContent className={cn(fileUrl && "md:max-w-[90vw]")}>
+                <DialogHeader>
+                    <DialogTitle>Banner image</DialogTitle>
+                </DialogHeader>
+                {
+                    fileUrl
+                    ? <div className='h-[50vh] relative'>
+                        <Cropper
+                            aspect={aspect} 
+                            crop={crop} 
+                            cropShape="rect" 
+                            image={fileUrl} 
+                            onCropChange={setCrop}
+                            onCropComplete={(_, croppedAreaPixels) => {
+                                setCroppedAreaPixels(croppedAreaPixels)
+                            }} 
+                            showGrid={false}
+                            zoom={zoom} 
+                        />
+                    </div>
+                    : <Input 
+                        onChange={async (e) => {
+                            const fyl = e.target.files[0]
+                            const url = await URL.createObjectURL(fyl)
+                            setFileUrl(url)
+                        }} 
+                        className="my-5" 
+                        type="file"
+                    />
+                }
+                <DialogFooter>
+                    <div className="w-full flex flex-col">
+                    {   fileUrl &&
+                        <div className="w-full my-10 flex justify-center">
+                            <Slider min={1} max={2} step={0.01} onValueChange={(e) => setZoom(e[0])} />
+                        </div>
+                    }
+                        <div className="flex flex-col md:flex-row gap-10 justify-between">
+                        {
+                            fileUrl &&
+                            <Button variant="outline" onClick={() => setFileUrl(undefined)}>
+                                <Eraser />
+                                Clear Image
+                            </Button>
+                        }
+                            <div className="flex flex-col md:flex-row justify-end gap-3 grow">
+                                <DialogClose asChild>
+                                    <Button 
+                                        className="cursor-pointer" 
+                                        variant="outline"
+                                    >
+                                        Cancel
+                                    </Button>
+                                </DialogClose>
+                                <Button 
+                                    onClick={async () => {
+                                        if (fileUrl) {
+                                            const x: Blob|null = await getCroppedImage(fileUrl, croppedAreaPixels, imageWidth, imageHeight)
+                                            const formData = new FormData()
+                                            formData.append('image', x)
+                                            axios.post(storeImage().url, formData, {
+                                                headers: {
+                                                    Authorization: 'Bearer ' + apiToken
+                                                }
+                                            }).then((res) => {
+                                                const link = res.data.upload
+                                                setData('banner', link)
+                                                close()
+                                            }).catch((err) => {
+                                                console.log('File upload error:', err)
+                                            })
+                                        } else { // fileurl == undefined
+                                            setData("banner", "")
                                             close()
                                         }
                                         
@@ -307,11 +440,37 @@ export default function TeamProfile({
                 close={() => setShowAvatarDialog(false)}
                 team={team}
             />
+
+            <BannerDialog
+                team={team}
+                image={team.banner ?? ""}
+                imageHeight={350}
+                imageWidth={1728}
+                open={showBannerDialog}
+                onOpenChange={setShowBannerDialog}
+                close={() => setShowBannerDialog(false)}
+            />
             <div className="flex h-full flex-col overflow-x-auto">
-                <div className="h-full md:h-[350px] flex gap-4 justify-between rounded-xl border-sidebar-border/70 dark:border-sidebar-border">
-                        <div className="w-full relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
-                            <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
-                        </div>
+                <div
+                    style={team.banner ? { backgroundImage: `url("${team.banner}")` } : {}}
+                    className="h-45 md:h-[350px] bg-gradient-to-r from-indigo-500 from-10% via-sky-500 via-30% to-emerald-500 to-90% bg-cover bg-center flex gap-4 justify-between border-sidebar-border/70 dark:border-sidebar-border"
+                >
+                    <div className="w-full h-full  relative overflow-hidden flex justify-end items-end md:max-w-10xll px-4 py-5">
+                    {
+                        team.owner_id === auth.user?.id &&
+                        <Button
+                            variant="secondary"
+                            type="button" 
+                            className="cursor-pointer" 
+                            size="icon-lg"
+                            onClick={() => {
+                                setShowBannerDialog(true)
+                            }}
+                        >
+                            <Pencil />
+                        </Button>
+                    }
+                    </div>
                 </div>
                 <div className="w-full flex flex-col md:max-w-8xl mx-auto gap-0 items-center">
                     <div className="flex flex-col md:flex-row md:gap-4 relative -top-11 -mb-11 w-full md:max-w-10xl px-4 md:mx-0">

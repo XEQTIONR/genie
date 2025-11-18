@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('slug');
             $table->string('type')->default('team');
             $table->string('avatar')->nullable();
+            $table->string('banner')->nullable();
             $table->string('location')->nullable();
             $table->text('description')->nullable();
             $table->json('meta')->nullable();

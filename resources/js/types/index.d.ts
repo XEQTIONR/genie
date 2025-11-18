@@ -74,6 +74,7 @@ export interface Team {
     id: number
     name: string
     avatar: string
+    banner: string
     description: string
     slug: string
     created_at: string

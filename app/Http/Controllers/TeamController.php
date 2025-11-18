@@ -118,12 +118,14 @@ class TeamController extends Controller
     public function update(Request $request, Team $team)
     {
         $validated = $request->validate([
-            'field' => 'required|string|in:avatar'
+            'field' => 'required|string|in:avatar,banner'
         ]);
 
         switch ($validated['field']) {
             case 'avatar':
                 return $this->updateAvatar($request, $team);
+            case 'banner':
+                return $this->updateBanner($request, $team);
         }
     }
 
@@ -150,6 +152,33 @@ class TeamController extends Controller
         ])->with('notification', [
             'type' => 'info',
             'message' => "Avatar updated.",
+            'button' => null
+        ]);
+    }
+
+    protected function updateBanner(Request $request, Team $team)
+    {
+        $validated = $request->validate([
+            'banner' => 'nullable|string'
+        ]);
+
+        $old_banner = $team->banner;
+        $team->banner = $validated['banner'];
+        $team->save();
+
+        if ($old_banner) {
+            $upload = Upload::where('url', $old_banner)->first();
+            if ($upload) {
+                Storage::disk('public')->delete($upload->name);
+                $upload->delete();
+            }
+        }
+
+        return to_route('teams.show', [
+            'team' => $team
+        ])->with('notification', [
+            'type' => 'info',
+            'message' => "Banner updated.",
             'button' => null
         ]);
     }
