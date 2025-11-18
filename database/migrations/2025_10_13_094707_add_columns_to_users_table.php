@@ -14,7 +14,9 @@ return new class extends Migration
         Schema::table('users', function (Blueprint $table) {
             $table->string('username')->unique()->after('id');
             $table->json('location')->nullable()->after('password');
-            $table->text('bio')->nullable()->after('location');
+            $table->string('avatar')->nullable()->after('location');
+            $table->string('banner')->nullable()->after('avatar');
+            $table->text('bio')->nullable()->after('banner');
             $table->string('status')->nullable()->after('bio');
             $table->string('state')->nullable()->after('status');
             $table->json('meta')->nullable()->after('state');
@@ -30,6 +32,8 @@ return new class extends Migration
             $table->dropUnique('users_username_unique');
             $table->dropColumn('username');
             $table->dropColumn('location');
+            $table->dropColumn('avatar');
+            $table->dropColumn('banner');
             $table->dropColumn('bio');
             $table->dropColumn('status');
             $table->dropColumn('state');

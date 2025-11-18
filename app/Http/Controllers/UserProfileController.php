@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Upload;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 
@@ -57,22 +56,24 @@ class UserProfileController extends Controller
     public function update(Request $request, User $user)
     {   
         $validated = $request->validate([
-            'field' => 'required|string|in:status,bio,location,fav_games,skills,contact,socials,avatar',
+            'field' => 'required|string|in:avatar,banner,bio,contact,fav_games,location,skills,socials,status',
         ]);
 
         switch ($validated['field']) {
-            case 'status':
-                return $this->updateStatus($request, $user);
-            case 'bio':
-                return $this->updateBio($request, $user);
-            case 'location':
-                return $this->updateLocation($request, $user);
-            case 'fav_games':
-                return $this->updateFavoriteGames($request, $user);
-            case 'skills':
-                return $this->updateSkills($request, $user);
             case 'avatar':
                 return $this->updateAvatar($request, $user);
+            case 'banner':
+                return $this->updateBanner($request, $user);
+            case 'bio':
+                return $this->updateBio($request, $user);
+            case 'fav_games':
+                return $this->updateFavoriteGames($request, $user);
+            case 'location':
+                return $this->updateLocation($request, $user);
+            case 'skills':
+                return $this->updateSkills($request, $user);
+            case 'status':
+                return $this->updateStatus($request, $user);
         }
     }
 
@@ -107,6 +108,33 @@ class UserProfileController extends Controller
         ])->with('notification', [
             'type' => 'info',
             'message' => "Avatar updated.",
+            'button' => null
+        ]);
+    }
+
+    protected function updateBanner(Request $request, User $user)
+    {
+        $validated = $request->validateWithBag('userInfo', [
+            'banner' => 'nullable|string'
+        ]);
+
+        $old_banner = $user->banner;
+        $user->banner = $validated['banner'];
+        $user->save();
+
+        if ($old_banner) {
+            $upload = Upload::where('url', $old_banner)->first();
+            if ($upload) {
+                Storage::disk('public')->delete($upload->name);
+                $upload->delete();
+            }
+        }
+
+        return to_route('users.about', [
+            'user' => $user
+        ])->with('notification', [
+            'type' => 'info',
+            'message' => "Banner updated.",
             'button' => null
         ]);
     }

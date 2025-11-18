@@ -100,6 +100,7 @@ export interface User {
     name: string
     email: string
     avatar?: string
+    banner?: string
     email_verified_at: string | null
     location: { city: string, country: string } | null
     two_factor_enabled?: boolean

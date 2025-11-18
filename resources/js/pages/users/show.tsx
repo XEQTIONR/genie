@@ -1,5 +1,5 @@
 import AppLayout from '@/layouts/app-layout'
-import { ArrowUpRightIcon } from "lucide-react"
+import { ArrowUpRightIcon, Eraser, ImageIcon } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { AtSign, Camera, Dribbble, EllipsisVertical, Facebook, Figma, Gamepad2, Github, Gitlab, Globe, Hammer, Instagram, Lightbulb, Linkedin, LinkIcon, Mail, MapPin, Pencil, PencilRuler, Plus, Rocket, Slack, Trash, Twitch, Twitter, UserPlus, Users, X, Youtube } from 'lucide-react'
 import axios from 'axios'
@@ -51,7 +51,6 @@ import {
 import { Label } from '@/components/ui/label'
 import { NavItem, Team, User, type BreadcrumbItem } from '@/types'
 import NoProjects from '@/components/no-projects'
-import { PlaceholderPattern } from '@/components/ui/placeholder-pattern'
 import ProjectCard from '@/components/project-card'
 import roles from '@/data/roles'
 import SearchBar from '@/components/ui/search-bar'
@@ -70,6 +69,53 @@ import { useDebouncedCallback } from 'use-debounce'
 import { Slider } from '@/components/ui/slider'
 
 type ProfileTab = NavItem & {key: string, className?: string}
+
+
+const createImage = (url: string) => new Promise<HTMLImageElement>((resolve, reject) => {
+    const image = new Image()
+    image.addEventListener('load', () => resolve(image))
+    image.addEventListener('error', (error) => reject(error))
+    image.setAttribute('crossOrigin', 'anonymous') // needed to avoid cross-origin issues on CodeSandbox
+    image.src = url
+})
+
+const getCroppedImage = async (
+    imgSrc: string,
+    pixelCrop: Area,
+    width: number,
+    height: number,
+) : Promise<Blob|null> => {
+    const image = await createImage(imgSrc)
+    const canvas = document.createElement('canvas')
+    const ctx = canvas.getContext('2d')
+
+    if (!ctx) {
+        return null
+    }
+
+    canvas.width = width
+    canvas.height = height
+
+    ctx.drawImage(
+        image, 
+        pixelCrop.x, 
+        pixelCrop.y, 
+        pixelCrop.width, 
+        pixelCrop.height, 
+        0, 
+        0, 
+        canvas.width, 
+        canvas.height
+    )
+
+    return new Promise((resolve) => {
+        canvas.toBlob((f) => {
+            if (f !== null) {
+                resolve(f)
+            }
+        }, 'image/jpeg')
+    })
+}
 
 function RenderMultilineText({ text } : { text: string }) {
     const paragraphs = text.split('\n');
@@ -178,8 +224,11 @@ function NoReleases() {
     )
 }
 
-function AvatarDialog({ image, open, onOpenChange, close } : { 
+function AvatarDialog({ aspect = 1, image, imageHeight, imageWidth, open, onOpenChange, close } : { 
+    aspect?: number
     image: string
+    imageHeight: number
+    imageWidth: number
     open: boolean
     onOpenChange: (o: boolean) => void
     close: () => void 
@@ -203,45 +252,10 @@ function AvatarDialog({ image, open, onOpenChange, close } : {
     }, [image])
 
     useEffect(() => {
-        console.log('avatar link changed:', data.avatar)
         if (data.avatar !== image) {
-            patch(updateUser({ user: auth.user.id }).url)
+            patch(updateUser({ user: auth?.user.id }).url)
         }
-    }, [data.avatar, auth.user.id, patch, image]);
-
-    const createImage = (url: string) => new Promise((resolve, reject) => {
-        const image = new Image()
-        image.addEventListener('load', () => resolve(image))
-        image.addEventListener('error', (error) => reject(error))
-        image.setAttribute('crossOrigin', 'anonymous') // needed to avoid cross-origin issues on CodeSandbox
-        image.src = url
-    })
-
-    const getCroppedImage = async (
-        imgSrc: string,
-        pixelCrop: Area,
-    ) : Promise<Blob|null> => {
-        const image = await createImage(imgSrc)
-        const canvas = document.createElement('canvas')
-        const ctx = canvas.getContext('2d')
-
-        if (!ctx) {
-            return null
-        }
-
-        canvas.width = 200
-        canvas.height = 200
-
-        ctx.drawImage(image, pixelCrop.x, pixelCrop.y, pixelCrop.width, pixelCrop.height, 0, 0, canvas.width, canvas.height)
-
-        return new Promise((resolve) => {
-            canvas.toBlob((f) => {
-                if (f !== null) { // @TODO
-                    resolve(f)
-                }
-            }, 'image/jpeg')
-        })
-    }
+    }, [data.avatar, auth.user, patch, image])
 
     return (
         <Dialog open={open} onOpenChange={(o) => {
@@ -258,7 +272,7 @@ function AvatarDialog({ image, open, onOpenChange, close } : {
                     fileUrl
                     ? <div className='h-[50vh] relative'>
                         <Cropper
-                            aspect={1} 
+                            aspect={aspect} 
                             crop={crop} 
                             cropShape="round" 
                             image={fileUrl} 
@@ -302,32 +316,165 @@ function AvatarDialog({ image, open, onOpenChange, close } : {
                                         Cancel
                                     </Button>
                                 </DialogClose>
-                                <Button onClick={async () => {
-                                    if (fileUrl) {
-                                        const x: Blob|null = await getCroppedImage(fileUrl, croppedAreaPixels)
-                                        console.log('x:', x)
-                                        const formData = new FormData()
-                                        formData.append('image', x)
-                                        axios.post(storeImage().url, formData, {
-                                            headers: {
-                                                Authorization: 'Bearer ' + apiToken
-                                            }
-                                        }).then((res) => {
-                                            console.log('res:',res)
-                                            const link = res.data.upload
-                                            console.log('link:', link)
-                                            setData('avatar', link)
+                                <Button 
+                                    onClick={async () => {
+                                        if (fileUrl) {
+                                            const x: Blob|null = await getCroppedImage(fileUrl, croppedAreaPixels, imageWidth, imageHeight)
+                                            const formData = new FormData()
+                                            formData.append('image', x)
+                                            axios.post(storeImage().url, formData, {
+                                                headers: {
+                                                    Authorization: 'Bearer ' + apiToken
+                                                }
+                                            }).then((res) => {
+                                                const link = res.data.upload
+                                                setData('avatar', link)
+                                                close()
+                                            }).catch((err) => {
+                                                console.log('File upload error:', err)
+                                            })
+                                        } else { // fileurl == undefined
+                                            setData("avatar", "")
                                             close()
+                                        }
+                                        
+                                    }} 
+                                    className="cursor-pointer" 
+                                    type="button"
+                                >
+                                    Save changes
+                                </Button>
+                            </div>
+                        </div>
+                    </div>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+    )
+}
 
-                                        }).catch((err) => {
-                                            console.log('File upload error:', err)
-                                        })
-                                    } else { // fileurl == undefined
-                                        setData("avatar", "")
-                                        close()
-                                    }
-                                    
-                                }} className="cursor-pointer" type="button">Save changes</Button>
+function BannerDialog({ aspect = 5, image, imageHeight, imageWidth, open, onOpenChange, close } : { 
+    aspect?: number
+    image: string
+    imageHeight: number
+    imageWidth: number
+    open: boolean
+    onOpenChange: (o: boolean) => void
+    close: () => void 
+}) {
+
+    const { auth, apiToken } = usePage<SharedData>().props;
+
+    const [crop, setCrop] = useState<Point>({ x: 0, y: 0 })
+    const [zoom, setZoom] = useState(1)
+    const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area|undefined>(undefined)
+    const [fileUrl, setFileUrl] = useState<string|undefined>(image)
+
+    const {data, setData, patch} = useForm({
+        field: 'banner',
+        banner: image
+    })
+
+    useEffect(() => {
+        setFileUrl(image)
+        setZoom(1)
+    }, [image])
+
+    useEffect(() => {
+        if (data.banner !== image) {
+            patch(updateUser({ user: auth?.user.id }).url)
+        }
+    }, [data.banner, auth.user, patch, image])
+
+    return (
+        <Dialog open={open} onOpenChange={(o) => {
+            if (!o) {
+                setFileUrl(image)
+            }
+            onOpenChange(o)
+        }}>
+            <DialogContent className={cn(fileUrl && "md:max-w-[90vw]")}>
+                <DialogHeader>
+                    <DialogTitle>Banner image</DialogTitle>
+                </DialogHeader>
+                {
+                    fileUrl
+                    ? <div className='h-[50vh] relative'>
+                        <Cropper
+                            aspect={aspect} 
+                            crop={crop} 
+                            cropShape="rect" 
+                            image={fileUrl} 
+                            onCropChange={setCrop}
+                            onCropComplete={(_, croppedAreaPixels) => {
+                                setCroppedAreaPixels(croppedAreaPixels)
+                            }} 
+                            showGrid={false}
+                            zoom={zoom} 
+                        />
+                    </div>
+                    : <Input 
+                        onChange={async (e) => {
+                            const fyl = e.target.files[0]
+                            const url = await URL.createObjectURL(fyl)
+                            setFileUrl(url)
+                        }} 
+                        className="my-5" 
+                        type="file"
+                    />
+                }
+                <DialogFooter>
+                    <div className="w-full flex flex-col">
+                    {   fileUrl &&
+                        <div className="w-full my-10 flex justify-center">
+                            <Slider min={1} max={2} step={0.01} onValueChange={(e) => setZoom(e[0])} />
+                        </div>
+                    }
+                        <div className="flex flex-col md:flex-row gap-10 justify-between">
+                        {
+                            fileUrl &&
+                            <Button variant="outline" onClick={() => setFileUrl(undefined)}>
+                                <Eraser />
+                                Clear Image
+                            </Button>
+                        }
+                            <div className="flex flex-col md:flex-row justify-end gap-3 grow">
+                                <DialogClose asChild>
+                                    <Button 
+                                        className="cursor-pointer" 
+                                        variant="outline"
+                                    >
+                                        Cancel
+                                    </Button>
+                                </DialogClose>
+                                <Button 
+                                    onClick={async () => {
+                                        if (fileUrl) {
+                                            const x: Blob|null = await getCroppedImage(fileUrl, croppedAreaPixels, imageWidth, imageHeight)
+                                            const formData = new FormData()
+                                            formData.append('image', x)
+                                            axios.post(storeImage().url, formData, {
+                                                headers: {
+                                                    Authorization: 'Bearer ' + apiToken
+                                                }
+                                            }).then((res) => {
+                                                const link = res.data.upload
+                                                setData('banner', link)
+                                                close()
+                                            }).catch((err) => {
+                                                console.log('File upload error:', err)
+                                            })
+                                        } else { // fileurl == undefined
+                                            setData("banner", "")
+                                            close()
+                                        }
+                                        
+                                    }} 
+                                    className="cursor-pointer" 
+                                    type="button"
+                                >
+                                    Save changes
+                                </Button>
                             </div>
                         </div>
                     </div>
@@ -340,6 +487,8 @@ function AvatarDialog({ image, open, onOpenChange, close } : {
 export default function Profile({ user, tab = 'showcase', teams } : { user: User, tab: string, teams: Team[] }) {
 
     const [showAvatarDialog, setShowAvatarDialog] = useState(false)
+
+    const [showBannerDialog, setShowBannerDialog] = useState(false)
 
     const [loading, setLoading] = useState(false)
 
@@ -1015,18 +1164,46 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
     }
     
     return (
-        <AppLayout maxWidth='md:max-w-full' maxHeaderWidth='md:max-w-10xl' breadcrumbs={breadcrumbs}>
+        <AppLayout maxWidth='md:max-w-11xl' maxHeaderWidth='md:max-w-10xl' breadcrumbs={breadcrumbs}>
             <Head title="Profile" />
             <AvatarDialog 
-                image={user.avatar ?? ""} 
+                image={user.avatar ?? ""}
+                imageHeight={200}
+                imageWidth={200} 
                 open={showAvatarDialog} 
                 onOpenChange={setShowAvatarDialog}
                 close={() => setShowAvatarDialog(false)} 
             />
+
+            <BannerDialog
+                image={user.banner ?? ""}
+                imageHeight={350}
+                imageWidth={1728}
+                open={showBannerDialog}
+                onOpenChange={setShowBannerDialog}
+                close={() => setShowBannerDialog(false)}
+            />
             <div className="flex h-full flex-col overflow-x-auto">
-                <div className="h-45 md:h-[350px] flex gap-4 justify-between border-sidebar-border/70 dark:border-sidebar-border">
-                    <div className="w-full h-full relative overflow-hidden border border-sidebar-border/70 dark:border-sidebar-border">
-                        <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
+                <div
+                    id="banner"
+                    style={user.banner ? { backgroundImage: `url("${user.banner}")` } : {}}
+                    className="h-45 md:h-[350px] bg-gradient-to-r from-indigo-500 from-10% via-sky-500 via-30% to-emerald-500 to-90% bg-cover bg-center flex gap-4 justify-between border-sidebar-border/70 dark:border-sidebar-border"
+                >
+                    <div className="w-full h-full  relative overflow-hidden flex justify-end items-end md:max-w-10xll px-4 py-5">
+                    {
+                        user.id === auth.user?.id &&
+                        <Button
+                            variant="secondary"
+                            type="button" 
+                            className="cursor-pointer" 
+                            size="icon-lg"
+                            onClick={() => {
+                                setShowBannerDialog(true)
+                            }}
+                        >
+                            <Pencil />
+                        </Button>
+                    }
                     </div>
                 </div>
                 <div className="w-full flex flex-col md:max-w-8xl mx-auto gap-0 items-center">
