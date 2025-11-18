@@ -1139,7 +1139,6 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
             />
             <div className="flex h-full flex-col overflow-x-auto">
                 <div
-                    id="banner"
                     style={user.banner ? { backgroundImage: `url("${user.banner}")` } : {}}
                     className="h-45 md:h-[350px] bg-gradient-to-r from-indigo-500 from-10% via-sky-500 via-30% to-emerald-500 to-90% bg-cover bg-center flex gap-4 justify-between border-sidebar-border/70 dark:border-sidebar-border"
                 >

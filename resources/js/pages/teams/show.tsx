@@ -50,6 +50,8 @@ import Cropper, { Area, Point } from 'react-easy-crop'
 import { Input } from "@/components/ui/input"
 import { Slider } from '@/components/ui/slider'
 import { update } from '@/routes/teams'
+import { useDebouncedCallback } from 'use-debounce'
+import { Separator } from '@/components/ui/separator'
 
 type ProfileTab = NavItem & {key: string, className?: string}
 
@@ -200,6 +202,15 @@ export default function TeamProfile({
 
     const [showBannerDialog, setShowBannerDialog] = useState(false)
 
+    const [windowWidth, setWindowWidth] = useState(window.innerWidth)
+
+    const rz = useDebouncedCallback(() => {setWindowWidth(window.innerWidth)}, 500)
+
+    useEffect(() => {
+        window.addEventListener("resize", rz)
+        return () => window.removeEventListener("resize", rz)
+    }, [rz])
+
     const [loading, setLoading] = useState(false)
 
     const { auth } = usePage<SharedData>().props
@@ -285,7 +296,7 @@ export default function TeamProfile({
     const isPro = true
     
     return (
-        <AppLayout maxWidth='md:max-w-7xl' breadcrumbs={breadcrumbs}>
+        <AppLayout maxWidth='md:max-w-11xl' maxHeaderWidth='md:max-w-10xl' breadcrumbs={breadcrumbs}>
             <Head title="Profile" />
             <AvatarDialog 
                 image={team.avatar ?? ""}
@@ -296,37 +307,40 @@ export default function TeamProfile({
                 close={() => setShowAvatarDialog(false)}
                 team={team}
             />
-            <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
-                <div className="h-full md:h-[400px] flex gap-4 justify-between rounded-xl border-sidebar-border/70 dark:border-sidebar-border">
+            <div className="flex h-full flex-col overflow-x-auto">
+                <div className="h-full md:h-[350px] flex gap-4 justify-between rounded-xl border-sidebar-border/70 dark:border-sidebar-border">
                         <div className="w-full relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
                             <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
                         </div>
                 </div>
-                <div className="w-full relative -top-22 md:-top-28 -mb-22 md:-mb-28 flex flex-col gap-8">
-                    <Avatar variant="square" className="size-36 sm:size-44 md:size-48 ml-[50%] -translate-x-1/2 md:translate-x-0 md:ml-12">
-                        {
-                            auth.user && auth.user.id === team.owner_id &&
-                            <div onClick={() => setShowAvatarDialog(true)} className="cursor-pointer size-full flex items-center justify-center absolute bg-neutral-950/50 z-50 opacity-0 hover:opacity-100">
-                                <Camera className="opacity-90 stroke-white" size={25} />
+                <div className="w-full flex flex-col md:max-w-8xl mx-auto gap-0 items-center">
+                    <div className="flex flex-col md:flex-row md:gap-4 relative -top-11 -mb-11 w-full md:max-w-10xl px-4 md:mx-0">
+                        <Avatar variant="square" className="size-32 sm:size-44 md:size-48">
+                            {
+                                auth.user && auth.user.id === team.owner_id &&
+                                <div onClick={() => setShowAvatarDialog(true)} className="cursor-pointer size-full flex items-center justify-center absolute bg-neutral-950/50 z-50 opacity-0 hover:opacity-100">
+                                    <Camera className="opacity-90 stroke-white" size={25} />
+                                </div>
+                            }
+                            <AvatarImage src={team.avatar} />
+                            <AvatarFallback variant="square" className="text-3xl">{team.name.split(' ').map(word => word.charAt(0)).join("")}</AvatarFallback>
+                        </Avatar>
+                        <div className="relative md:top-12 md:mb-12 flex flex-col md:flex-row gap-4 grow items-start justify-between mt-4">
+                            <div className="flex flex-col gap-2">
+                                <div className="text-4xl font-semibold flex items-center gap-4">
+                                    {team.name}
+                                    {isPro && <span className="text-xs bg-primary text-background px-2 py-0.5 rounded">PRO</span>}
+                                </div>
+                                <span></span>
                             </div>
-                        }
-                        <AvatarImage src={team.avatar} />
-                        <AvatarFallback variant="square" className="text-3xl">{team.name.split(' ').map(word => word.charAt(0)).join("")}</AvatarFallback>
-                    </Avatar>
-                    <div className="md:mx-8">
-                        <div className="w-full flex justify-between items-center">
-                            <div className="text-2xl sm:text-5xl font-bold flex items-center gap-4 max-w-4/5">
-                                {team.name}
-                                {isPro && <span className="text-sm bg-primary text-background px-2 py-0.5 rounded">PRO</span>}
-                            </div>
-                            <div className="flex gap-2 items-center">
-                                {/* <span className="hidden lg:inline mr-3 text-sm">Let's build something together</span> */}
-                                <Button className="hidden lg:inline cursor-pointer">Get in touch</Button>
+                            <div className="flex flex-row-reverse md:flex-row gap-2 items-center shrink-0">
+                                <span className="hidden lg:inline mr-3 text-sm">Let's build something together</span>
+                                <Button className="cursor-pointer">Get in touch</Button>
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
                                         <Button className="cursor-pointer" variant="outline" size="icon"><EllipsisVertical /></Button>
                                     </DropdownMenuTrigger>
-                                    <DropdownMenuContent sideOffset={10} className="dark:bg-neutral-900" align="end">
+                                    <DropdownMenuContent sideOffset={10} className="dark:bg-neutral-900" align={windowWidth >= 768 ? "end" : "start"}>
                                         <DropdownMenuLabel>Options</DropdownMenuLabel>
                                         <DropdownMenuSeparator />
                                         <DropdownMenuItem className="cursor-pointer">Contact</DropdownMenuItem>
@@ -336,25 +350,16 @@ export default function TeamProfile({
                                 </DropdownMenu>
                             </div>
                         </div>
-                        <div className="flex items-center gap-6 mt-2 text-neutral-400 font-medium">
-                            <Link preserveScroll href={membersIndex({ team: team.slug })} className="flex items-center gap-2 hover:underline"> <Users size={16} /> {user_count} </Link>
-                            <Link preserveScroll className="flex items-center gap-2 hover:underline"> <PencilRuler size={16} /> {user_count} </Link>
-                            <Link preserveScroll className="flex items-center gap-2 hover:underline"> <Rocket size={16} /> {user_count} </Link>
-                        </div>
-                        <div className="flex flex-wrap gap-4 mt-4">
-                        {/* {
-                            titles.map((title) => (
-                                <span className="bg-neutral-100 dark:bg-neutral-900 text-neutral-500 px-4 py-2 rounded-full font-semibold">{title}</span>
-                            ))
-                        } */}
-                        </div>
-                        <div className="w-full mt-8">
-                            <h2 className="font-semibold text-2xl">About</h2>
-                            <p className="mt-4 text-lg">
-                                {team.description}
-                            </p>
-                        </div>
+                        
                     </div>
+                    <div className="w-full mt-8 ml-8">
+                        <h2 className="font-semibold text-2xl">About</h2>
+                        <p className="mt-4 text-lg">
+                            {team.description}
+                        </p>
+                    </div>
+                </div>
+                <div className="w-full md:max-w-8xl block mx-auto">
                     <TabbedSectionHeaders
                         current={tab}
                         headers={tabs}
@@ -362,7 +367,9 @@ export default function TeamProfile({
                             setLoading(true)
                         }}
                     />
+                    <Separator />
                 </div>
+                
                 <div className="w-full h-full md:min-h-[50vh] flex overflow-hidden">
                     {
                         loading 
