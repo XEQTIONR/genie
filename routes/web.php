@@ -21,6 +21,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->name('projects.members.create');
     Route::post('/projects/{project:slug}/members', [ProjectMembershipController::class, 'store'])
         ->name('project.members.store');
+
+    Route::patch('/profile/{user}', [UserProfileController::class, 'update'])->name('users.update');
+
+    Route::patch('/teams/{team}', [TeamController::class, 'update'])->name('teams.update');
 });
 
 Route::get('/projects/{project:slug}', [ProjectController::class, 'show'])->name('projects.show');
@@ -35,8 +39,6 @@ Route::get('/profile/{user:username}', function(User $user) {
         'tab' => 'showcase'
     ]);
 })->name('users.show');
-
-Route::patch('/profile/{user}', [UserProfileController::class, 'update'])->name('users.update');
 
 Route::get('/profile/{user:username}/about', function(User $user) {
     $user->load(['ownedProjects']);

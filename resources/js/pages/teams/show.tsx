@@ -2,14 +2,23 @@ import { Button } from '@/components/ui/button'
 import { PlaceholderPattern } from '@/components/ui/placeholder-pattern'
 import AppLayout from '@/layouts/app-layout'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import axios from 'axios'
 import { show } from '@/routes/teams'
 import { show as showUser } from '@/routes/users'
 import { show as showProject } from '@/routes/projects'
 import { index as membersIndex } from '@/routes/teams/users'
 import { index as projectsIndex } from '@/routes/teams/projects'
-import { NavItem, Project, ProjectMember, Team, User, type BreadcrumbItem } from '@/types'
+import { NavItem, Project, ProjectMember, Team, type BreadcrumbItem } from '@/types'
 import { Head, Link } from '@inertiajs/react'
-import { EllipsisVertical, Mail, MapPin, PencilRuler, Rocket, UserPlus, Users } from 'lucide-react'
+import { Camera, EllipsisVertical, PencilRuler, Rocket, UserPlus, Users } from 'lucide-react'
+import {
+    Dialog,
+    DialogClose,
+    DialogContent,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -20,7 +29,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { TabbedSectionHeaders } from '@/components/ui/tabbed-sections'
 import { type SharedData } from '@/types'
-import { usePage } from '@inertiajs/react'
+import { useForm, usePage } from '@inertiajs/react'
 import { useInitials } from '@/hooks/use-initials';
 import { Spinner } from '@/components/ui/spinner'
 import { useState } from 'react'
@@ -34,8 +43,143 @@ import {
 } from "@/components/ui/item"
 import ProjectCard from '@/components/project-card'
 import NoProjects from '@/components/no-projects'
+import { getCroppedImage } from '@/hooks/use-crop'
+import { store as storeImage } from '@/routes/api/uploads'
+import { useEffect } from 'react'
+import Cropper, { Area, Point } from 'react-easy-crop'
+import { Input } from "@/components/ui/input"
+import { Slider } from '@/components/ui/slider'
+import { update } from '@/routes/teams'
 
 type ProfileTab = NavItem & {key: string, className?: string}
+
+
+function AvatarDialog({ aspect = 1, image, imageHeight, imageWidth, open, onOpenChange, close, team } : { 
+    aspect?: number
+    image: string
+    imageHeight: number
+    imageWidth: number
+    open: boolean
+    onOpenChange: (o: boolean) => void
+    close: () => void 
+    team: Team
+}) {
+    const { apiToken } = usePage<SharedData>().props;
+
+    const [crop, setCrop] = useState<Point>({ x: 0, y: 0 })
+    const [zoom, setZoom] = useState(1)
+    const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area|undefined>(undefined)
+    const [fileUrl, setFileUrl] = useState<string|undefined>(image)
+
+    const {data, setData, patch} = useForm({
+        field: "avatar",
+        avatar: image
+    })
+
+    useEffect(() => {
+        setFileUrl(image)
+        setZoom(1)
+    }, [image])
+
+    useEffect(() => {
+        if (data.avatar !== image) {
+            patch(update({ team: team.id }).url)
+        }
+    }, [data.avatar, team, patch, image])
+
+    return (
+        <Dialog open={open} onOpenChange={(o) => {
+            if (!o) {
+                setFileUrl(image)
+            }
+            onOpenChange(o)
+        }}>
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>Profile photo</DialogTitle>
+                </DialogHeader>
+                {
+                    fileUrl
+                        ? <div className='h-[50vh] relative'>
+                            <Cropper
+                                aspect={aspect} 
+                                crop={crop} 
+                                cropShape="rect" 
+                                image={fileUrl} 
+                                onCropChange={setCrop}
+                                onCropComplete={(_, croppedAreaPixels) => {
+                                    setCroppedAreaPixels(croppedAreaPixels)
+                                }} 
+                                showGrid={false}
+                                zoom={zoom} 
+                            />
+                        </div>
+                        : <Input 
+                            onChange={async (e) => {
+                                const url = await URL.createObjectURL(e.target.files[0])
+                                setFileUrl(url)
+                            }} 
+                            className="my-5" 
+                            type="file"
+                        />
+                }
+                <DialogFooter>
+                    <div className="w-full flex flex-col">
+                        {   fileUrl &&
+                            <div className="w-full my-10 flex justify-center">
+                                <Slider min={1} max={2} step={0.01} onValueChange={(e) => setZoom(e[0])} />
+                            </div>
+                        }
+                        <div className="flex flex-col md:flex-row gap-10 justify-between">
+                            {
+                                fileUrl &&
+                                <Button variant="outline" onClick={() => setFileUrl(undefined)}>Clear Image</Button>
+                            }
+                            <div className="flex flex-col md:flex-row justify-end gap-3 grow">
+                                <DialogClose asChild>
+                                    <Button 
+                                        className="cursor-pointer" 
+                                        variant="outline"
+                                    >
+                                        Cancel
+                                    </Button>
+                                </DialogClose>
+                                <Button 
+                                    onClick={async () => {
+                                        if (fileUrl) {
+                                            const x: Blob|null = await getCroppedImage(fileUrl, croppedAreaPixels, imageWidth, imageHeight)
+                                            const formData = new FormData()
+                                            formData.append('image', x)
+                                            axios.post(storeImage().url, formData, {
+                                                headers: {
+                                                    Authorization: 'Bearer ' + apiToken
+                                                }
+                                            }).then((res) => {
+                                                const link = res.data.upload
+                                                setData('avatar', link)
+                                                close()
+                                            }).catch((err) => {
+                                                console.log('File upload error:', err)
+                                            })
+                                        } else { // fileurl == undefined
+                                            setData("avatar", "")
+                                            close()
+                                        }
+                                        
+                                    }} 
+                                    className="cursor-pointer" 
+                                    type="button"
+                                >
+                                    Save changes
+                                </Button>
+                            </div>
+                        </div>
+                    </div>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+    )
+}
 
 export default function TeamProfile({ 
     team, 
@@ -51,6 +195,10 @@ export default function TeamProfile({
     users?: ProjectMember[]
     projects?: Project[] 
 }) {
+
+    const [showAvatarDialog, setShowAvatarDialog] = useState(false)
+
+    const [showBannerDialog, setShowBannerDialog] = useState(false)
 
     const [loading, setLoading] = useState(false)
 
@@ -130,15 +278,24 @@ export default function TeamProfile({
         }
     }
 
-    if ( auth.user?.id === team.owner_id ) {
-        tabs.push({ title: "Add to team", href: "/", key: "invite", icon: UserPlus, className: "ml-2 border" })
-    }
+    // if ( auth.user?.id === team.owner_id ) {
+    //     tabs.push({ title: "Add to team", href: "/", key: "invite", icon: UserPlus, className: "ml-2 border" })
+    // }
 
     const isPro = true
     
     return (
         <AppLayout maxWidth='md:max-w-7xl' breadcrumbs={breadcrumbs}>
             <Head title="Profile" />
+            <AvatarDialog 
+                image={team.avatar ?? ""}
+                imageHeight={200}
+                imageWidth={200}
+                open={showAvatarDialog}
+                onOpenChange={setShowAvatarDialog}
+                close={() => setShowAvatarDialog(false)}
+                team={team}
+            />
             <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
                 <div className="h-full md:h-[400px] flex gap-4 justify-between rounded-xl border-sidebar-border/70 dark:border-sidebar-border">
                         <div className="w-full relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
@@ -147,8 +304,14 @@ export default function TeamProfile({
                 </div>
                 <div className="w-full relative -top-22 md:-top-28 -mb-22 md:-mb-28 flex flex-col gap-8">
                     <Avatar variant="square" className="size-36 sm:size-44 md:size-48 ml-[50%] -translate-x-1/2 md:translate-x-0 md:ml-12">
+                        {
+                            auth.user && auth.user.id === team.owner_id &&
+                            <div onClick={() => setShowAvatarDialog(true)} className="cursor-pointer size-full flex items-center justify-center absolute bg-neutral-950/50 z-50 opacity-0 hover:opacity-100">
+                                <Camera className="opacity-90 stroke-white" size={25} />
+                            </div>
+                        }
                         <AvatarImage src={team.avatar} />
-                        <AvatarFallback className="text-3xl">{team.name.split(' ').map(word => word.charAt(0)).join("")}</AvatarFallback>
+                        <AvatarFallback variant="square" className="text-3xl">{team.name.split(' ').map(word => word.charAt(0)).join("")}</AvatarFallback>
                     </Avatar>
                     <div className="md:mx-8">
                         <div className="w-full flex justify-between items-center">

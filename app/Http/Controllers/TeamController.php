@@ -4,12 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Models\Team;
 use App\Models\TeamInvitation;
+use App\Models\Upload;
 use App\Models\User;
 use App\Notifications\TeamInvitationNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 
@@ -108,5 +110,47 @@ class TeamController extends Controller
         }
 
         return to_route('teams.show', ['team' => $team]);
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, Team $team)
+    {
+        $validated = $request->validate([
+            'field' => 'required|string|in:avatar'
+        ]);
+
+        switch ($validated['field']) {
+            case 'avatar':
+                return $this->updateAvatar($request, $team);
+        }
+    }
+
+    protected function updateAvatar(Request $request, Team $team)
+    {
+        $validated = $request->validate([
+            'avatar' => 'nullable|string'
+        ]);
+
+        $old_avatar = $team->avatar;
+        $team->avatar = $validated['avatar'];
+        $team->save();
+
+        if ($old_avatar) {
+            $upload = Upload::where('url', $old_avatar)->first();
+            if ($upload) {
+                Storage::disk('public')->delete($upload->name);
+                $upload->delete();
+            }
+        }
+
+        return to_route('teams.show', [
+            'team' => $team
+        ])->with('notification', [
+            'type' => 'info',
+            'message' => "Avatar updated.",
+            'button' => null
+        ]);
     }
 }
