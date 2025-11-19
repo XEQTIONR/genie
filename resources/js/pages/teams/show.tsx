@@ -1,16 +1,17 @@
 import { Button } from '@/components/ui/button'
-import { PlaceholderPattern } from '@/components/ui/placeholder-pattern'
 import AppLayout from '@/layouts/app-layout'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import axios from 'axios'
+import { Badge } from '@/components/ui/badge'
 import { show } from '@/routes/teams'
 import { show as showUser } from '@/routes/users'
 import { show as showProject } from '@/routes/projects'
 import { index as membersIndex } from '@/routes/teams/users'
 import { index as projectsIndex } from '@/routes/teams/projects'
+import { index as jobsIndex } from '@/routes/teams/jobs'
 import { NavItem, Project, ProjectMember, Team, type BreadcrumbItem } from '@/types'
 import { Head, Link } from '@inertiajs/react'
-import { Camera, EllipsisVertical, Eraser, Pencil, PencilRuler, Rocket, UserPlus, Users } from 'lucide-react'
+import { Camera, EllipsisVertical, Eraser, Pencil, PencilRuler } from 'lucide-react'
 import {
     Dialog,
     DialogClose,
@@ -339,6 +340,8 @@ export default function TeamProfile({
 
     const rz = useDebouncedCallback(() => {setWindowWidth(window.innerWidth)}, 500)
 
+    const [jobs] = useState((new Array(50)).fill(0))
+
     useEffect(() => {
         window.addEventListener("resize", rz)
         return () => window.removeEventListener("resize", rz)
@@ -363,14 +366,15 @@ export default function TeamProfile({
         { title: "Projects", href: projectsIndex({ team: team.slug }), key: "projects" },
         { title: "Releases", href: "/", key: "releases" },
         { title: "Members", href: membersIndex({ team: team.slug }), key: "members" },
-        { title: "Openings", href: "/", key: "openings" },
+        { title: "Openings", href: jobsIndex({ team: team.slug }), key: "jobs" },
     ]
 
     function showTab(tab: string) {
         switch(tab) {
             case 'members':
                 return (
-                    <div className="flex w-full h-full flex-col gap-6 mx-2 md:mx-8">
+                    <div className="flex w-full h-full flex-col gap-6 px-3 py-5">
+                        <h3 className="text-xl font-semibold mt-6">Members</h3>
                         <ItemGroup className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
                             {users.map((member) => (
                             <Item key={member.id} variant="outline" asChild role="listitem">
@@ -419,6 +423,32 @@ export default function TeamProfile({
                         }
                     </div>)
                     : <NoProjects />
+
+            case 'jobs':
+                return (<div className="w-full h-full mx-2 mt-4 flex flex-col gap-3">
+                    {/* <h2 className="text-xl font-bold">Openings</h2> */}
+                    <section className="w-full h-full flex flex-col">
+                        <h3 className="text-xl font-semibold mt-6">Current Openings</h3>
+                        {
+                            jobs.map(() => (
+                                <div className="flex flex-col py-7 border-b">
+                                    <div className="cursor-pointer">
+                                    <h3 className="text-lg font-semibold pl-1">Software Engineer, Machine Learning</h3>
+                                    <div className="text-sm pl-1 mt-0.5">Remote <span className="mx-1">&bull;</span> Full-time <span className="mx-1">&bull;</span> United States</div>
+                                    <div className="flex flex-wrap gap-1.5 mt-5">
+                                        <Badge className="text-sm" variant="secondary">Multiple locations</Badge>
+                                        <Badge className="text-sm" variant="secondary">AI infrastructure</Badge>
+                                        <Badge className="text-sm" variant="secondary">Messenger</Badge>
+                                        <Badge className="text-sm" variant="secondary">Instagram</Badge>
+                                    </div>
+                                    </div>
+                                </div>
+                            ))
+                        }
+
+
+                    </section>
+                </div>)
         }
     }
 
@@ -433,8 +463,8 @@ export default function TeamProfile({
             <Head title="Profile" />
             <AvatarDialog 
                 image={team.avatar ?? ""}
-                imageHeight={200}
-                imageWidth={200}
+                imageHeight={480}
+                imageWidth={480}
                 open={showAvatarDialog}
                 onOpenChange={setShowAvatarDialog}
                 close={() => setShowAvatarDialog(false)}
@@ -511,15 +541,16 @@ export default function TeamProfile({
                         </div>
                         
                     </div>
-                    <div className="w-full mt-8 ml-8">
-                        <h2 className="font-semibold text-2xl">About</h2>
-                        <p className="mt-4 text-lg">
+                    <div className="w-full mt-8 pl-4">
+                        <h2 className="font-bold text-xl">About</h2>
+                        <p className="my-4">
                             {team.description}
                         </p>
                     </div>
                 </div>
                 <div className="w-full md:max-w-8xl block mx-auto">
                     <TabbedSectionHeaders
+                        className="px-1"
                         current={tab}
                         headers={tabs}
                         onTabChange={() => {
@@ -529,7 +560,7 @@ export default function TeamProfile({
                     <Separator />
                 </div>
                 
-                <div className="w-full h-full md:min-h-[50vh] flex overflow-hidden">
+                <div className="w-full h-full md:min-h-[50vh] flex overflow-hidden max-w-8xl mx-auto">
                     {
                         loading 
                             ? <Spinner className="block mx-auto size-6" />

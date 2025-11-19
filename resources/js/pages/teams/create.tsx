@@ -171,7 +171,7 @@ export default function CreateTeam({ apiToken } : { apiToken: string }) {
                 <Step step={1} heading="General">
                     <FieldGroup className="mt-2 mb-10">
                         <Field className="gap-2">
-                            <FieldLabel className="font-semibold">Team Name *</FieldLabel>
+                            <FieldLabel>Team Name *</FieldLabel>
                             <Input onChange={({target}) => {
                                 setData('name', target.value)
                             }} name="title" />
@@ -180,7 +180,7 @@ export default function CreateTeam({ apiToken } : { apiToken: string }) {
                             </FieldDescription>
                         </Field>
                         <Field className="gap-2">
-                            <FieldLabel className="font-semibold">Description</FieldLabel>
+                            <FieldLabel>Description</FieldLabel>
                             <Textarea onChange={({target}) => {
                                 setData('description', target.value)
                             }} name="description" className="h-28" />
@@ -193,7 +193,7 @@ export default function CreateTeam({ apiToken } : { apiToken: string }) {
                 <Step step={2} heading="Members">
                     <FieldGroup className="mt-2">
                         <Field className="gap-2">
-                            <FieldLabel className="font-semibold">Email Address / Username</FieldLabel>
+                            <FieldLabel>Email Address / Username</FieldLabel>
                             <div className="flex gap-2">
                                 <Input
                                     ref={input}

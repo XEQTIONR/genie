@@ -166,16 +166,16 @@ export default function CreateProject({ user, teams, apiToken } : { user: User, 
                 <Step step={1} heading={"General"}>
                     <FieldGroup className="mt-2 mb-10">
                         <Field className="gap-2">
-                            <FieldLabel className="font-semibold">Project Name *</FieldLabel>
+                            <FieldLabel>Project Name *</FieldLabel>
                             <Input name="title" />
                         </Field>
                         <Field className="gap-2">
-                            <FieldLabel className="font-semibold">Excerpt</FieldLabel>
+                            <FieldLabel>Excerpt</FieldLabel>
                             <Input name="excerpt" />
                             <FieldDescription>A short description about the project</FieldDescription>
                         </Field>
                         <Field className="gap-3">
-                            <FieldLabel className="font-semibold">Description</FieldLabel>
+                            <FieldLabel>Description</FieldLabel>
                             {/* <Textarea name="description" className="h-28" /> */}
                             <div className='max-w-full flex justify-start'>
                                 <ButtonGroup>

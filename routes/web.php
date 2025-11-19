@@ -2,14 +2,19 @@
 
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\ProjectInvitationController;
+use App\Http\Controllers\ProjectJobController;
 use App\Http\Controllers\ProjectMembershipController;
+use App\Http\Controllers\ProjectOpeningController;
 use App\Http\Controllers\TeamController;
 use App\Http\Controllers\TeamInvitationController;
 use App\Http\Controllers\UserProfileController;
+use App\Models\JobOpening;
 use App\Models\Team;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Casts\Json;
+use Illuminate\Support\Facades\Auth;
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/teams', [TeamController::class, 'store'])->name('teams.store');
@@ -21,6 +26,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->name('projects.members.create');
     Route::post('/projects/{project:slug}/members', [ProjectMembershipController::class, 'store'])
         ->name('project.members.store');
+
+    //Route::get('/projects/{project:slug}/job-openings', [ProjectJobController::class, 'index'])->name('projects.jobs.index');
+
+    Route::get('/jobs/create', function () {
+        return Inertia::render('jobs/create', [
+            'teams' => Auth::user()->teams,
+            'projects' => Auth::user()->ownedProjects,
+        ]);
+    })->name('jobs.create');
 
     Route::patch('/profile/{user}', [UserProfileController::class, 'update'])->name('users.update');
 
@@ -57,12 +71,7 @@ Route::get('/profile/{user:username}/teams', function(User $user) {
     ]);
 })->name('users.teams.index');
 
-Route::get('/teams/{team:slug}', function(Team $team) {
-    return Inertia::render('teams/show', [
-        'team' => $team,
-        'user_count' => $team->users()->count()
-    ]);
-})->name('teams.show');
+Route::get('/teams/{team:slug}', [TeamController::class, 'index'])->name('teams.show');
 
 Route::get('/teams/{team:slug}/members', function(Team $team) {
     $users = $team->users()->get();
@@ -85,6 +94,14 @@ Route::get('/teams/{team:slug}/projects', function(Team $team) {
         'tab' => 'projects'
     ]);
 })->name('teams.projects.index');
+
+Route::get('/teams/{team:slug}/jobs', function (Team $team) {
+    return Inertia::render('teams/show', [
+        'team' => $team,
+        'jobs' => [],
+        'tab' => 'jobs'
+    ]);
+})->name('teams.jobs.index');
 
 Route::get('/', function () {
         return Inertia::render('dashboard');
