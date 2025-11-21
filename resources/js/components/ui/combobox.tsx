@@ -1,4 +1,4 @@
-import { useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { Check, ChevronsUpDown } from "lucide-react"
 
 import { cn } from "@/lib/utils"
@@ -35,7 +35,8 @@ export function Combobox({
     placeholder = "Select...",
     searchLabel = "Search...",
     noResultsLabel = "No results found.",
-    onQueryChange
+    onQueryChange,
+    onSelectValue,
 } : {
     name?: string
     defaultValue?: string
@@ -45,6 +46,7 @@ export function Combobox({
     searchLabel?: string
     noResultsLabel?: string
     onQueryChange?: (q: string) => void
+    onSelectValue?: (val: string) => void
 
 }) {
   const [open, setOpen] = useState(false)
@@ -99,6 +101,9 @@ export function Combobox({
                                         value={item.value}
                                         onSelect={(currentValue) => {
                                         setValue(currentValue === value ? "" : currentValue)
+                                        if (onSelectValue) {
+                                            onSelectValue(currentValue === value ? "" : currentValue)
+                                        }
                                         setOpen(false)
                                     }}>
                                         {item.label}
@@ -120,6 +125,9 @@ export function Combobox({
                                             value={item.value}
                                             onSelect={(currentValue) => {
                                             setValue(currentValue === value ? "" : currentValue)
+                                            if (onSelectValue) {
+                                                onSelectValue(currentValue === value ? "" : currentValue)
+                                            }
                                             setOpen(false)
                                         }}>
                                             {item.label}

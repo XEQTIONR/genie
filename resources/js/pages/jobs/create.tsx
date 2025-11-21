@@ -1,10 +1,12 @@
 import AppLayout from '@/layouts/app-layout'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Badge } from '@/components/ui/badge'
 import { BreadcrumbItem, Project } from '@/types'
-import { create } from '@/routes/jobs'
-import { store as storeImage } from '@/routes/api/uploads'
-import { Form, Head, useForm } from '@inertiajs/react'
-import { Separator } from '@/components/ui/separator'
-import { useInitials } from '@/hooks/use-initials'
+import { BriefcaseBusiness, Check, Heading1, Heading2, List, ListChecks, ListOrdered, PencilRuler, Plus, WrapText, X } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { ButtonGroup } from '@/components/ui/button-group'
+import { Checkbox } from '@/components/ui/checkbox'
+import { create, store } from '@/routes/jobs'
 import {
   Field,
   FieldSet,
@@ -13,62 +15,35 @@ import {
   FieldDescription,
   FieldGroup,
   FieldLabel,
-  FieldSeparator,
 } from "@/components/ui/field"
+import { Head, Link, useForm } from '@inertiajs/react'
+import { useInitials } from '@/hooks/use-initials'
 import { Input } from '@/components/ui/input'
-import {
-  Item,
-  ItemActions,
-  ItemContent,
-  ItemDescription,
-  ItemTitle,
-} from "@/components/ui/item"
-import roles from '@/data/roles'
-import { User, Team } from '@/types'
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
-import { PlaceholderPattern } from '@/components/ui/placeholder-pattern'
-
-import { useEffect, useRef, useState } from 'react'
-import { Button } from '@/components/ui/button'
-import { AlignCenter, AlignJustify, AlignLeft, AlignRight, BriefcaseBusiness, Check, Eye, Film, Heading1, Heading2, Image, List, ListChecks, ListOrdered, Lock, Pen, PencilRuler, WrapText, X } from 'lucide-react'
-import { Checkbox } from '@/components/ui/checkbox'
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog"
-
 import Quill from 'quill'
-// import 'quill/dist/quill.bubble.css'
-import '/resources/css/quill.bubble.css'
-import { ButtonGroup } from '@/components/ui/button-group'
-import { Label } from '@/components/ui/label'
-import {
-  InputGroup,
-  InputGroupAddon,
-  InputGroupInput,
-  InputGroupText,
-} from "@/components/ui/input-group"
-import axios from 'axios'
-import { Switch } from '@/components/ui/switch'
+import roles from '@/data/roles'
+import { Separator } from '@/components/ui/separator'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
-import SearchBar from '@/components/ui/search-bar'
-import { Badge } from '@/components/ui/badge'
-import { Avatar } from '@/components/ui/avatar'
-import { AvatarFallback, AvatarImage } from '@radix-ui/react-avatar'
+import {
+    Select,
+    SelectContent,
+    SelectGroup,
+    SelectItem,
+    SelectLabel,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select"
+import { Switch } from '@/components/ui/switch'
+import { Team } from '@/types'
+import { useEffect, useRef, useState } from 'react'
+import '/resources/css/quill.bubble.css'
+import { Combobox, GroupedOptions } from '@/components/ui/combobox'
+import axios from 'axios'
+
+
+interface Location {
+    city: string|null,
+    country: string
+}
 
 function Step({step, heading, children} : {step: number, heading: string, children: React.ReactNode}) {
     return (<>
@@ -95,7 +70,7 @@ function Step({step, heading, children} : {step: number, heading: string, childr
     </>)
 }
 
-export default function CreateJobPosting({ apiToken, projects, teams } : { projects: Project[], teams: Team[], apiToken: string }) {
+export default function CreateJobPosting({ projects, teams } : { projects: Project[], teams: Team[] }) {
 
     const [tagsFocused, setTagFocused] = useState<boolean>(false)
 
@@ -107,6 +82,11 @@ export default function CreateJobPosting({ apiToken, projects, teams } : { proje
             href: create().url
         }
     ]
+    
+    const [countryOptions, setCountryOptions] = useState<GroupedOptions>({})
+    
+    const [inputCity, setInputCity] = useState<string>("")
+    const [inputCountry, setInputCountry] = useState<string>("")
 
     const editor = useRef<Quill>(undefined)
 
@@ -132,21 +112,57 @@ export default function CreateJobPosting({ apiToken, projects, teams } : { proje
         editor.current = quill
     }, [])
 
-    const { data, setData, transform } = useForm<{
+    useEffect(() => {
+        axios.get('https://restcountries.com/v3.1/all?fields=name,flag,region')
+            .then(({data}) => {
+                const opts = data.map(({name, flag, region} : { name: { common: string }, flag: string, region: string}) => {
+                    return { name: name.common, flag, region }
+                }).sort((a: {name: string}, b: {name: string}) => a.name.localeCompare(b.name))
+                .filter(({name} : {name: string}) => name !== 'Israel')
+                .map(({ name, flag, region } : { name: string, flag: string, region: string }) => {
+                    return { label: flag + ' ' + name, value: name, region }
+                })
+
+                const grouped = Object.groupBy(opts, (opt : {region: string}) => opt.region)
+
+                setCountryOptions({
+                    None: [{label: "Not selected", value: ""}],
+                    ...grouped
+                })
+            })
+    }, [])
+
+    const getRoleOptions = () => {
+        const obj : GroupedOptions = {}
+
+        obj['Default'] = [{ label: 'Not Selected', value: ''}]
+
+        roles.forEach(({name, items}) => {
+            obj[name] = items.map(itm => ({ label: itm, value: itm}))
+        })
+        
+        return obj
+    }
+
+    const { data, setData, transform, post } = useForm<{
         title: string
-        description: string
-        publish: boolean 
+        publish: boolean
+        primary_role: string 
+        locations: Location[]
         location_type: string
-        tags: string[] 
+        compensation_type: string 
+        tags: string[]
         work_location: string[]
         employment_type: string[]
         owner_type: string|null
         owner_id: number|null
     }>({
         title: '',
-        description: '',
         publish: true,
+        primary_role: '',
+        locations: [],
         location_type: 'global',
+        compensation_type: 'compensated',
         tags: [],
         work_location: [],
         employment_type: [],
@@ -156,7 +172,8 @@ export default function CreateJobPosting({ apiToken, projects, teams } : { proje
 
     transform((data) => ({
         ...data,
-        description: editor.current?.root.innerHTML
+        description_html: editor.current?.root.innerHTML,
+        description: editor.current?.getText(),
     }))
 
     const selection = () : number[] => {
@@ -174,32 +191,34 @@ export default function CreateJobPosting({ apiToken, projects, teams } : { proje
     return (
         <AppLayout maxWidth="md:max-w-7xl" breadcrumbs={breadcrumbs}>
             <Head title="Create new project" />
-            <Form
+            <form
+                onSubmit={(e) => {
+                    e.preventDefault()
+                    post(store().url)
+                }}
                 onKeyDown={(e) => {
                     if (e.key == 'Enter' && tagsFocused) {
-                        // console.log('enter')
                         e.preventDefault()
                     }
                 }} 
-                // action={store()} 
                 className="w-full max-w-4xl mx-auto flex flex-col pt-8 px-4"
-                transform={(data) => ({
-                    ...data,
-                    description: editor.current?.root.innerHTML
-                })}
             >
                 <div className="flex items-center gap-3 mb-1">
                     <BriefcaseBusiness size={25} />
                     <h1 className="text-xl font-bold">Create a new job listing</h1>
                 </div>
-                <span className="text-sm text-dim md:mx-10 mb-1">Add a job posting that people can use to contact you to join your team. Job postings can be compensated or voluntary</span>
-                <span className="text-sm text-dim md:mx-10 italic mb-10">Required fields are marked with an asterisk (*).</span>
+                <span className="text-sm text-dim md:mx-10 mb-1 font-medium">Add a job posting that people can use to contact you to join your team. Job postings can be compensated or voluntary</span>
+                <span className="text-sm text-dim md:mx-10 italic mb-10 font-medium">Required fields are marked with an asterisk (*).</span>
                 
-                <Step step={1} heading={"General"}>
+                <Step step={1} heading={"General Information"}>
                     <FieldGroup className="mt-2 mb-10">
                         <Field className="gap-2">
                             <FieldLabel>Job Title *</FieldLabel>
                             <Input value={data.title} onChange={(e) => setData('title', e.target.value)} name="title" />
+                        </Field>
+                        <Field>
+                            <FieldLabel>Primary Role</FieldLabel>
+                            <Combobox onSelectValue={(val) => setData('primary_role', val)} placeholder="Select primary role" items={getRoleOptions()} />
                         </Field>
                         <Field className="gap-3">
                             <FieldLabel>Description *</FieldLabel>
@@ -266,59 +285,58 @@ export default function CreateJobPosting({ apiToken, projects, teams } : { proje
                                         textBox.focus()
                                     }
                                 }}
-                                className='min-h-36 border p-0 rounded-md' 
+                                className='min-h-36 border p-0 rounded-md cursor-text' 
                                 id="editor"
                             />
                         </Field>
                     </FieldGroup>
-
-                    
-                    
                 </Step>
-                <Step step={2} heading={"Options"}>
-                    <Field className="w-full max-w-md mt-2">
-                            <FieldLabel>Choose team or project *</FieldLabel>
-                            <FieldDescription>
-                                Choose a team or project that this position is for.
-                            </FieldDescription>
 
-                            <Select onValueChange={(value) => {
-                                const [ownerType, ownerId] = value.split('-')
-                                setData('owner_type', ownerType)
-                                setData('owner_id', parseInt(ownerId))
-                            }}>
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Select team / project" />
-                                    <SelectContent>
-                                        <SelectGroup>
-                                            <SelectLabel>Teams</SelectLabel>
-                                            {
-                                                teams.map(({ avatar, id, name, }) => (
-                                                    <SelectItem value={`team-${id}`}>
-                                                        <Avatar variant="square" className="size-5">
-                                                            <AvatarImage src={avatar}></AvatarImage>
-                                                            <AvatarFallback>{getInitials(name)}</AvatarFallback>
-                                                        </Avatar>
-                                                        {name}
-                                                    </SelectItem>
-                                                ))
-                                            }
-                                        </SelectGroup>
-                                        <SelectGroup>
-                                            <SelectLabel>Projects</SelectLabel>
-                                            {
-                                                projects.map(({id, title}) => (
-                                                    <SelectItem value={`project-${id}`}>
-                                                        <PencilRuler size={5} />
-                                                        {title}
-                                                    </SelectItem>
-                                                ))
-                                            }
-                                        </SelectGroup>
-                                    </SelectContent>
-                                </SelectTrigger>
-                            </Select>
-                        </Field>
+                <Step step={2} heading={"Job Options"}>
+                    <Field className="w-full max-w-md mt-2">
+                        <FieldLabel>Choose team or project *</FieldLabel>
+                        <FieldDescription>
+                            Choose a team or project that this position is for.
+                        </FieldDescription>
+
+                        <Select onValueChange={(value) => {
+                            const [ownerType, ownerId] = value.split('-')
+                            setData('owner_type', ownerType)
+                            setData('owner_id', parseInt(ownerId))
+                        }}>
+                            <SelectTrigger>
+                                <SelectValue placeholder="Select team / project" />
+                                <SelectContent>
+                                    <SelectGroup>
+                                        <SelectLabel>Teams</SelectLabel>
+                                        {
+                                            teams.map(({ avatar, id, name, }) => (
+                                                <SelectItem value={`team-${id}`}>
+                                                    <Avatar variant="square" className="size-5">
+                                                        <AvatarImage src={avatar}></AvatarImage>
+                                                        <AvatarFallback>{getInitials(name)}</AvatarFallback>
+                                                    </Avatar>
+                                                    {name}
+                                                </SelectItem>
+                                            ))
+                                        }
+                                    </SelectGroup>
+                                    <SelectGroup>
+                                        <SelectLabel>Projects</SelectLabel>
+                                        {
+                                            projects.map(({id, title}) => (
+                                                <SelectItem value={`project-${id}`}>
+                                                    <PencilRuler size={5} />
+                                                    {title}
+                                                </SelectItem>
+                                            ))
+                                        }
+                                    </SelectGroup>
+                                </SelectContent>
+                            </SelectTrigger>
+                        </Select>
+                    </Field>
+
                     <Field className="w-full max-w-md mt-8">
                         <FieldLabel>Tags</FieldLabel>
                         <FieldDescription>
@@ -343,7 +361,6 @@ export default function CreateJobPosting({ apiToken, projects, teams } : { proje
                             onFocus={() => setTagFocused(true)}
                             onBlur={() => setTagFocused(false)} 
                             onKeyUp={(e) => {
-                                console.log(e.key)
                                 if (e.key == 'Enter') {
                                     if (tagsInpurRef.current && (tagsInpurRef.current.value.length > 0)) {
                                         const set = new Set(data.tags)
@@ -359,11 +376,56 @@ export default function CreateJobPosting({ apiToken, projects, teams } : { proje
                     </Field>
 
                     <FieldSet className="w-full mt-8">
+                        <FieldLabel>Compensation *</FieldLabel>
+                        <FieldDescription>
+                            How contributions will be compensated. 
+                            {/* <div className="inline pb-1"> */}
+                                <a className="text-xxs relative -top-0.5 left-2" target='_blank' href="https://google.com">Learn more</a>
+                            {/* </div> */}
+                        </FieldDescription>
+                        
+                        <RadioGroup onValueChange={(value) => setData('compensation_type', value)} value={data.compensation_type}>
+                            <Field orientation="horizontal">
+                                <RadioGroupItem value="compensated" />
+                                <FieldLabel className="font-normal">
+                                    Compensated
+                                </FieldLabel>
+                            </Field>
+                            <Field orientation="horizontal">
+                                <RadioGroupItem value="ownership" />
+                                <FieldLabel className="font-normal">
+                                    Shared Ownership
+                                </FieldLabel>
+                            </Field>
+                            <Field orientation="horizontal">
+                                <RadioGroupItem value="credited" />
+                                <FieldLabel className="font-normal">
+                                    Credited
+                                </FieldLabel>
+                            </Field>
+                            <Field orientation="horizontal">
+                                <RadioGroupItem value="voluntary" />
+                                <FieldLabel className="font-normal">
+                                    Voluntary
+                                </FieldLabel>
+                            </Field>
+                        </RadioGroup>
+                    </FieldSet>
+
+                    <FieldSet className="w-full mt-8">
                         <FieldLabel>Location *</FieldLabel>
                         <FieldDescription>
                             Where contributors must be from.
                         </FieldDescription>
-                        <RadioGroup onValueChange={(value) => setData('location_type', value)} value={data.location_type}>
+                        <RadioGroup 
+                            onValueChange={(value) => {
+                                setData('location_type', value)
+                                if (data.location_type === 'global') {
+                                    setData('locations', [])
+                                }
+                            }} 
+                            value={data.location_type}
+                        >
                             <Field orientation="horizontal">
                                 <RadioGroupItem value="global" />
                                 <FieldLabel className="font-normal">
@@ -378,6 +440,71 @@ export default function CreateJobPosting({ apiToken, projects, teams } : { proje
                             </Field>
                         </RadioGroup>
                     </FieldSet>
+                    {
+                        data.location_type === 'specific' &&
+                        <FieldSet className="w-full mt-4 gap-4">
+                            {
+                                data.locations.length > 0 &&
+                                <div className='w-full flex flex-wrap gap-2'>
+                                { 
+                                    data.locations.map((l, idx) => {
+                                        return (
+                                            <Badge
+                                                className="cursor-pointer" 
+                                                key={idx}
+                                                onClick={() =>setData('locations', data.locations.filter((_, i) => i !== idx))}
+                                            >
+                                                {
+                                                    l.city ? (l.city + ', ' + l.country) : l.country
+                                                } 
+                                                <X />
+                                            </Badge>
+                                        )
+                                    })
+                                }
+                                </div>
+                            }
+                            <FieldDescription>Add Locations</FieldDescription>
+                            <div className="flex flex-col md:flex-row gap-4">
+                                <Field className='w-full md:w-56'>
+                                    <FieldLabel>City</FieldLabel>
+                                    <Input 
+                                        value={inputCity} 
+                                        onChange={(e) => setInputCity(e.target.value)}
+                                    />
+                                </Field>
+                                <Field className='w-full md:w-56'>
+                                    <FieldLabel>Country</FieldLabel>
+                                    <Combobox
+                                        defaultValue={inputCountry} 
+                                        onSelectValue={(value) => setInputCountry(value)} 
+                                        items={countryOptions} 
+                                    />
+                                </Field>
+                            </div>
+                            <Button
+                                onClick={() => {
+                                    const regex = / +/g
+                                    const city = inputCity === "" ? null : inputCity.trim().replaceAll(regex, " ")
+                                    const idx = data.locations.findIndex((location) => location.city == city && location.country == inputCountry)
+
+                                    if (idx === -1 && inputCountry.length > 0) {
+                                        setData('locations', [...data.locations, { city: city, country: inputCountry }])
+                                    }
+
+                                    setInputCity("")
+                                }} 
+                                variant="secondary"
+                                size="sm"
+                                className="w-32 cursor-pointer"
+                                type="button"
+                            >
+                                <Plus />
+                                Add location
+                            </Button>
+                        </FieldSet>
+                    }
+                    
 
                     <FieldSet className="w-full mt-8">
                         <FieldLegend variant="label">
@@ -424,25 +551,6 @@ export default function CreateJobPosting({ apiToken, projects, teams } : { proje
                                     className="font-normal"
                                 >
                                     On-site
-                                </FieldLabel>
-                            </Field>
-                            <Field orientation="horizontal">
-                                <Checkbox
-                                    checked={data.work_location.includes('hybrid')} 
-                                    onCheckedChange={(checked) => {
-                                        if (checked) {
-                                            setData('work_location', [...data.work_location, 'hybrid'])
-                                        } else {
-                                            setData('work_location', data.work_location.filter(value => value !== 'hybrid') )
-                                        }
-                                    }}  
-                                    id="checked-hybrid" 
-                                />
-                                <FieldLabel
-                                    htmlFor="checked-hybrid"
-                                    className="font-normal"
-                                >
-                                    Hybrid
                                 </FieldLabel>
                             </Field>
                         </FieldGroup>
@@ -520,25 +628,29 @@ export default function CreateJobPosting({ apiToken, projects, teams } : { proje
                     <Field className="w-full mt-8" orientation="horizontal">
                         <FieldContent>
                             <FieldLabel htmlFor="publish">Publish this job upon creation *</FieldLabel>
-                            <FieldDescription className="max-w-md">
+                            <FieldDescription className="hidden md:inline max-w-md">
                                 This posting will be published immediately upon creation and people will
                                 be able to view this and reply to it.
                             </FieldDescription>
                         </FieldContent>
                         <div className='flex items-center gap-3'>
-                            {
-                                data.publish
-                                    ? <span className="text-xs flex items-center gap-1 text-green-400"><Check size={15} />Publish</span>
-                                    : <span className="text-xs flex items-center gap-1 text-red-400"><X size={15} /> Don't publish</span>
-                            }
+                        {
+                            data.publish
+                                ? <span className="text-xs flex items-center gap-1 text-green-400"><Check size={15} />Publish</span>
+                                : <span className="text-xs flex items-center gap-1 text-red-400"><X size={15} /> Don't publish</span>
+                        }
                             <Switch checked={data.publish} onCheckedChange={(checked) => setData('publish', checked)} id="publish" />
                         </div>
                     </Field>
+                    <FieldDescription className="md:hidden pt-2">
+                        This posting will be published immediately upon creation and people will
+                        be able to view this and reply to it.
+                    </FieldDescription>
                 </Step>
                 <div className="w-full flex justify-end  max-w-4xl mx-auto py-4">
-                    <Button className="mr-3 md:mr-0">Create job listing</Button>
+                    <Button type="submit" className="mr-3 md:mr-0">Create job listing</Button>
                 </div>
-            </Form>
+            </form>
         </AppLayout>
     )
 }

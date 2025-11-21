@@ -12,20 +12,22 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('job_openings', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('team_id');
+            $table->uuid('id');
             $table->string('title');
-            $table->text('body');
+            $table->boolean('publish');
+            $table->string('primary_role')->nullable();
+            $table->string('location_type');
+            $table->json('locations')->nullable();
+            $table->json('tags')->nullable();
+            $table->json('work_location');
+            $table->json('employment_type');
+            $table->string('owner_type');
+            $table->foreignId('owner_id');
+            $table->text('description');
             $table->string('compensation_type');
             $table->string('compensation')->nullable();
-            $table->json('location');
-            $table->json('type');
-            $table->json('roles')->nullable();
-            $table->string('status');
-            $table->string('visibility');
+            $table->string('status')->default('created');
             $table->timestamps();
-
-            $table->foreign('team_id')->references('id')->on('teams');
         });
     }
 

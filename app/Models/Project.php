@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class Project extends Model
@@ -52,5 +53,10 @@ class Project extends Model
             ->using(ProjectMembership::class)
             ->withPivot(['roles'])
             ->withTimestamps();
+    }
+
+    public function jobs(): MorphMany
+    {
+        return $this->morphMany(JobOpening::class, 'owner');
     }
 }

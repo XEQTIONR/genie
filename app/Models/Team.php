@@ -52,4 +52,9 @@ class Team extends Model
     {
         return $this->morphMany(Project::class, 'owner');
     }
+
+    public function jobs(): MorphMany
+    {
+        return $this->morphMany(JobOpening::class, 'owner');
+    }
 }

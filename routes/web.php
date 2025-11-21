@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\JobController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\ProjectInvitationController;
 use App\Http\Controllers\ProjectJobController;
@@ -29,12 +30,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     //Route::get('/projects/{project:slug}/job-openings', [ProjectJobController::class, 'index'])->name('projects.jobs.index');
 
-    Route::get('/jobs/create', function () {
-        return Inertia::render('jobs/create', [
-            'teams' => Auth::user()->teams,
-            'projects' => Auth::user()->ownedProjects,
-        ]);
-    })->name('jobs.create');
+    Route::get('/jobs/create', [JobController::class, 'create'])->name('jobs.create');
+    Route::post('/jobs', [JobController::class, 'store'])->name('jobs.store');
 
     Route::patch('/profile/{user}', [UserProfileController::class, 'update'])->name('users.update');
 
