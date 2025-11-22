@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\JobPostingResource;
 use App\Models\JobOpening;
 use App\Models\Project;
 use App\Models\Team;
@@ -79,9 +80,11 @@ class JobController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(JobOpening $job)
     {
-        //
+        return Inertia::render('jobs/show', [
+            'job' => new JobPostingResource($job)
+        ]);
     }
 
     /**

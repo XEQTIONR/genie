@@ -10,6 +10,7 @@ class JobOpening extends Model
 {
     use HasUuids;
 
+    protected $table = 'job_postings';
     protected $fillable = [
         'title',
         'publish',

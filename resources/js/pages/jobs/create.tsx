@@ -183,7 +183,7 @@ export default function CreateJobPosting({ projects, teams } : { projects: Proje
     }
 
     return (
-        <AppLayout maxWidth="md:max-w-7xl" breadcrumbs={breadcrumbs}>
+        <AppLayout maxBodyWidth="md:max-w-7xl" breadcrumbs={breadcrumbs}>
             <Head title="Create new project" />
             <form
                 onSubmit={(e) => {

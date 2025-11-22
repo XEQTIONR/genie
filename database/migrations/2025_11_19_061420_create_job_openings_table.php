@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('job_openings', function (Blueprint $table) {
+        Schema::create('job_postings', function (Blueprint $table) {
             $table->uuid('id');
             $table->string('title');
             $table->boolean('publish');
@@ -36,6 +36,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('job_openings');
+        Schema::dropIfExists('job_postings');
     }
 };

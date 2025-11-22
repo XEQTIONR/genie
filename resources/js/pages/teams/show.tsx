@@ -4,6 +4,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import axios from 'axios'
 import { Badge } from '@/components/ui/badge'
 import { show } from '@/routes/teams'
+import { show as showJobPosting } from "@/routes/jobs"
 import { show as showUser } from '@/routes/users'
 import { show as showProject } from '@/routes/projects'
 import { index as membersIndex } from '@/routes/teams/users'
@@ -435,8 +436,8 @@ export default function TeamProfile({
                     <section className="w-full h-full flex flex-col">
                         <h3 className="text-xl font-semibold mt-6">Current Openings</h3>
                         {
-                            jobs?.data.map(({title, tags, work_location, compensation_type, employment_type, location_type, locations, primary_role}) => (
-                                <div className="flex flex-col py-7 border-b">
+                            jobs?.data.map(({id, title, tags, work_location, compensation_type, employment_type, location_type, locations, primary_role}) => (
+                                <Link href={showJobPosting({ id: id })} className="flex flex-col py-7 border-b">
                                     <div className="cursor-pointer">
                                     <h3 className="text-lg font-semibold pl-1">{title}</h3>
                                     <div className="text-sm pl-1 mt-0.5">
@@ -473,7 +474,7 @@ export default function TeamProfile({
                                         }
                                     </div>
                                     </div>
-                                </div>
+                                </Link>
                             ))
                         }
 
