@@ -1,7 +1,7 @@
 import AppLayout from '@/layouts/app-layout'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
-import { BreadcrumbItem, Project } from '@/types'
+import { BreadcrumbItem, Location, Project } from '@/types'
 import { BriefcaseBusiness, Check, Heading1, Heading2, List, ListChecks, ListOrdered, PencilRuler, Plus, WrapText, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { ButtonGroup } from '@/components/ui/button-group'
@@ -38,12 +38,6 @@ import { useEffect, useRef, useState } from 'react'
 import '/resources/css/quill.bubble.css'
 import { Combobox, GroupedOptions } from '@/components/ui/combobox'
 import axios from 'axios'
-
-
-interface Location {
-    city: string|null,
-    country: string
-}
 
 function Step({step, heading, children} : {step: number, heading: string, children: React.ReactNode}) {
     return (<>

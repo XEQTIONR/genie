@@ -9,7 +9,7 @@ import { show as showProject } from '@/routes/projects'
 import { index as membersIndex } from '@/routes/teams/users'
 import { index as projectsIndex } from '@/routes/teams/projects'
 import { index as jobsIndex } from '@/routes/teams/jobs'
-import { NavItem, Project, ProjectMember, Team, type BreadcrumbItem } from '@/types'
+import { JobPosting, NavItem, Project, ProjectMember, Team, type BreadcrumbItem } from '@/types'
 import { Head, Link } from '@inertiajs/react'
 import { Camera, EllipsisVertical, Eraser, Pencil, PencilRuler } from 'lucide-react'
 import {
@@ -54,6 +54,7 @@ import { update } from '@/routes/teams'
 import { useDebouncedCallback } from 'use-debounce'
 import { Separator } from '@/components/ui/separator'
 import { cn } from '@/lib/utils'
+import roles from '@/data/roles'
 
 type ProfileTab = NavItem & {key: string, className?: string}
 
@@ -322,14 +323,18 @@ export default function TeamProfile({
     tab = 'activity', 
     user_count, 
     users = [],
-    projects = [] 
+    projects = [],
+    jobs 
 
 } : { 
     team: Team 
     tab: string
     user_count: number
     users?: ProjectMember[]
-    projects?: Project[] 
+    projects?: Project[]
+    jobs?: {
+        data: JobPosting[]
+    }
 }) {
 
     const [showAvatarDialog, setShowAvatarDialog] = useState(false)
@@ -340,7 +345,7 @@ export default function TeamProfile({
 
     const rz = useDebouncedCallback(() => {setWindowWidth(window.innerWidth)}, 500)
 
-    const [jobs] = useState((new Array(50)).fill(0))
+    const [jobsd] = useState((new Array(2)).fill(0))
 
     useEffect(() => {
         window.addEventListener("resize", rz)
@@ -430,16 +435,42 @@ export default function TeamProfile({
                     <section className="w-full h-full flex flex-col">
                         <h3 className="text-xl font-semibold mt-6">Current Openings</h3>
                         {
-                            jobs.map(() => (
+                            jobs?.data.map(({title, tags, work_location, compensation_type, employment_type, location_type, locations, primary_role}) => (
                                 <div className="flex flex-col py-7 border-b">
                                     <div className="cursor-pointer">
-                                    <h3 className="text-lg font-semibold pl-1">Software Engineer, Machine Learning</h3>
-                                    <div className="text-sm pl-1 mt-0.5">Remote <span className="mx-1">&bull;</span> Full-time <span className="mx-1">&bull;</span> United States</div>
+                                    <h3 className="text-lg font-semibold pl-1">{title}</h3>
+                                    <div className="text-sm pl-1 mt-0.5">
+                                        {
+                                            work_location.map((l => l.charAt(0).toUpperCase() + l.slice(1))).join(" / ")
+                                        }
+                                        <span className="mx-1.5">&bull;</span>
+                                        {
+                                            compensation_type.charAt(0).toUpperCase() + compensation_type.slice(1)
+                                        }
+                                        <span className="mx-1.5">&bull;</span>
+                                        {
+                                            employment_type.map((l => l.charAt(0).toUpperCase() + l.slice(1))).sort((a, b) => a < b ? 1 : -1).join(" / ")
+                                        }
+                                        <span className="mx-1.5">&bull;</span>
+                                        {
+                                            location_type === 'global'
+                                                ? 'Worldwide'
+                                                : locations.map(({city, country}) => city ? `${city}, ${country}` : country).join(" / ") 
+                                        }
+                                    </div>
                                     <div className="flex flex-wrap gap-1.5 mt-5">
-                                        <Badge className="text-sm" variant="secondary">Multiple locations</Badge>
-                                        <Badge className="text-sm" variant="secondary">AI infrastructure</Badge>
-                                        <Badge className="text-sm" variant="secondary">Messenger</Badge>
-                                        <Badge className="text-sm" variant="secondary">Instagram</Badge>
+                                        { tags?.map((tag) => <Badge className="text-sm" variant="secondary">{tag}</Badge>)}
+                                        {
+                                            primary_role
+                                                ? <>
+                                                    
+                                                    <Badge className="text-sm" variant="secondary">{ primary_role }</Badge>
+                                                    <Badge className="text-sm" variant="secondary">{
+                                                        roles.find(({items}) => items.includes(primary_role))?.name
+                                                    }</Badge>
+                                                </>
+                                                : null
+                                        }
                                     </div>
                                     </div>
                                 </div>

@@ -52,9 +52,6 @@ class JobController extends Controller
             'description' => 'required|string'
         ]);
 
-        Log::info('validated:');
-        Log::info($validated);
-
         $job = new JobOpening([
             'title' => $validated['title'],
             'publish' => $validated['publish'],

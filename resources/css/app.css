@@ -71,6 +71,9 @@
     --container-10xl: 104rem;
     --container-10xll: 106rem;
     --container-11xl: 108rem;
+
+    --text-xxs: 0.70rem;
+    --text-xxs--line-height: calc(1 / 0.70);
 }
 
 :root {

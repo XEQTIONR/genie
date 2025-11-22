@@ -9,6 +9,7 @@ use App\Http\Controllers\ProjectOpeningController;
 use App\Http\Controllers\TeamController;
 use App\Http\Controllers\TeamInvitationController;
 use App\Http\Controllers\UserProfileController;
+use App\Http\Resources\JobPostingResource;
 use App\Models\JobOpening;
 use App\Models\Team;
 use Illuminate\Support\Facades\Route;
@@ -95,8 +96,8 @@ Route::get('/teams/{team:slug}/projects', function(Team $team) {
 Route::get('/teams/{team:slug}/jobs', function (Team $team) {
     return Inertia::render('teams/show', [
         'team' => $team,
-        'jobs' => [],
-        'tab' => 'jobs'
+        'tab' => 'jobs',
+        'jobs' => JobPostingResource::collection($team->jobs)
     ]);
 })->name('teams.jobs.index');
 

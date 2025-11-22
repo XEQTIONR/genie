@@ -39,6 +39,11 @@ export interface SharedData {
     }
 }
 
+interface Location {
+    city: string|null,
+    country: string
+}
+
 type ProjectOwnerTypeUser = typeof USERMODEL
 type ProjectOwnerTypeTeam = typeof TEAMMODEL
 export type ProjectOwner = ProjectOwnerTypeUser | ProjectOwnerTypeTeam
@@ -121,4 +126,17 @@ export type ProjectMember = User & {
     pivot: {
         roles: string[]
     }
+}
+
+export interface JobPosting {
+    id: string
+    compensation_type: string
+    description: string
+    employment_type: string[]
+    location_type: string
+    locations: Location[]
+    primary_role: string|null
+    tags?: string[]
+    title: string
+    work_location: string[]
 }
