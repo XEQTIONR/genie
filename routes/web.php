@@ -29,8 +29,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     //Route::get('/projects/{project:slug}/job-openings', [ProjectJobController::class, 'index'])->name('projects.jobs.index');
 
-    Route::get('/jobs/create', [OpportunityController::class, 'create'])->name('jobs.create');
-    Route::post('/jobs', [OpportunityController::class, 'store'])->name('jobs.store');
+    Route::get('/opportunities/create', [OpportunityController::class, 'create'])->name('opportunities.create');
+    Route::post('/opportunities', [OpportunityController::class, 'store'])->name('opportunities.store');
 
     Route::patch('/profile/{user}', [UserProfileController::class, 'update'])->name('users.update');
 
@@ -91,15 +91,15 @@ Route::get('/teams/{team:slug}/projects', function(Team $team) {
     ]);
 })->name('teams.projects.index');
 
-Route::get('/jobs/{job}', [OpportunityController::class, 'show'])->name('jobs.show');
+Route::get('/opportunities/{job}', [OpportunityController::class, 'show'])->name('opportunities.show');
 
-Route::get('/teams/{team:slug}/jobs', function (Team $team) {
+Route::get('/teams/{team:slug}/opportunities', function (Team $team) {
     return Inertia::render('teams/show', [
         'team' => $team,
         'tab' => 'jobs',
-        'jobs' => OpportunityResource::collection($team->opportunities)
+        'opportunities' => OpportunityResource::collection($team->opportunities)
     ]);
-})->name('teams.jobs.index');
+})->name('teams.opportunities.index');
 
 Route::get('/', function () {
         return Inertia::render('dashboard');

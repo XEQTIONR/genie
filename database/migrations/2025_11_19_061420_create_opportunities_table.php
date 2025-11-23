@@ -23,11 +23,14 @@ return new class extends Migration
             $table->json('employment_type');
             $table->string('owner_type');
             $table->foreignId('owner_id');
+            $table->foreignId('creator_id');
             $table->text('description');
             $table->string('compensation_type');
             $table->string('compensation')->nullable();
             $table->string('status')->default('created');
             $table->timestamps();
+
+            $table->foreign('creator_id')->references('id')->on('users');
         });
     }
 

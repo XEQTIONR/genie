@@ -1,11 +1,15 @@
-import AppLayout from "@/layouts/app-layout";
-import { show } from "@/routes/jobs";
-import { BreadcrumbItem, Opportunity } from "@/types";
-import { Head } from "@inertiajs/react";
+import AppLayout from "@/layouts/app-layout"
+import { show } from "@/routes/opportunities"
+import { show as showUser } from "@/routes/users"
+import { BreadcrumbItem, Opportunity } from "@/types"
+import { Head, Link } from "@inertiajs/react"
 import '/resources/css/projects.css'
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Separator } from "@/components/ui/separator"
+import { Avatar } from "@/components/ui/avatar"
+import { AvatarFallback, AvatarImage } from "@radix-ui/react-avatar"
+import { useInitials } from "@/hooks/use-initials"
 
 export default function ShowJobPosting({ job } : { job: { data: Opportunity } }) {
 
@@ -17,6 +21,8 @@ export default function ShowJobPosting({ job } : { job: { data: Opportunity } })
             }).url
         }
     ]
+
+    const getInitials = useInitials()
 
     return (
         <AppLayout maxBodyWidth="md:max-w-4xl" breadcrumbs={breadcrumbs}>
@@ -38,6 +44,24 @@ export default function ShowJobPosting({ job } : { job: { data: Opportunity } })
 
                 <div id="description" dangerouslySetInnerHTML={{ __html: job.data.description}} className="w-full">
                 </div>
+
+                {
+                    job.data.creator &&
+                    <div className="w-full flex flex-col gap-1">
+                        <span className="text-sm">Posted by</span>
+                        <Link href={showUser({ username: job.data.creator.username })} className="flex items-center gap-2">
+                            <Avatar>
+                                <AvatarImage src={job.data.creator?.avatar} />
+                                <AvatarFallback>{ getInitials(job.data.creator.name ?? "") }</AvatarFallback>
+                            </Avatar>
+                            <div className="flex flex-col">
+                                <span className="text-sm font-semibold">{job.data.creator?.name}</span>
+                                <span className="text-xs">{(new Date(job.data.created_at)).toDateString()}</span>
+                            </div>
+                        </Link>
+                    </div>
+                }
+                
 
                 <Separator className="mt-10" />
                 <div className="w-full flex flex-col gap-5 items-center py-14">

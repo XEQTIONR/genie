@@ -64,6 +64,7 @@ class OpportunityController extends Controller
             'employment_type' => $validated['employment_type'],
             'compensation_type' => $validated['compensation_type'],
             'description' => $validated['description_html'],
+            'creator_id' => Auth::id(),
         ]);
 
         if ($validated['owner_type'] == 'project') {
@@ -82,6 +83,7 @@ class OpportunityController extends Controller
      */
     public function show(Opportunity $job)
     {
+        $job->load(['creator']);
         return Inertia::render('jobs/show', [
             'job' => new OpportunityResource($job)
         ]);

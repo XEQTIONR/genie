@@ -24,7 +24,10 @@ class OpportunityResource extends JsonResource
             'primary_role' => $this->primary_role,
             'tags' => $this->tags,
             'title' => $this->title,
-            'work_location' => $this->work_location
+            'work_location' => $this->work_location,
+            'creator' => $this->whenLoaded('creator'),
+            'created_at' => $this->created_at,
+
         ];
     }
 }

@@ -4,12 +4,12 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import axios from 'axios'
 import { Badge } from '@/components/ui/badge'
 import { show } from '@/routes/teams'
-import { show as showJobPosting } from "@/routes/jobs"
+import { show as showJobPosting } from "@/routes/opportunities"
 import { show as showUser } from '@/routes/users'
 import { show as showProject } from '@/routes/projects'
 import { index as membersIndex } from '@/routes/teams/users'
 import { index as projectsIndex } from '@/routes/teams/projects'
-import { index as jobsIndex } from '@/routes/teams/jobs'
+import { index as jobsIndex } from '@/routes/teams/opportunities'
 import { Opportunity, NavItem, Project, ProjectMember, Team, type BreadcrumbItem } from '@/types'
 import { Head, Link } from '@inertiajs/react'
 import { Camera, EllipsisVertical, Eraser, Pencil, PencilRuler } from 'lucide-react'
@@ -325,7 +325,7 @@ export default function TeamProfile({
     user_count, 
     users = [],
     projects = [],
-    jobs 
+    opportunities 
 
 } : { 
     team: Team 
@@ -333,7 +333,7 @@ export default function TeamProfile({
     user_count: number
     users?: ProjectMember[]
     projects?: Project[]
-    jobs?: {
+    opportunities?: {
         data: Opportunity[]
     }
 }) {
@@ -434,7 +434,7 @@ export default function TeamProfile({
                     <section className="w-full h-full flex flex-col">
                         <h3 className="text-xl font-semibold mt-6">Current Openings</h3>
                         {
-                            jobs?.data.map(({id, title, tags, work_location, compensation_type, employment_type, location_type, locations, primary_role}) => (
+                            opportunities?.data.map(({id, title, tags, work_location, compensation_type, employment_type, location_type, locations, primary_role}) => (
                                 <Link href={showJobPosting({ id: id })} className="flex flex-col py-7 border-b">
                                     <div className="cursor-pointer">
                                     <h3 className="text-lg font-semibold pl-1">{title}</h3>

@@ -78,6 +78,11 @@ class User extends Authenticatable
         return $this->hasMany(Project::class, 'creator_id');
     }
 
+    public function createdOpportunities(): HasMany
+    {
+        return $this->hasMany(Opportunity::class, 'creator_id');
+    }
+
     public function ownedProjects(): MorphMany
     {
         return $this->morphMany(Project::class, 'owner');

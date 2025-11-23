@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class Opportunity extends Model
@@ -21,7 +22,8 @@ class Opportunity extends Model
         'employment_type',
         'description',
         'compensation_type',
-        'status'
+        'status',
+        'creator_id',
     ];
 
     protected function casts(): array
@@ -38,5 +40,10 @@ class Opportunity extends Model
     public function owner(): MorphTo
     {
         return $this->morphTo();
+    }
+
+    public function creator(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'creator_id');
     }
 }

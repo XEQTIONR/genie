@@ -139,4 +139,6 @@ export interface Opportunity {
     tags?: string[]
     title: string
     work_location: string[]
+    creator?: User
+    created_at: string
 }

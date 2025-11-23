@@ -6,7 +6,7 @@ import { BriefcaseBusiness, Check, Heading1, Heading2, List, ListChecks, ListOrd
 import { Button } from '@/components/ui/button'
 import { ButtonGroup } from '@/components/ui/button-group'
 import { Checkbox } from '@/components/ui/checkbox'
-import { create, store } from '@/routes/jobs'
+import { create, store } from '@/routes/opportunities'
 import {
   Field,
   FieldSet,
