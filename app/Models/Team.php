@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class Team extends Model
@@ -53,8 +52,8 @@ class Team extends Model
         return $this->morphMany(Project::class, 'owner');
     }
 
-    public function jobs(): MorphMany
+    public function opportunities(): MorphMany
     {
-        return $this->morphMany(JobOpening::class, 'owner');
+        return $this->morphMany(Opportunity::class, 'owner');
     }
 }

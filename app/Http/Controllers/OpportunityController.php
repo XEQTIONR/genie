@@ -2,15 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\JobPostingResource;
-use App\Models\JobOpening;
+use App\Http\Resources\OpportunityResource;
+use App\Models\Opportunity;
 use App\Models\Project;
 use App\Models\Team;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
-class JobController extends Controller
+class OpportunityController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -53,7 +53,7 @@ class JobController extends Controller
             'description' => 'required|string'
         ]);
 
-        $job = new JobOpening([
+        $job = new Opportunity([
             'title' => $validated['title'],
             'publish' => $validated['publish'],
             'primary_role' => $validated['primary_role'],
@@ -68,10 +68,10 @@ class JobController extends Controller
 
         if ($validated['owner_type'] == 'project') {
             $project = Project::find($validated['owner_id']);
-            $project->jobs()->save($job);
+            $project->opportunities()->save($job);
         } else { // $validated['owner_type'] == 'team'
             $team = Team::find($validated['owner_id']);
-            $team->jobs()->save($job);
+            $team->opportunities()->save($job);
         }
 
         return to_route('home');
@@ -80,10 +80,10 @@ class JobController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(JobOpening $job)
+    public function show(Opportunity $job)
     {
         return Inertia::render('jobs/show', [
-            'job' => new JobPostingResource($job)
+            'job' => new OpportunityResource($job)
         ]);
     }
 

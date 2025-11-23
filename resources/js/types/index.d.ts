@@ -128,7 +128,7 @@ export type ProjectMember = User & {
     }
 }
 
-export interface JobPosting {
+export interface Opportunity {
     id: string
     compensation_type: string
     description: string

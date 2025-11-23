@@ -10,7 +10,7 @@ import { show as showProject } from '@/routes/projects'
 import { index as membersIndex } from '@/routes/teams/users'
 import { index as projectsIndex } from '@/routes/teams/projects'
 import { index as jobsIndex } from '@/routes/teams/jobs'
-import { JobPosting, NavItem, Project, ProjectMember, Team, type BreadcrumbItem } from '@/types'
+import { Opportunity, NavItem, Project, ProjectMember, Team, type BreadcrumbItem } from '@/types'
 import { Head, Link } from '@inertiajs/react'
 import { Camera, EllipsisVertical, Eraser, Pencil, PencilRuler } from 'lucide-react'
 import {
@@ -334,7 +334,7 @@ export default function TeamProfile({
     users?: ProjectMember[]
     projects?: Project[]
     jobs?: {
-        data: JobPosting[]
+        data: Opportunity[]
     }
 }) {
 
@@ -345,8 +345,6 @@ export default function TeamProfile({
     const [windowWidth, setWindowWidth] = useState(window.innerWidth)
 
     const rz = useDebouncedCallback(() => {setWindowWidth(window.innerWidth)}, 500)
-
-    const [jobsd] = useState((new Array(2)).fill(0))
 
     useEffect(() => {
         window.addEventListener("resize", rz)

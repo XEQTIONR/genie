@@ -1,13 +1,13 @@
 import AppLayout from "@/layouts/app-layout";
 import { show } from "@/routes/jobs";
-import { BreadcrumbItem, JobPosting } from "@/types";
+import { BreadcrumbItem, Opportunity } from "@/types";
 import { Head } from "@inertiajs/react";
 import '/resources/css/projects.css'
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 
-export default function ShowJobPosting({ job } : { job: { data: JobPosting } }) {
+export default function ShowJobPosting({ job } : { job: { data: Opportunity } }) {
 
     const breadcrumbs: BreadcrumbItem[] = [
         {

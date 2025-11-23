@@ -55,8 +55,8 @@ class Project extends Model
             ->withTimestamps();
     }
 
-    public function jobs(): MorphMany
+    public function opportunities(): MorphMany
     {
-        return $this->morphMany(JobOpening::class, 'owner');
+        return $this->morphMany(Opportunity::class, 'owner');
     }
 }

@@ -6,11 +6,10 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 
-class JobOpening extends Model
+class Opportunity extends Model
 {
     use HasUuids;
 
-    protected $table = 'job_postings';
     protected $fillable = [
         'title',
         'publish',
