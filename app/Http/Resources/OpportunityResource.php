@@ -14,6 +14,8 @@ class OpportunityResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $types = explode('\\', $this->owner_type);
+
         return [
             'id' => $this->id,
             'compensation_type' => $this->compensation_type,
@@ -25,6 +27,8 @@ class OpportunityResource extends JsonResource
             'tags' => $this->tags,
             'title' => $this->title,
             'work_location' => $this->work_location,
+            'owner' => $this->owner,
+            'owner_type' => $types[count($types) - 1],
             'creator' => $this->whenLoaded('creator'),
             'created_at' => $this->created_at,
 
