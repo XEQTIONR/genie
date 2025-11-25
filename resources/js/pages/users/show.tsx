@@ -536,7 +536,7 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
                                     team: team.slug
                                 })}>
                                     <ItemMedia variant="image">
-                                        <Avatar className="size-16">
+                                        <Avatar variant="square" className="size-10">
                                             <AvatarImage src={team.avatar} />
                                             <AvatarFallback className="text-3xl">{team.name.split(' ').map(word => word.charAt(0)).join("")}</AvatarFallback>
                                         </Avatar>
