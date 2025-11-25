@@ -2,6 +2,7 @@ import AppLayout from "@/layouts/app-layout"
 import { show } from "@/routes/opportunities"
 import { show as showUser } from "@/routes/users"
 import { show as showTeam } from "@/routes/teams"
+import { store } from "@/routes/opportunities/inquiries"
 import { BreadcrumbItem, Opportunity } from "@/types"
 import {
   Dialog,
@@ -13,20 +14,20 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
-import { Head, Link } from "@inertiajs/react"
+import { Form, Head, Link } from "@inertiajs/react"
 import '/resources/css/projects.css'
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { useInitials } from "@/hooks/use-initials"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Send } from "lucide-react"
 
-export default function ShowJobPosting({ job } : { job: { data: Opportunity } }) {
+export default function ShowJobPosting({ job, notification } : { job: { data: Opportunity }, notification: object }) {
 
     const breadcrumbs: BreadcrumbItem[] = [
         {
@@ -40,6 +41,12 @@ export default function ShowJobPosting({ job } : { job: { data: Opportunity } })
     const [showDialog, setShowDialog] = useState(false)
 
     const getInitials = useInitials()
+
+    useEffect(() => {
+        if (notification) {
+            setShowDialog(false)
+        }
+    }, [notification])
 
     return (
         <AppLayout maxBodyWidth="md:max-w-4xl" breadcrumbs={breadcrumbs}>
@@ -63,25 +70,27 @@ export default function ShowJobPosting({ job } : { job: { data: Opportunity } })
                             </div>
                         </div>
                         <div className="w-full h-full flex flex-col justify-between">
-                            <form className="mt-6 lg:mt-[25%] grow flex flex-col gap-5 md:gap-10 justify-between">
+                            <Form action={store(job.data.id)} className="mt-6 lg:mt-[25%] grow flex flex-col gap-5 md:gap-10 justify-between">
                                 <FieldGroup className="flex flex-col grow gap-4.5">
                                     <Field>
                                         <FieldLabel>Full Name *</FieldLabel>
-                                        <Input />
+                                        <Input name="name" />
                                     </Field>
                                     <Field>
                                         <FieldLabel>Email *</FieldLabel>
-                                        <Input />
+                                        <Input name="email" />
                                     </Field>
                                     <Field className="h-full flex flex-col grow">
                                         <FieldLabel>Message *</FieldLabel>
-                                        <Textarea className="grow" />
+                                        <Textarea name="message" className="grow" />
                                     </Field>
                                 </FieldGroup>
                                 <div className="w-full flex justify-end">
-                                        <Button className="font-semibold" size="lg"><Send /> Send Message</Button>
+                                    <Button type="submit" className="font-semibold" size="lg">
+                                        <Send /> Send Message
+                                    </Button>
                                 </div>
-                            </form>
+                            </Form>
                         </div>
                     </div>
                 </DialogContent>

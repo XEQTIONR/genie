@@ -81,11 +81,11 @@ class OpportunityController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Opportunity $job)
+    public function show(Opportunity $opportunity)
     {
-        $job->load(['creator']);
+        $opportunity->load(['creator']);
         return Inertia::render('jobs/show', [
-            'job' => new OpportunityResource($job)
+            'job' => new OpportunityResource($opportunity)
         ]);
     }
 

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\OpportunityController;
+use App\Http\Controllers\OpportunityInquiryController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\ProjectInvitationController;
 use App\Http\Controllers\ProjectJobController;
@@ -49,7 +50,6 @@ Route::get('/profile/{user:username}', function(User $user) {
         'tab' => 'showcase'
     ]);
 })->name('users.show');
-
 Route::get('/profile/{user:username}/about', function(User $user) {
     $user->load(['ownedProjects']);
     return Inertia::render('users/show', [
@@ -57,7 +57,6 @@ Route::get('/profile/{user:username}/about', function(User $user) {
         'tab' => 'about'
     ]);
 })->name('users.about');
-
 Route::get('/profile/{user:username}/teams', function(User $user) {
     $teams = $user->teams()->withCount(['users', 'projects'])->get();
     return Inertia::render('users/show', [
@@ -68,7 +67,6 @@ Route::get('/profile/{user:username}/teams', function(User $user) {
 })->name('users.teams.index');
 
 Route::get('/teams/{team:slug}', [TeamController::class, 'index'])->name('teams.show');
-
 Route::get('/teams/{team:slug}/members', function(Team $team) {
     $users = $team->users()->get();
 
@@ -79,7 +77,6 @@ Route::get('/teams/{team:slug}/members', function(Team $team) {
         'tab' => 'members'
     ]);
 })->name('teams.users.index');
-
 Route::get('/teams/{team:slug}/projects', function(Team $team) {
     $projects = $team->projects()->get();
 
@@ -91,7 +88,9 @@ Route::get('/teams/{team:slug}/projects', function(Team $team) {
     ]);
 })->name('teams.projects.index');
 
-Route::get('/opportunities/{job}', [OpportunityController::class, 'show'])->name('opportunities.show');
+Route::get('/opportunities/{opportunity}', [OpportunityController::class, 'show'])->name('opportunities.show');
+
+Route::post('/opportunities/{opportunity}/inquiry', [OpportunityInquiryController::class, 'store'])->name('opportunities.inquiries.store');
 
 Route::get('/teams/{team:slug}/opportunities', function (Team $team) {
     return Inertia::render('teams/show', [
