@@ -1190,16 +1190,28 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
                         <AvatarImage src={user.avatar} />
                         <AvatarFallback className="text-3xl">{user.name.split(' ').map(word => word.charAt(0)).join("")}</AvatarFallback>
                     </Avatar>
-                    <div className="text-3xl font-semibold flex items-center gap-4 text-white">
+                    <div className="text-2xl font-semibold flex items-center gap-4 text-white">
                         {user.name}
                         {/* {isPro && <span className="text-xs bg-primary text-background px-2 py-0.5 rounded">PRO</span>} */}
                     </div>
                     <div className='flex gap-1.5 text-sm text-white'>
                         <span>Backed 10 projects</span>
                         <span>&bull;</span>
-                        <span>Houston, TX</span>
-                        <span>&bull;</span>
-                        <span>Joined May 2014</span>
+                        {
+                            user.location &&
+                            <>
+                                <span>{user.location.city ? `${user.location.city},` : null} {user.location.country}</span>
+                                <span>&bull;</span>
+                            </>
+                        }
+                        <span>Joined {
+                            (new Intl.DateTimeFormat('en-US', {
+                                year: 'numeric',
+                                month: 'short',
+                            
+                            })).format(new Date(user.created_at))
+                        }
+                        </span>
                     </div>
                 </div>
                 <div className="w-full flex flex-col mx-auto gap-0 items-center">
