@@ -45,23 +45,32 @@ function TabbedSectionHeaders({
             className
         )}>
             {
-                (scrollLeft ?? 0) > 0 && <div className="relative top-13 -mt-10 float-left flex items-center bg-neutral-50/50 dark:bg-neutral-900/50 size-10">
+                (scrollLeft ?? 0) > 0 && <div className="relative top-13 md:top-14 -mt-10 float-left flex items-center bg-neutral-50/50 dark:bg-neutral-900/50 size-10">
                     <ChevronLeft onClick={() => div.current.scrollLeft -= 200 } className="block mx-auto" />
                 </div> 
             }
 
             {
-                div.current && (scrollLength > 0) && (scrollLength - (scrollLeft ?? 0) > scrollThresh) && <div className="relative top-13 -mt-10 float-right flex items-center bg-neutral-50/50 dark:bg-neutral-900/50 size-10">
+                div.current && (scrollLength > 0) && (scrollLength - (scrollLeft ?? 0) > scrollThresh) && <div className="relative top-13 md:top-14 -mt-10 float-right flex items-center bg-neutral-50/50 dark:bg-neutral-900/50 size-10">
                     <ChevronRight onClick={() => div.current.scrollLeft += 200 } className="block mx-auto" />
                 </div>
             }
             
             
-            <ul onScroll={fn} ref={div} id="tabbedSectionHeaderContent" className="scroll-smooth flex items-stretch justify-center gap-3 w-full overflow-x-scroll scrollbar-hide h-20">
+            <ul 
+                onScroll={fn} 
+                ref={div} 
+                id="tabbedSectionHeaderContent" 
+                className={cn(
+                    "scroll-smooth flex items-stretch gap-3 overflow-x-scroll scrollbar-hide h-16 md:h-20",
+                    scrollLength > 0 ? "justify-start" : "justify-center"
+                )}
+            >
             {
                 headers.map(({title, key, href, icon, className}) => (
-                    <li className={cn("text-sm flex items-center font-medium",
-                        current == key && "border-b-2 border-foreground"
+                    <li className={cn("text-sm flex items-center font-medium border-b-2",
+                        current == key ? "border-foreground" : "border-transparent",
+                        
                     )} key={key}>
                     {
 

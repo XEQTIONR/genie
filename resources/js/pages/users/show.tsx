@@ -1143,36 +1143,14 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
                         backgroundImage: `url("/pattern_10.jpg")`,
                         backgroundSize: '247.8px 193.8px'
                     }}
-                    className="h-45 md:h-[350px]  flex gap-4 justify-between border-sidebar-border/70 dark:border-sidebar-border"
+                    className="h-88 flex gap-4 justify-between border-sidebar-border/70 dark:border-sidebar-border"
                 >
-                    <div className="w-full h-full  relative overflow-hidden flex justify-end items-end px-4 py-5">
-                    <div className='absolute top-1/2 left-1/2 -translate-1/2 flex flex-col items-center gap-3 w-full max-w-3xl'>
-                        <Avatar className="size-24 ring-background">
-                            {
-                                auth.user && auth.user.id === user.id &&
-                                <div onClick={() => setShowAvatarDialog(true)} className="cursor-pointer size-full flex items-center justify-center absolute bg-neutral-950/50 z-50 opacity-0 hover:opacity-100">
-                                    <Camera className="opacity-90 stroke-white" size={25} />
-                                </div>
-                            }
-                            <AvatarImage src={user.avatar} />
-                            <AvatarFallback className="text-3xl">{user.name.split(' ').map(word => word.charAt(0)).join("")}</AvatarFallback>
-                        </Avatar>
-                        <div className="text-3xl font-semibold flex items-center gap-4">
-                            {user.name}
-                            {/* {isPro && <span className="text-xs bg-primary text-background px-2 py-0.5 rounded">PRO</span>} */}
-                        </div>
-                        <div className='flex gap-1.5 text-sm'>
-                            <span>Backed 10 projects</span>
-                            <span>&bull;</span>
-                            <span>Houston, TX</span>
-                            <span>&bull;</span>
-                            <span>Joined May 2014</span>
-                        </div>
-                    </div>
+                    <div className="w-full h-full relative flex justify-end items-start md:items-end px-4 py-5">
+                    
                     {
-                        user.id === auth.user?.id &&
+                        user.id === auth.user?.id ?
                         <Button
-                            variant="secondary"
+                            variant="outline"
                             type="button" 
                             className="cursor-pointer" 
                             size="icon-lg"
@@ -1181,8 +1159,47 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
                             }}
                         >
                             <Pencil />
-                        </Button>
+                        </Button> :
+                        <div className="flex flex-row gap-2 items-center shrink-0">
+                                <span className="hidden lg:inline mr-3 text-sm text-white">Let's build something together</span>
+                                <Button className="cursor-pointer">Get in touch</Button>
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button className="cursor-pointer" variant="outline" size="icon"><EllipsisVertical /></Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent sideOffset={10} className="dark:bg-neutral-900" align="end">
+                                        <DropdownMenuLabel>Options</DropdownMenuLabel>
+                                        <DropdownMenuSeparator />
+                                        <DropdownMenuItem className="cursor-pointer">Contact</DropdownMenuItem>
+                                        <DropdownMenuItem className="cursor-pointer">Add to team</DropdownMenuItem>
+                                        <DropdownMenuItem className="cursor-pointer">Block</DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+                            </div>
                     }
+                    </div>
+                </div>
+                <div className="relative -top-60 -mb-44 flex flex-col items-center gap-3 w-full">
+                    <Avatar className="size-24 ring-background">
+                        {
+                            auth.user && auth.user.id === user.id &&
+                            <div onClick={() => setShowAvatarDialog(true)} className="cursor-pointer size-full flex items-center justify-center absolute bg-neutral-950/50 z-50 opacity-0 hover:opacity-100">
+                                <Camera className="opacity-90 stroke-white" size={25} />
+                            </div>
+                        }
+                        <AvatarImage src={user.avatar} />
+                        <AvatarFallback className="text-3xl">{user.name.split(' ').map(word => word.charAt(0)).join("")}</AvatarFallback>
+                    </Avatar>
+                    <div className="text-3xl font-semibold flex items-center gap-4 text-white">
+                        {user.name}
+                        {/* {isPro && <span className="text-xs bg-primary text-background px-2 py-0.5 rounded">PRO</span>} */}
+                    </div>
+                    <div className='flex gap-1.5 text-sm text-white'>
+                        <span>Backed 10 projects</span>
+                        <span>&bull;</span>
+                        <span>Houston, TX</span>
+                        <span>&bull;</span>
+                        <span>Joined May 2014</span>
                     </div>
                 </div>
                 <div className="w-full flex flex-col mx-auto gap-0 items-center">
@@ -1249,7 +1266,7 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
                     />
                 </div>
                 
-                <div className="w-full md:max-w-8xl mx-auto relative h-full md:min-h-[50vh] flex overflow-hidden border-sidebar-border/70 dark:border-sidebar-border">
+                <div className="w-full h-full md:min-h-[50vh] md:max-w-8xl mx-auto relative flex overflow-hidden border-sidebar-border/70 dark:border-sidebar-border">
                 {
                     loading 
                         ? <Spinner className="block m-auto size-6" />

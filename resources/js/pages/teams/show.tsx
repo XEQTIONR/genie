@@ -12,7 +12,7 @@ import { index as projectsIndex } from '@/routes/teams/projects'
 import { index as jobsIndex } from '@/routes/teams/opportunities'
 import { Opportunity, NavItem, Project, ProjectMember, Team, type BreadcrumbItem } from '@/types'
 import { Head, Link } from '@inertiajs/react'
-import { Camera, EllipsisVertical, Eraser, Facebook, Globe, Instagram, MapPin, Pencil, PencilRuler, Twitch, Twitter, Youtube } from 'lucide-react'
+import { Camera, Eraser, Facebook, Globe, Instagram, MapPin, Pencil, PencilRuler, Twitch, Twitter, Youtube } from 'lucide-react'
 import {
     Dialog,
     DialogClose,
@@ -21,14 +21,6 @@ import {
     DialogHeader,
     DialogTitle,
 } from "@/components/ui/dialog"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
 import { TabbedSectionHeaders } from '@/components/ui/tabbed-sections'
 import { type SharedData } from '@/types'
 import { useForm, usePage } from '@inertiajs/react'
@@ -517,10 +509,10 @@ export default function TeamProfile({
                         backgroundSize: '247.8px 193.8px'
                     }}
                     // style={team.banner ? { backgroundImage: `url("${team.banner}")` } : {}}
-                    className="h-45 md:h-[350px] bg-gradient-to-r from-indigo-500 from-10% via-sky-500 via-30% to-emerald-500 to-90% bg-cover bg-center flex gap-4 justify-between border-sidebar-border/70 dark:border-sidebar-border"
+                    className="h-88 bg-gradient-to-r from-indigo-500 from-10% via-sky-500 via-30% to-emerald-500 to-90% bg-cover bg-center flex gap-4 justify-between border-sidebar-border/70 dark:border-sidebar-border"
                 >
-                    <div className="w-full h-full  relative overflow-hidden flex justify-end items-end px-4 py-5">
-                        <div className='absolute top-1/2 left-1/2 -translate-1/2 flex flex-col gap-3 w-full max-w-3xl'>
+                    <div className="w-full h-full  relative overflow-hidden flex justify-end items-start md:items-end px-4 py-5">
+                        <div className='absolute top-1/2 left-1/2 -translate-1/2 flex flex-col gap-3 w-full px-5 lg:px-0 max-w-3xl'>
                             <div className="flex gap-5">
                                 <Avatar variant="square" className="size-20">
                                 {
@@ -550,7 +542,7 @@ export default function TeamProfile({
                     {
                         team.owner_id === auth.user?.id &&
                         <Button
-                            variant="secondary"
+                            variant="outline"
                             type="button" 
                             className="cursor-pointer" 
                             size="icon-lg"
@@ -574,10 +566,10 @@ export default function TeamProfile({
                     />
                 </div>
                 
-                <div className="w-full h-full md:min-h-[50vh] flex overflow-hidden max-w-7xl mx-auto">
+                <div className="w-full h-full md:min-h-[50vh] max-w-7xl mx-auto flex overflow-hidden">
                     {
                         loading 
-                            ? <Spinner className="block mx-auto size-6" />
+                            ? <Spinner className="block m-auto size-6" />
                             : showTab(tab)
                     }
                 </div>
