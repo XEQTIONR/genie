@@ -12,7 +12,7 @@ import { index as projectsIndex } from '@/routes/teams/projects'
 import { index as jobsIndex } from '@/routes/teams/opportunities'
 import { Opportunity, NavItem, Project, ProjectMember, Team, type BreadcrumbItem } from '@/types'
 import { Head, Link } from '@inertiajs/react'
-import { Camera, EllipsisVertical, Eraser, Pencil, PencilRuler } from 'lucide-react'
+import { Camera, EllipsisVertical, Eraser, Facebook, Globe, Instagram, MapPin, Pencil, PencilRuler, Twitch, Twitter, Youtube } from 'lucide-react'
 import {
     Dialog,
     DialogClose,
@@ -512,10 +512,41 @@ export default function TeamProfile({
             />
             <div className="flex h-full flex-col overflow-x-auto">
                 <div
-                    style={team.banner ? { backgroundImage: `url("${team.banner}")` } : {}}
+                    style={team.banner ? { backgroundImage: `url("${team.banner}")` } : {
+                        backgroundImage: `url("/pattern_10.jpg")`,
+                        backgroundSize: '247.8px 193.8px'
+                    }}
+                    // style={team.banner ? { backgroundImage: `url("${team.banner}")` } : {}}
                     className="h-45 md:h-[350px] bg-gradient-to-r from-indigo-500 from-10% via-sky-500 via-30% to-emerald-500 to-90% bg-cover bg-center flex gap-4 justify-between border-sidebar-border/70 dark:border-sidebar-border"
                 >
-                    <div className="w-full h-full  relative overflow-hidden flex justify-end items-end md:max-w-10xll px-4 py-5">
+                    <div className="w-full h-full  relative overflow-hidden flex justify-end items-end px-4 py-5">
+                        <div className='absolute top-1/2 left-1/2 -translate-1/2 flex flex-col gap-3 w-full max-w-3xl'>
+                            <div className="flex gap-5">
+                                <Avatar variant="square" className="size-20">
+                                {
+                                    auth.user && auth.user.id === team.owner_id &&
+                                    <div onClick={() => setShowAvatarDialog(true)} className="cursor-pointer size-full flex items-center justify-center absolute bg-neutral-950/50 z-50 opacity-0 hover:opacity-100">
+                                        <Camera className="opacity-90 stroke-white" size={25} />
+                                    </div>
+                                }
+                                    <AvatarImage src={team.avatar} />
+                                    <AvatarFallback variant="square" className="text-3xl">{team.name.split(' ').map(word => word.charAt(0)).join("")}</AvatarFallback>
+                                </Avatar>
+                                <div className="flex flex-col justify-center">
+                                    <h1 className="text-2xl font-bold text-white">{team.name}</h1>
+                                    <div className="flex gap-1 items-center text-sm text-white"><MapPin size={16} /> Toronto, ON</div>
+                                </div>
+                            </div>
+                            <p className="text-sm text-white">{team.description}</p>
+                            <div className='flex gap-2.5 text-white'>
+                                <Facebook size={16} />
+                                <Twitter size={16} />
+                                <Instagram size={16} />
+                                <Youtube size={16} />
+                                <Twitch size={16} />
+                                <Globe size={16} />
+                            </div>
+                        </div>
                     {
                         team.owner_id === auth.user?.id &&
                         <Button
@@ -532,65 +563,18 @@ export default function TeamProfile({
                     }
                     </div>
                 </div>
-                <div className="w-full flex flex-col md:max-w-8xl mx-auto gap-0 items-center">
-                    <div className="flex flex-col md:flex-row md:gap-4 relative -top-11 -mb-11 w-full md:max-w-10xl px-4 md:mx-0">
-                        <Avatar variant="square" className="size-32 sm:size-44 md:size-48">
-                            {
-                                auth.user && auth.user.id === team.owner_id &&
-                                <div onClick={() => setShowAvatarDialog(true)} className="cursor-pointer size-full flex items-center justify-center absolute bg-neutral-950/50 z-50 opacity-0 hover:opacity-100">
-                                    <Camera className="opacity-90 stroke-white" size={25} />
-                                </div>
-                            }
-                            <AvatarImage src={team.avatar} />
-                            <AvatarFallback variant="square" className="text-3xl">{team.name.split(' ').map(word => word.charAt(0)).join("")}</AvatarFallback>
-                        </Avatar>
-                        <div className="relative md:top-12 md:mb-12 flex flex-col md:flex-row gap-4 grow items-start justify-between mt-4">
-                            <div className="flex flex-col gap-2">
-                                <div className="text-4xl font-semibold flex items-center gap-4">
-                                    {team.name}
-                                    {isPro && <span className="text-xs bg-primary text-background px-2 py-0.5 rounded">PRO</span>}
-                                </div>
-                                <span></span>
-                            </div>
-                            <div className="flex flex-row-reverse md:flex-row gap-2 items-center shrink-0">
-                                <span className="hidden lg:inline mr-3 text-sm">Let's build something together</span>
-                                <Button className="cursor-pointer">Get in touch</Button>
-                                <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
-                                        <Button className="cursor-pointer" variant="outline" size="icon"><EllipsisVertical /></Button>
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent sideOffset={10} className="dark:bg-neutral-900" align={windowWidth >= 768 ? "end" : "start"}>
-                                        <DropdownMenuLabel>Options</DropdownMenuLabel>
-                                        <DropdownMenuSeparator />
-                                        <DropdownMenuItem className="cursor-pointer">Contact</DropdownMenuItem>
-                                        <DropdownMenuItem className="cursor-pointer">Add to team</DropdownMenuItem>
-                                        <DropdownMenuItem className="cursor-pointer">Block</DropdownMenuItem>
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
-                            </div>
-                        </div>
-                        
-                    </div>
-                    <div className="w-full mt-8 pl-4">
-                        <h2 className="font-bold text-xl">About</h2>
-                        <p className="my-4">
-                            {team.description}
-                        </p>
-                    </div>
-                </div>
-                <div className="w-full md:max-w-8xl block mx-auto">
+                <div className="w-full block mx-auto">
                     <TabbedSectionHeaders
-                        className="px-1"
+                        className="px-1 bg-foreground/5 dark:bg-foreground/2"
                         current={tab}
                         headers={tabs}
                         onTabChange={() => {
                             setLoading(true)
                         }}
                     />
-                    <Separator />
                 </div>
                 
-                <div className="w-full h-full md:min-h-[50vh] flex overflow-hidden max-w-8xl mx-auto">
+                <div className="w-full h-full md:min-h-[50vh] flex overflow-hidden max-w-7xl mx-auto">
                     {
                         loading 
                             ? <Spinner className="block mx-auto size-6" />

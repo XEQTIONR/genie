@@ -57,21 +57,20 @@ function TabbedSectionHeaders({
             }
             
             
-            <ul onScroll={fn} ref={div} id="tabbedSectionHeaderContent" className="scroll-smooth flex items-center gap-3 w-full overflow-x-scroll scrollbar-hide pt-5">
+            <ul onScroll={fn} ref={div} id="tabbedSectionHeaderContent" className="scroll-smooth flex items-stretch justify-center gap-3 w-full overflow-x-scroll scrollbar-hide h-20">
             {
                 headers.map(({title, key, href, icon, className}) => (
-                    <li className="font-bold mb-2.5" key={key}>
+                    <li className={cn("text-sm flex items-center font-medium",
+                        current == key && "border-b-2 border-foreground"
+                    )} key={key}>
                     {
-                        current == key
-                            ? <span className="p-2.5 my-2 border-b-2 border-foreground text-nowrap">
-                                {title}
-                            </span>
-                            : <Link
+
+                            <Link
                                 onClick={onTabChange} 
                                 preserveScroll
                                 className={cn(
                                     className,
-                                    "p-2.5 my-2 hover:bg-accent rounded-md text-nowrap",
+                                    "p-2.5 hover:underline rounded-md text-nowrap",
                                 )} 
                                 href={href}>
                                 {icon && (

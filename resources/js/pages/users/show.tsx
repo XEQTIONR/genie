@@ -1139,10 +1139,36 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
             />
             <div className="flex h-full flex-col overflow-x-auto">
                 <div
-                    style={user.banner ? { backgroundImage: `url("${user.banner}")` } : {}}
-                    className="h-45 md:h-[350px] bg-gradient-to-r from-indigo-500 from-10% via-sky-500 via-30% to-emerald-500 to-90% bg-cover bg-center flex gap-4 justify-between border-sidebar-border/70 dark:border-sidebar-border"
+                    style={user.banner ? { backgroundImage: `url("${user.banner}")` } : {
+                        backgroundImage: `url("/pattern_10.jpg")`,
+                        backgroundSize: '247.8px 193.8px'
+                    }}
+                    className="h-45 md:h-[350px]  flex gap-4 justify-between border-sidebar-border/70 dark:border-sidebar-border"
                 >
-                    <div className="w-full h-full  relative overflow-hidden flex justify-end items-end md:max-w-10xll px-4 py-5">
+                    <div className="w-full h-full  relative overflow-hidden flex justify-end items-end px-4 py-5">
+                    <div className='absolute top-1/2 left-1/2 -translate-1/2 flex flex-col items-center gap-3 w-full max-w-3xl'>
+                        <Avatar className="size-24 ring-background">
+                            {
+                                auth.user && auth.user.id === user.id &&
+                                <div onClick={() => setShowAvatarDialog(true)} className="cursor-pointer size-full flex items-center justify-center absolute bg-neutral-950/50 z-50 opacity-0 hover:opacity-100">
+                                    <Camera className="opacity-90 stroke-white" size={25} />
+                                </div>
+                            }
+                            <AvatarImage src={user.avatar} />
+                            <AvatarFallback className="text-3xl">{user.name.split(' ').map(word => word.charAt(0)).join("")}</AvatarFallback>
+                        </Avatar>
+                        <div className="text-3xl font-semibold flex items-center gap-4">
+                            {user.name}
+                            {/* {isPro && <span className="text-xs bg-primary text-background px-2 py-0.5 rounded">PRO</span>} */}
+                        </div>
+                        <div className='flex gap-1.5 text-sm'>
+                            <span>Backed 10 projects</span>
+                            <span>&bull;</span>
+                            <span>Houston, TX</span>
+                            <span>&bull;</span>
+                            <span>Joined May 2014</span>
+                        </div>
+                    </div>
                     {
                         user.id === auth.user?.id &&
                         <Button
@@ -1159,18 +1185,9 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
                     }
                     </div>
                 </div>
-                <div className="w-full flex flex-col md:max-w-8xl mx-auto gap-0 items-center">
-                    <div className="flex flex-col md:flex-row md:gap-4 relative -top-11 -mb-11 w-full md:max-w-10xl px-4 md:mx-0">
-                        <Avatar className="size-32 md:size-36 ring-8 ring-background">
-                            {
-                                auth.user && auth.user.id === user.id &&
-                                <div onClick={() => setShowAvatarDialog(true)} className="cursor-pointer size-full flex items-center justify-center absolute bg-neutral-950/50 z-50 opacity-0 hover:opacity-100">
-                                    <Camera className="opacity-90 stroke-white" size={25} />
-                                </div>
-                            }
-                            <AvatarImage src={user.avatar} />
-                            <AvatarFallback className="text-3xl">{user.name.split(' ').map(word => word.charAt(0)).join("")}</AvatarFallback>
-                        </Avatar>
+                <div className="w-full flex flex-col mx-auto gap-0 items-center">
+                    {/* <div className="flex flex-col md:flex-row md:gap-4 relative -top-11 -mb-11 w-full md:max-w-10xl px-4 md:mx-0">
+                        
                         <div className="relative md:top-12 md:mb-12 flex flex-col md:flex-row gap-4 grow items-start justify-between mt-4">
                             <div className="flex flex-col gap-2">
                                 <div className="text-4xl font-semibold flex items-center gap-4">
@@ -1196,7 +1213,7 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
                                 </DropdownMenu>
                             </div>
                         </div>
-                    </div>
+                    </div> */}
                     
                     {/* <div className="md:ml-8">
                         <div className="w-full flex justify-between items-center mb-2">
@@ -1223,14 +1240,13 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
                     </div> */}
                     
                     <TabbedSectionHeaders
-                        className="w-full md:max-w-8xl px-3 mt-5"
+                        className="w-full px-1 bg-foreground/5 dark:bg-foreground/2"
                         current={tab}
                         headers={tabs}
                         onTabChange={() => {
                             setLoading(true)
                         }}
                     />
-                    <Separator />
                 </div>
                 
                 <div className="w-full md:max-w-8xl mx-auto relative h-full md:min-h-[50vh] flex overflow-hidden border-sidebar-border/70 dark:border-sidebar-border">
