@@ -599,6 +599,18 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
                         </div>
                         <Separator />
                         <div className="flex px-5">
+                            <div className="w-1/5 text-sm font-semibold">Tools</div>
+                            <div className="w-3/5 flex flex-wrap gap-2 relative -top-1">
+                            {
+                                user.meta?.skills &&
+                                user.meta?.skills.map((skill) => (
+                                    <span className="text-xs px-2.5 py-2 rounded-lg bg-foreground/5">{skill}</span>
+                                ))
+                            }
+                            </div>
+                        </div>
+                        <Separator />
+                        <div className="flex px-5">
                             <div className="w-1/5 text-sm font-semibold">Favorite Games</div>
                             <div className="w-3/5 text-sm flex gap-2 relative -top-1">
                                 {
