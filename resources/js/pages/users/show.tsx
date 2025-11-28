@@ -1,7 +1,7 @@
 import AppLayout from '@/layouts/app-layout'
 import { ArrowUpRightIcon, Eraser, ImageIcon } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { AtSign, Camera, Dribbble, EllipsisVertical, Facebook, Figma, Gamepad2, Github, Gitlab, Globe, Hammer, Instagram, Lightbulb, Linkedin, LinkIcon, Mail, MapPin, Pencil, PencilRuler, Plus, Rocket, Slack, Trash, Twitch, Twitter, UserPlus, Users, X, Youtube } from 'lucide-react'
+import { AtSign, Camera, EllipsisVertical, Gamepad2, Globe, Hammer, Lightbulb, LinkIcon, Mail, MapPin, Pencil, PencilRuler, Plus, Rocket, Trash, UserPlus, Users, X, } from 'lucide-react'
 import axios from 'axios'
 import { Badge } from '@/components/ui/badge'
 import { Button, buttonVariants } from '@/components/ui/button'
@@ -68,6 +68,7 @@ import { useEffect, useState } from 'react'
 import { useDebouncedCallback } from 'use-debounce'
 import { Slider } from '@/components/ui/slider'
 import { getCroppedImage } from '@/hooks/use-crop'
+import { Discord, Facebook, LinkedIn, Twitter, Twitch, Youtube } from '@/components/icons/svgs'
 
 type ProfileTab = NavItem & {key: string, className?: string}
 
@@ -564,537 +565,81 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
                 )
             case 'about':
                 return (
-                    // <div className="w-full flex flex-col md:flex-row border bg-neutral-50 dark:bg-neutral-900 md:mx-8 rounded-lg">
-                    <div className="w-full flex flex-col md:flex-row rounded-lg ml-2 mr-2 md:mr-0">
-                        <div className="w-full md:w-1/4 flex flex-col p-2 gap-2 mb-2">
-                            <h2 className="text-lg font-bold mx-2 mt-2 mb-6">About</h2>
-                            
-                            {
-                                sectionLabels.map(({label, name}) => <div 
-                                    key={name}
-                                    onClick={() => setCurrentSection(name)} 
-                                    className={cn(
-                                        "font-medium py-1 px-2 rounded",
-                                        (name == currentSection) ? "bg-accent font-bold" : "cursor-pointer hover:bg-accent" 
-                                    )}
-                                >
-                                    {label}
-                                </div>)
-                            }
+                    <div className="w-full max-w-3xl mx-auto mt-20 flex flex-col gap-8">
+                        <div className="flex px-5">
+                            <div className="w-1/5 text-sm font-semibold">Status</div>
+                            <div className="w-3/5 text-sm">{user.status}</div>
                         </div>
-                        <Separator className="hidden md:inline" orientation="vertical" />
-                        <Separator className="inline md:hidden" />
-                        <div className="w-full md:w-3/4 p-4 flex flex-col gap-8">
-                        {
-                            currentSection == 'overview' && (
-                                <>
-                                    <div className="flex justify-between items-start">
-                                        <div className="flex flex-col gap-2 w-full">
-                                            <h3 className="font-bold">Status</h3>
-                                            { editing === 'status' 
-                                                ? <Form
-                                                    errorBag="userInfo"
-                                                    action={updateUser({ user: user.id })}
-                                                    options={{ 
-                                                        preserveScroll: true,
-                                                        onSuccess: () => setEditing(false)
-                                                    }} 
-                                                    className="flex grow flex-col gap-2"
-                                                >
-                                                {
-                                                    ({ errors }) => (
-                                                        <>
-                                                            <Input type="hidden" name="field" value="status" />
-                                                            <Input autoFocus defaultValue={user.status ?? ""} name="status" maxLength={50} className="dark:bg-background bg-white relative -left-0.5" />
-                                                            <FieldDescription className="text-destructive-foreground">{errors?.status}</FieldDescription>
-
-                                                            <div className="flex gap-2">
-                                                                <Button
-                                                                    type="submit" 
-                                                                    className="cursor-pointer text-neutral-900 bg-neutral-200 hover:bg-[#e1e1e1] dark:hover:bg-neutral-100" 
-                                                                    size="sm"
-                                                                >
-                                                                    Submit
-                                                                </Button>
-                                                                <Button className="cursor-pointer" onClick={() => setEditing(false)} variant="destructive" size="sm">Cancel</Button>
-                                                            </div>
-                                                        </>
-                                                    )
-                                                }
-                                                </Form>
-                                                : <div>{user.status ?? "--"}</div>
-                                            }
-                                        </div>
-                                        <EditButton what="status" />
-                                    </div>
-                                    <div className="flex justify-between items-start">
-                                        <div className="flex flex-col gap-2 w-full">
-                                            <h3 className="font-bold">Bio</h3>
-                                            { editing === 'bio' 
-                                                ? <Form
-                                                    errorBag="userInfo"
-                                                    action={updateUser({ user: user.id })}
-                                                    options={{ 
-                                                        preserveScroll: true,
-                                                        onSuccess: () => setEditing(false)
-                                                    }} 
-                                                    className="flex grow flex-col gap-2"
-                                                >
-                                                {
-                                                    ({ errors }) => (
-                                                        <>
-                                                            <Input type="hidden" name="field" value="bio" />
-                                                            <Textarea autoFocus defaultValue={user.bio ?? ""} name="bio" maxLength={500} className="dark:bg-background bg-white relative -left-0.5 min-h-30" />
-                                                            {/* <Input autoFocus defaultValue={user.bio ?? ""} name="bio" maxLength={50} className="dark:bg-background bg-white relative -left-0.5" /> */}
-                                                            <FieldDescription className="text-destructive-foreground">{errors?.bio}</FieldDescription>
-
-                                                            <div className="flex gap-2">
-                                                                <Button
-                                                                    type="submit" 
-                                                                    className="cursor-pointer text-neutral-900 bg-neutral-200 hover:bg-[#e1e1e1] dark:hover:bg-neutral-100" 
-                                                                    size="sm"
-                                                                >
-                                                                    Submit
-                                                                </Button>
-                                                                <Button className="cursor-pointer" onClick={() => setEditing(false)} variant="destructive" size="sm">Cancel</Button>
-                                                            </div>
-                                                        </>
-                                                    )
-                                                }
-                                                </Form>
-                                                : <div>{user.bio ? <RenderMultilineText text={user.bio} /> : "--"}</div>
-                                            }
-                                        </div>
-                                        <EditButton what="bio" />
-                                    </div>
-                                    {
-                                        editing === 'location'
-                                        ? (
-                                            <Form
-                                                errorBag="userInfo" 
-                                                className="flex flex-col gap-1"
-                                                action={updateUser({ user: user.id })}
-                                                options={{ 
-                                                    preserveScroll: true,
-                                                    onSuccess: () => setEditing(false)
-                                                }}
-                                            >
-                                            {
-                                                ({ errors }) => (<>    
-                                                <Input type="hidden" name="field" value="location" />
-                                                <h3 className="font-bold">Location</h3>
-                                                <div className="w-full flex gap-2 -ml-1 mt-2">
-                                                    <div className="flex flex-col gap-2">
-                                                        <Label className="ml-1">City</Label>
-                                                        <Input defaultValue={user.location?.city} name="city" className="dark bg-background" />
-                                                    </div>
-                                                    <div className="flex flex-col gap-2">
-                                                        <Label className="ml-1">Country</Label>
-                                                        <EditLocation defaultValue={user.location?.country} />
-                                                    </div>
-                                                </div>
-                                                <FieldDescription className="text-destructive-foreground">{errors.city}</FieldDescription>
-                                                <FieldDescription className="text-destructive-foreground">{errors.country}</FieldDescription>
-                                                <div className="flex gap-2 mt-1.5">
-                                                    <Button
-                                                        type="submit" 
-                                                        className="cursor-pointer text-neutral-900 bg-neutral-200 hover:bg-[#e1e1e1] dark:hover:bg-neutral-100" 
-                                                        size="sm"
-                                                    >
-                                                        Submit
-                                                    </Button>
-                                                    <Button className="cursor-pointer" onClick={() => setEditing(false)} variant="destructive" size="sm">Cancel</Button>
-                                                </div>
-                                            </>)}
-                                            </Form>
-                                        ) : (
-                                            <div className="flex justify-between items-center">
-                                                <div className="flex items-center gap-2">
-                                                    <MapPin size={19} /> {
-                                                        user.location
-                                                        ? <>Lives in <span className="font-bold">{renderLocation(user.location)}</span></>
-                                                        : <span className="italic">Location not specified</span>
-                                                    }
-                                                </div>
-                                                <EditButton what="location" />
-                                            </div>
-                                        )
-                                    }
-                                    
-                                    <div className="flex flex-col gap-3">
-                                        <div className="flex justify-between items-center min-h-10">
-                                            <h3 className="font-bold flex items-center gap-2"><Gamepad2 size={20} /> Favorite games</h3>
-                                            <EditButton what="fav_games" />
-                                        </div>
-                                        {
-                                            editing === 'fav_games'
-                                                ? (
-                                                    <Form
-                                                        errorBag="userInfo" 
-                                                        className="flex flex-col gap-1"
-                                                        action={updateUser({ user: user.id })}
-                                                        options={{ 
-                                                            preserveScroll: true,
-                                                            onSuccess: () => setEditing(false)
-                                                        }}
-                                                    >
-                                                    {
-                                                        ({ errors }) => (<>    
-                                                            <Input type="hidden" name="field" value="fav_games" />
-                                                            <div className="flex flex-col gap-2">
-                                                                <ul>
-                                                                {
-                                                                    favGames.map((game : string, index: number) => (
-                                                                        <li className="flex gap-1.5 mb-1">
-                                                                            <Input
-                                                                                value={game}
-                                                                                onChange={({target}) => setFavGames((v) => {
-                                                                                    const temp = [...v]
-                                                                                    temp[index] = target.value
-                                                                                    return temp
-                                                                                })}
-                                                                                name="fav_games[]"
-                                                                                className="bg-background"
-                                                                            />
-                                                                            <Button
-                                                                                type="button"
-                                                                                className="cursor-pointer"
-                                                                                onClick={() => {setFavGames(() => favGames.filter((_, i) => i !== index))}}
-                                                                                variant="ghost" 
-                                                                                size="icon"
-                                                                            >
-                                                                                <Trash />
-                                                                            </Button>
-                                                                        </li>
-                                                                    ))
-                                                                }
-                                                                </ul>
-                                                            </div>
-                                                            <FieldDescription className="text-destructive-foreground">{errors.fav_games}</FieldDescription>
-                                                            <div className="flex justify-between mt-1.5">
-                                                                <Button className="cursor-pointer" type="button" onClick={() => setFavGames([...favGames, ''])} variant="ghost" size="sm"><Plus />Add another</Button>
-                                                                <div className="flex gap-2">
-                                                                    <Button
-                                                                        type="submit" 
-                                                                        className="cursor-pointer text-neutral-900 bg-neutral-200 hover:bg-[#e1e1e1] dark:hover:bg-neutral-100" 
-                                                                        size="sm"
-                                                                    >
-                                                                        Submit
-                                                                    </Button>
-                                                                    <Button 
-                                                                        className="cursor-pointer" 
-                                                                        onClick={() => {
-                                                                            setFavGames(user.meta?.fav_games ?? [])
-                                                                            setEditing(false)
-                                                                        }} 
-                                                                        variant="destructive" 
-                                                                        size="sm"
-                                                                    >
-                                                                        Cancel
-                                                                    </Button>
-                                                                </div>
-                                                            </div>
-                                                        </>)
-                                                    }
-                                                    </Form>
-                                                ) : (
-                                                    favGames.length > 1 || (favGames.length > 0 && favGames[0] !== "")  ? <ul className="flex gap-2">
-                                                    {
-                                                        favGames.map((game, index) => (
-                                                            index == (favGames.length - 1) ? <li>{game}</li> : <li>{game},</li>
-                                                        ))
-                                                    }
-                                                    </ul> : <span>--</span>
-                                                )
-                                        }
-                                    </div>
-                                </>
-                            )
-                        }
-                        {
-                            currentSection == 'skills' && (
-                                <>
-                                    <form 
-                                        onSubmit={(e) => {
-                                            e.preventDefault()
-                                            skillForm.patch(updateUser({ user: user.id }).url, {
-                                                preserveScroll: true,
-                                                onSuccess: () => setEditing(false)
-                                            })
-                                        }} 
-                                        className="flex flex-col gap-3"
-                                    >
-                                        <div className="flex flex-col gap-0">
-                                            <div className="flex justify-between items-center">
-                                                <h3 className="font-bold flex items-center gap-2"><Lightbulb size={19} /> Skills</h3>
-                                                <EditButton 
-                                                    onClick={() => {
-                                                        skillForm.setData({
-                                                            ...skillForm.data,
-                                                            skills: user.meta?.skills ?? []
-                                                        })
-                                                    }} 
-                                                    what='skills'
-                                                />
-                                            </div>
-                                            <span className="text-xs">Roles that I have experience working in</span>
-                                        </div>
-                                        <div className="flex gap-2">
-                                        {
-                                            editing == 'skills'
-                                            ? (skillForm.data.skills.sort().map(item => (
-                                                <Badge 
-                                                    onClick={() => {
-                                                        if (editing === 'skills') {
-                                                            skillForm.setData({
-                                                                ...skillForm.data,
-                                                                skills: skillForm.data.skills.filter(d => d !== item)
-                                                            })
-                                                        } 
-                                                    }} 
-                                                    className="text-sm cursor-pointer"
-                                                >
-                                                    {item} { editing === 'skills' && <X /> }
-                                                </Badge>
-                                            ))) : ((user.meta?.skills && (user.meta.skills.length > 0)) ? user.meta?.skills.sort().map(item => (
-                                                <Badge 
-                                                    onClick={() => {
-                                                        if (editing === 'skills') {
-                                                            skillForm.setData({
-                                                                ...skillForm.data,
-                                                                skills: skillForm.data.skills.filter(d => d !== item)
-                                                            })
-                                                        } 
-                                                    }} 
-                                                    className="text-sm"
-                                                >
-                                                    {item} { editing === 'skills' && <X /> }
-                                                </Badge>
-                                            )) : <span className="italic">No skills specified</span>)
-                                        }
-                                        </div>
-                                        {
-                                            editing == 'skills' && 
-                                            <>
-                                                <SearchBar
-                                                    onSelectOption={(option: string) => {
-                                                        const d = {...skillForm.data}
-                                                        d.skills = [ ...d.skills.filter(val => val !== option), option ]
-                                                        skillForm.setData(d)
-                                                    }} 
-                                                    searchOptions={roles.map(({name, items}) => {
-                                                        return {
-                                                            heading: name,
-                                                            options: items.map((item) => {
-                                                                return {
-                                                                    label: item,
-                                                                    value: item
-                                                                }
-                                                            })
-                                                        }
-                                                    })}
-                                                />
-                                                <div className="flex gap-2">
-                                                    <Button
-                                                        type="submit" 
-                                                        className="cursor-pointer text-neutral-900 bg-neutral-200 hover:bg-[#e1e1e1] dark:hover:bg-neutral-100" 
-                                                        size="sm"
-                                                    >
-                                                        Submit
-                                                    </Button>
-                                                    <Button
-                                                        onClick={() => setEditing(false)} 
-                                                        className="cursor-pointer" 
-                                                        variant="destructive" 
-                                                        size="sm"
-                                                    >
-                                                        Cancel
-                                                    </Button>
-                                                </div>
-                                            </>
-                                        }
-                                    </form>
-
-                                    <div className="flex flex-col gap-3">
-                                        <div className="flex justify-between items-center">
-                                            <h3 className="font-bold flex items-center gap-2"><Hammer size={18} /> Tools</h3>
-                                            <EditButton />
-                                        </div>
-                                        <div className="flex gap-1.5">
-                                            <div className="size-16 rounded-md flex justify-center items-center bg-neutral-100 border dark:border-neutral-700  dark:bg-neutral-900">
-                                                <Github size={25} />
-                                            </div>
-                                            <div className="size-16 rounded-md flex justify-center items-center bg-neutral-100 border dark:border-neutral-700  dark:bg-neutral-900">
-                                                <Gitlab size={27} />
-                                            </div>
-                                            {/* <div className="size-16 rounded-md flex justify-center items-center bg-neutral-100 border dark:border-neutral-700  dark:bg-neutral-900">
-                                                <Dribbble  size={25} />
-                                            </div> */}
-                                            <div className="size-16 rounded-md flex justify-center items-center bg-neutral-100 border dark:border-neutral-700  dark:bg-neutral-900">
-                                                <Godot strokeWidth={1.1} size={39} />
-                                            </div>
-                                            <div className="size-16 rounded-md flex justify-center items-center bg-neutral-100 border dark:border-neutral-700  dark:bg-neutral-900">
-                                                <Unity strokeWidth={1.5} size={32} />
-                                            </div>
-                                            <div className="size-16 rounded-md flex justify-center items-center bg-neutral-100 border dark:border-neutral-700  dark:bg-neutral-900">
-                                                <Unreal strokeWidth={1.5} size={28} />
-                                            </div>
-                                            <div className="size-16 rounded-md flex justify-center items-center bg-neutral-100 border dark:border-neutral-700  dark:bg-neutral-900">
-                                                <Figma size={23} />
-                                            </div>
-                                        </div>
-                                        {/* <SearchBar searchOptions={[]} /> */}
-                                    </div>
-                                </>
-                            )
-                        }
-                        {
-                            currentSection == 'projects' && (
-                                <div className="w-full flex flex-col">
-                                    <div className="flex flex-col gap-3">
-                                        <div className="flex flex-col gap-0">
-                                            <div className="flex justify-between items-center">
-                                                <h3 className="font-bold flex items-center gap-2">
-                                                    Projects
-                                                </h3>
-                                                <div>
-                                                    <Link className={cn(buttonVariants({ variant: 'ghost', size: 'icon', className: "" }))} href={create().url}>
-                                                        <Plus />
-                                                    </Link>
-                                                </div>
-                                            </div>
-                                            <span className="text-xs">Current game development projects you are working on that have not been released</span>
-                                        </div>
-                                        {
-                                            user.owned_projects && user.owned_projects.length > 0
-                                                ? (<div className="w-full grid grid-cols-1 md:grid-cols-2 gap-3 mt-4 mb-6">
-                                                    { user.owned_projects.map(({title, excerpt, platforms, slug}) => <ProjectCard href={showProject(slug).url} title={title} excerpt={excerpt} platforms={platforms} icon={PencilRuler} />) }
-                                                </div>)
-                                                : <NoProjects />
-                                        }  
-                                    </div>
-                                    <Separator className="mb-5" />
-                                    <div className="flex flex-col gap-3">
-                                        <div className="flex flex-col gap-0">
-                                            <div className="flex justify-between items-center">
-                                                <h3 className="font-bold flex items-center gap-2">
-                                                    Releases
-                                                </h3>
-                                                <Link className={cn(buttonVariants({ variant: 'ghost', size: 'icon', className: "" }))} href={create().url}>
-                                                    <Plus />
-                                                </Link>
-                                            </div>
-                                            <span className="text-xs">Completed game titles by you that are available to the public</span>
-                                        </div>
-                                        <NoReleases />
-                                        {/* <div className="w-full grid grid-cols-2 gap-3 mt-4 mb-6">
-                                            { releases.map(({name, platforms}) => <ProjectCard title={name} platforms={platforms} icon={Rocket} />) }
-                                        </div> */}
-                                    </div>
-                                </div>
-                            )
-                        }
-                        {
-                            currentSection == 'contact' && (
-                                <form className="w-full flex justify-between">
-                                    <div className="flex flex-col gap-10">
-                                        <div className="flex flex-col gap-3">
-                                            <div className="flex justify-between items-center">
-                                                <h3 className="font-bold flex items-center gap-2">Contact</h3>
-                                            </div>
-                                            <div className="flex items-center gap-2">
-                                                <AtSign size={18} />
-                                                {
-                                                    editing == 'contact'
-                                                        ? <Input name="email" className="bg-background w-60" />
-                                                        :<span>{"ishteharhussain@gmail.com"}</span>
-                                                        
-                                                }
-                                            </div>
-                                            <div className="flex items-center gap-2">
-                                                <Globe size={18} />
-                                                {
-                                                    editing == 'contact'
-                                                        ? <Input name="website" className="bg-background w-60" />
-                                                        :<span>{"https://www.ishteharhussain.com"}</span>
-                                                        
-                                                }
-                                            </div>
-                                        </div>
-                                        <div className="flex flex-col gap-3">
-                                            <div className="flex justify-between items-center">
-                                                <h3 className="font-bold flex items-center gap-2">Socials</h3>
-                                            </div>
-                                            <div className="flex items-center gap-2">
-                                                <Linkedin size={18} />
-                                                {
-                                                    editing == 'contact'
-                                                        ? <Input name="social[]" className="bg-background w-60" />
-                                                        :<span>{"/in/ishteharhussain"}</span>
-                                                        
-                                                }
-                                            </div>
-                                            <div className="flex items-center gap-2">
-                                                <Instagram size={18} />
-                                                {
-                                                    editing == 'contact'
-                                                        ? <Input name="social[]" className="bg-background w-60" />
-                                                        :<span>{"ishteharhussain"}</span>
-                                                        
-                                                }
-                                            </div>
-                                            <div className="flex items-center gap-2">
-                                                <Dribbble size={18} />
-                                                {
-                                                    editing == 'contact'
-                                                        ? <Input name="social[]" className="bg-background w-60" />
-                                                        :<span>{"Kreatank"}</span>
-                                                        
-                                                }
-                                            </div>
-                                            <div className="flex items-center gap-2">
-                                                <Youtube size={18} />
-                                                {
-                                                    editing == 'contact'
-                                                        ? <Input name="social[]" className="bg-background w-60" />
-                                                        :<span>{"@XEQTIONR"}</span>
-                                                        
-                                                }
-                                            </div>
-                                            <div className="flex items-center gap-2">
-                                                <Facebook size={18} />
-                                                {
-                                                    editing == 'contact'
-                                                        ? <Input name="social[]" className="bg-background w-60" />
-                                                        :<span>{"xeqtionr"}</span>
-                                                        
-                                                }
-                                            </div>
-                                            <div className="flex items-center gap-2">
-                                                <Twitter size={18} />
-                                                {
-                                                    editing == 'contact'
-                                                        ? <Input name="social[]" className="bg-background w-60" />
-                                                        :<span>{"@XEQTIONR"}</span>
-                                                        
-                                                }
-                                            </div>
-                                            <div className="flex items-center gap-2">
-                                                <LinkIcon size={18} />
-                                                {
-                                                    editing == 'contact'
-                                                        ? <Input name="social[]" className="bg-background w-60" />
-                                                        :<span>{"@XEQTIONR"}</span>
-                                                        
-                                                }
-                                            </div>
-                                        </div>
-                                        {/* <EditButton /> */}
-                                    </div>
-                                    <EditButton what="contact" />
-                                </form>
-                            )
-                        }
+                        <Separator />
+                        <div className="flex px-5">
+                            <div className="w-1/5 text-sm font-semibold">Biography</div>
+                            <div className="w-3/5 text-sm">{user.bio}</div>
+                        </div>
+                        <Separator />
+                        <div className="flex px-5">
+                            <div className="w-1/5 text-sm font-semibold">Websites</div>
+                            <div className="w-3/5 text-sm">
+                                <ul>
+                                    <li className="mb-0.5">ishteharhussain.com</li>
+                                    <li className="mb-0.5">dglcore.com</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <Separator />
+                        <div className="flex px-5">
+                            <div className="w-1/5 text-sm font-semibold">Skills</div>
+                            <div className="w-3/5 flex flex-wrap gap-2 relative -top-1">
+                            {
+                                user.meta?.skills &&
+                                user.meta?.skills.map((skill) => (
+                                    <span className="text-xs px-2.5 py-2 rounded-lg bg-foreground/5">{skill}</span>
+                                ))
+                            }
+                            </div>
+                        </div>
+                        <Separator />
+                        <div className="flex px-5">
+                            <div className="w-1/5 text-sm font-semibold">Favorite Games</div>
+                            <div className="w-3/5 text-sm flex gap-2 relative -top-1">
+                                {
+                                    user.meta?.fav_games &&
+                                    user.meta?.fav_games.map((game) => (
+                                        <span className="text-xs px-2.5 py-2 rounded-lg bg-foreground/5">{game}</span>
+                                    ))
+                                }
+                            </div>
+                        </div>
+                        <Separator />
+                        <div className="flex px-5 mb-32">
+                            <div className="w-1/5 text-sm font-semibold">Socials</div>
+                            <div className="w-3/5 text-sm">
+                                <ul>
+                                    <li className="mb-3 flex items-center gap-1">
+                                        <Facebook className="size-5" />
+                                        XEQTIONR
+                                    </li>
+                                    <li className="mb-3 flex items-center gap-1">
+                                        <LinkedIn className="size-5" />
+                                        /in/ishteharhussain
+                                    </li>
+                                    <li className="mb-3 ml-0.5 flex items-center gap-1">
+                                        <Twitter className="size-4" />
+                                        @XEQTIONR
+                                    </li>
+                                    <li className="mb-3 flex items-center gap-1">
+                                        <Twitch className="size-5" />
+                                        x_e_q_tionrz
+                                    </li>
+                                    <li className="mb-3 ml-0.5 flex items-center gap-1">
+                                        <Youtube className="size-4" />
+                                        @XEQTIONR
+                                    </li>
+                                    <li className="mb-3 flex items-center gap-1">
+                                        <Discord className="size-5" />
+                                        XEQTIONR#1534
+                                    </li>
+                                </ul>
+                            </div>
                         </div>
                     </div>
                 )
@@ -1278,7 +823,7 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
                     />
                 </div>
                 
-                <div className="w-full h-full md:min-h-[50vh] md:max-w-8xl mx-auto relative flex overflow-hidden border-sidebar-border/70 dark:border-sidebar-border">
+                <div className="w-full h-full md:min-h-[50vh] mx-auto relative flex overflow-hidden border-sidebar-border/70 dark:border-sidebar-border">
                 {
                     loading 
                         ? <Spinner className="block m-auto size-6" />
