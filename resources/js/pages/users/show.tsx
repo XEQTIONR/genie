@@ -566,19 +566,19 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
             case 'about':
                 return (
                     <div className="w-full max-w-3xl mx-auto mt-20 flex flex-col gap-8">
-                        <div className="flex px-5">
-                            <div className="w-1/5 text-sm font-semibold">Status</div>
-                            <div className="w-3/5 text-sm">{user.status}</div>
+                        <div className="flex flex-col md:flex-row gap-3 md:gap-0 px-5">
+                            <div className="w-full md:w-1/5 text-sm font-semibold">Status</div>
+                            <div className="w-full md:w-3/5 text-sm">{user.status}</div>
                         </div>
                         <Separator />
-                        <div className="flex px-5">
-                            <div className="w-1/5 text-sm font-semibold">Biography</div>
-                            <div className="w-3/5 text-sm">{user.bio}</div>
+                        <div className="flex flex-col md:flex-row gap-3 md:gap-0 px-5">
+                            <div className="w-full md:w-1/5 text-sm font-semibold">Biography</div>
+                            <div className="w-full md:w-3/5 text-sm">{user.bio}</div>
                         </div>
                         <Separator />
-                        <div className="flex px-5">
-                            <div className="w-1/5 text-sm font-semibold">Websites</div>
-                            <div className="w-3/5 text-sm">
+                        <div className="flex flex-col md:flex-row gap-3 md:gap-0 px-5">
+                            <div className="w-full md:w-1/5 text-sm font-semibold">Websites</div>
+                            <div className="w-full md:w-3/5 text-sm">
                                 <ul>
                                     <li className="mb-0.5">ishteharhussain.com</li>
                                     <li className="mb-0.5">dglcore.com</li>
@@ -586,9 +586,9 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
                             </div>
                         </div>
                         <Separator />
-                        <div className="flex px-5">
-                            <div className="w-1/5 text-sm font-semibold">Skills</div>
-                            <div className="w-3/5 flex flex-wrap gap-2 relative -top-1">
+                        <div className="flex flex-col md:flex-row gap-3 md:gap-0 px-5">
+                            <div className="w-full md:w-1/5 text-sm font-semibold">Skills</div>
+                            <div className="w-full md:w-3/5 flex flex-wrap gap-2 relative md:-top-1">
                             {
                                 user.meta?.skills &&
                                 user.meta?.skills.map((skill) => (
@@ -598,9 +598,9 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
                             </div>
                         </div>
                         <Separator />
-                        <div className="flex px-5">
-                            <div className="w-1/5 text-sm font-semibold">Tools</div>
-                            <div className="w-3/5 flex flex-wrap gap-2 relative -top-1">
+                        <div className="flex flex-col md:flex-row gap-3 md:gap-0 px-5">
+                            <div className="w-full md:w-1/5 text-sm font-semibold">Tools</div>
+                            <div className="w-full md:w-3/5 flex flex-wrap gap-2 relative md:-top-1">
                             {
                                 user.meta?.skills &&
                                 user.meta?.skills.map((skill) => (
@@ -610,9 +610,9 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
                             </div>
                         </div>
                         <Separator />
-                        <div className="flex px-5">
-                            <div className="w-1/5 text-sm font-semibold">Favorite Games</div>
-                            <div className="w-3/5 text-sm flex gap-2 relative -top-1">
+                        <div className="flex flex-col md:flex-row gap-3 md:gap-0 px-5">
+                            <div className="w-full md:w-1/5 text-sm font-semibold">Favorite Games</div>
+                            <div className="w-full md:w-3/5 text-sm flex gap-2 relative -top-1">
                                 {
                                     user.meta?.fav_games &&
                                     user.meta?.fav_games.map((game) => (
@@ -622,9 +622,9 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
                             </div>
                         </div>
                         <Separator />
-                        <div className="flex px-5 mb-32">
-                            <div className="w-1/5 text-sm font-semibold">Socials</div>
-                            <div className="w-3/5 text-sm">
+                        <div className="flex flex-col md:flex-row gap-3 md:gap-0 px-5 mb-32">
+                            <div className="w-full md:w-1/5 text-sm font-semibold">Socials</div>
+                            <div className="w-full md:w-3/5 text-sm">
                                 <ul>
                                     <li className="mb-3 flex items-center gap-1">
                                         <Facebook className="size-5" />
