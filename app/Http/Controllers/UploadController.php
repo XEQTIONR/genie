@@ -11,11 +11,13 @@ class UploadController extends Controller
     public function store(Request $request)
     {
         try {
-            $fileName = Storage::disk('public')->put('', $request->image);
+            $fileName = Storage::disk('public')->put('', $request->file);
+            $mime = $request->mime;
             $url = Storage::url($fileName);
             $upload = new Upload([
                 'name' => $fileName,
                 'url' => $url,
+                'mime' => $mime,
             ]);
             $upload->save();
 

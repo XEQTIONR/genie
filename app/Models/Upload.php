@@ -8,6 +8,7 @@ class Upload extends Model
 {
     protected $fillable = [
         'name',
-        'url'
+        'url',
+        'mime',
     ];
 }

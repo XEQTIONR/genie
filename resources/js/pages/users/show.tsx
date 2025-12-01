@@ -276,7 +276,9 @@ function AvatarDialog({ aspect = 1, image, imageHeight, imageWidth, open, onOpen
                                         if (fileUrl) {
                                             const x: Blob|null = await getCroppedImage(fileUrl, croppedAreaPixels, imageWidth, imageHeight)
                                             const formData = new FormData()
-                                            formData.append('image', x)
+                                            formData.append('file', x)
+                                            formData.append('mime', 'image/jpeg')
+                                
                                             axios.post(storeImage().url, formData, {
                                                 headers: {
                                                     Authorization: 'Bearer ' + apiToken
@@ -407,7 +409,9 @@ function BannerDialog({ aspect = 5, image, imageHeight, imageWidth, open, onOpen
                                         if (fileUrl) {
                                             const x: Blob|null = await getCroppedImage(fileUrl, croppedAreaPixels, imageWidth, imageHeight)
                                             const formData = new FormData()
-                                            formData.append('image', x)
+                                            formData.append('file', x)
+                                            formData.append('mime', 'image/jpeg')
+
                                             axios.post(storeImage().url, formData, {
                                                 headers: {
                                                     Authorization: 'Bearer ' + apiToken
