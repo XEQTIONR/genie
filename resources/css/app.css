@@ -73,6 +73,8 @@
 
     --text-xxs: 0.70rem;
     --text-xxs--line-height: calc(1 / 0.70);
+
+    --aspect-grid: 16 / 11
 }
 
 :root {

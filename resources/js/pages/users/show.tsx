@@ -1,5 +1,5 @@
 import AppLayout from '@/layouts/app-layout'
-import { ArrowUpRightIcon, Eraser, ImageIcon } from "lucide-react"
+import { ArrowUpRightIcon, Eraser, Eye, Heart, Image, ImageIcon, LayoutGrid } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { AtSign, Camera, EllipsisVertical, Gamepad2, Globe, Hammer, Lightbulb, LinkIcon, Mail, MapPin, Pencil, PencilRuler, Plus, Rocket, Trash, UserPlus, Users, X, } from 'lucide-react'
 import axios from 'axios'
@@ -69,6 +69,8 @@ import { useDebouncedCallback } from 'use-debounce'
 import { Slider } from '@/components/ui/slider'
 import { getCroppedImage } from '@/hooks/use-crop'
 import { Discord, Facebook, LinkedIn, Twitter, Twitch, Youtube } from '@/components/icons/svgs'
+import { PlaceholderPattern } from '@/components/ui/placeholder-pattern'
+import GridCard from '@/components/grid-card'
 
 type ProfileTab = NavItem & {key: string, className?: string}
 
@@ -497,6 +499,8 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
 
     const isPro = true
 
+    const items: Array<string> = (new Array(50)).fill(0)
+
     const skillForm = useForm<{skills: string[], field: string}>({
         field: 'skills',
         skills: user.meta?.skills ?? []
@@ -632,23 +636,26 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
                                 <ul>
                                     <li className="mb-3 flex items-center gap-1">
                                         <Facebook className="size-5" />
-                                        XEQTIONR
+                                        <a href="https://linkedin.com/XEQTIONR">XEQTIONR</a>
+                                        
                                     </li>
                                     <li className="mb-3 flex items-center gap-1">
                                         <LinkedIn className="size-5" />
-                                        /in/ishteharhussain
+                                        <a href="https://linkedin.com/in/ishteharhussain">/in/ishteharhussain</a>
+                                        
                                     </li>
                                     <li className="mb-3 ml-0.5 flex items-center gap-1">
                                         <Twitter className="size-4" />
-                                        @XEQTIONR
+                                        <a href="https://x.com/@XEQTIONR">@XEQTIONR</a>
                                     </li>
                                     <li className="mb-3 flex items-center gap-1">
                                         <Twitch className="size-5" />
-                                        x_e_q_tionrz
+                                        <a href="">https://www.twitch.tv/curry</a>
+                                        curry
                                     </li>
                                     <li className="mb-3 ml-0.5 flex items-center gap-1">
                                         <Youtube className="size-4" />
-                                        @XEQTIONR
+                                        <a href="https://www.youtube/@XEQTIONR">@XEQTIONR</a>
                                     </li>
                                     <li className="mb-3 flex items-center gap-1">
                                         <Discord className="size-5" />
@@ -657,6 +664,52 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
                                 </ul>
                             </div>
                         </div>
+                    </div>
+                )
+            case "showcase":
+                return (
+                    <div className={cn(
+                        "w-full p-5 max-w-9xl mx-auto",
+                        // "grid gap-9 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3",
+                        "flex justify-center items-center"
+                    )}>
+                    {
+                        // items.map(() => (
+                        //     <div className="flex flex-col gap-3">
+                        //         <GridCard />
+                        //     </div>
+                        // ))
+                    }
+                    {
+                        <Empty className="">
+                            <EmptyHeader>
+                                <EmptyMedia variant="icon">
+                                <LayoutGrid />
+                                </EmptyMedia>
+                                <EmptyTitle>No Posts Yet</EmptyTitle>
+                                <EmptyDescription>
+                                    You haven&apos;t created any posts yet. Get started by creating
+                                    your first post.
+                                </EmptyDescription>
+                            </EmptyHeader>
+                            <EmptyContent>
+                                <div className="flex gap-2">
+                                <Button>Create a post</Button>
+                                <Button variant="outline">Browse posts</Button>
+                                </div>
+                            </EmptyContent>
+                            <Button
+                                variant="link"
+                                asChild
+                                className="text-muted-foreground"
+                                size="sm"
+                            >
+                                <a href="#">
+                                Learn More <ArrowUpRightIcon />
+                                </a>
+                            </Button>
+                        </Empty>
+                    }
                     </div>
                 )
             default: 

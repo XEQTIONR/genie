@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\OpportunityController;
 use App\Http\Controllers\OpportunityInquiryController;
+use App\Http\Controllers\PostController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\ProjectInvitationController;
 use App\Http\Controllers\ProjectJobController;
@@ -36,6 +37,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::patch('/profile/{user}', [UserProfileController::class, 'update'])->name('users.update');
 
     Route::patch('/teams/{team}', [TeamController::class, 'update'])->name('teams.update');
+
+    Route::get('/posts/create', [PostController::class, 'create'])->name('posts.create');
 });
 
 Route::get('/projects/{project:slug}', [ProjectController::class, 'show'])->name('projects.show');

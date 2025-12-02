@@ -10,6 +10,9 @@ class UploadController extends Controller
 {
     public function store(Request $request)
     {
+        // post_max_size=128M
+        // upload_max_filesize=128M
+
         try {
             $fileName = Storage::disk('public')->put('', $request->file);
             $mime = $request->mime;
