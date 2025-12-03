@@ -8,16 +8,25 @@ import {
   EmptyTitle,
 } from "@/components/ui/empty"
 import { ImagePlay } from "lucide-react"
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "@inertiajs/react";
+import { cn } from "@/lib/utils";
 
 export default function FileDragArea({
-    onSelect
-} : { onSelect : (f: File) => void }) {
+    className = "",
+    onSelect,
+    onClicked
+} : {
+    className?: string,
+    onSelect : (f: File) => void
+    onClicked?: () => void
+}) {
 
     
 
     const fileInput = useRef<HTMLInputElement>(null)
+
+    const [dragging, setDragging] = useState(false)
 
     const { data, setData } = useForm<{ file: File|null }>({
         file: null
@@ -33,22 +42,37 @@ export default function FileDragArea({
 
     return (
         <Empty
-            className="h-full grow border-dashed border-2 rounded-lg"
+            className={cn(
+                "h-full grow border-dashed border-2 rounded-lg",
+                dragging && "border-neutral-700",
+                className
+            )}
+            onClick={(e) => {
+                e.stopPropagation()
+                if (onClicked) {
+                    onClicked()
+                }
+            }}
             onDragEnter={(e) => {
                 e.preventDefault()
+                setDragging(true)
             }}
             onDragOver={(e) => {
                 e.preventDefault()
+                if (!dragging) {
+                    setDragging(true)
+                }
             }}
             onDragLeave={(e) => {
                 e.preventDefault()
+                setDragging(false)
             }}
             onDrop={(e) => {
                 e.preventDefault()
+                setDragging(false)
                 const dataTransfer = e.dataTransfer
                 const files = [...dataTransfer.files]
                 setData('file', files[0])
-                // console.log('files[0]:', files[0]) 
             }}
         >
             <EmptyHeader className="max-w-full">
@@ -71,7 +95,6 @@ export default function FileDragArea({
                             if (e.target.files !== null) {
                                 const files = [...e.target.files]
                                 setData('file', files[0])
-                                // console.log('files[0]:', files[0]) 
                             } else {
                                 setData('file', null)
                             }
