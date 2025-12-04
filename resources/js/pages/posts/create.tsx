@@ -161,7 +161,15 @@ function PostSidebar({ at, isOpen, onClose, onSelectFile } : {
     )
 }
 
-function Block({item, selected=false} : {item: ImageBlock, selected?: boolean}) {
+function Block({
+    item, 
+    selected=false,
+    move
+} : {
+    item: ImageBlock
+    selected?: boolean
+    move?: (dir: "up"|"down") => void
+}) {
     return (
         <div className="w-full relative">
             <img className="w-full" src={URL.createObjectURL(item.file)} />
@@ -169,11 +177,31 @@ function Block({item, selected=false} : {item: ImageBlock, selected?: boolean}) 
                 selected && (
                     <div className="absolute -top-3 -right-16 flex flex-col gap-3 p-4 rounded-full bg-accent">
                         <Tooltip>
-                            <TooltipTrigger><ArrowUp size={18} className="cursor-pointer" /></TooltipTrigger>
+                            <TooltipTrigger>
+                                <ArrowUp 
+                                    size={18} 
+                                    className="cursor-pointer"
+                                    onClick={() => {
+                                        if (move) {
+                                            move("up")
+                                        }
+                                    }}
+                                />
+                            </TooltipTrigger>
                             <TooltipContent side="right">Move Up</TooltipContent>
                         </Tooltip>
                         <Tooltip>
-                            <TooltipTrigger><ArrowDown size={18}  className="cursor-pointer" /></TooltipTrigger>
+                            <TooltipTrigger>
+                                <ArrowDown 
+                                    size={18}  
+                                    className="cursor-pointer" 
+                                    onClick={() => {
+                                        if (move) {
+                                            move("down")
+                                        }
+                                    }} 
+                                />
+                            </TooltipTrigger>
                             <TooltipContent side="right">Move Down</TooltipContent>
                         </Tooltip>
                         <Separator className="bg-neutral-500 my-1" />
@@ -348,22 +376,51 @@ export default function CreatePost () {
                                         </div>
                                         
                                         <div 
-                                            onClick={() => setSelectedBlockIndex(idx)} 
+                                            onClick={() => {
+                                                setSelectedBlockIndex(idx)
+                                                console.log('parent')
+                                            }} 
                                             className={cn("w-full p-1 border-2", selectedBlockIndex == idx ? 'border-accent' : 'border-transparent')}
                                         >
-                                            <Block selected={selectedBlockIndex == idx} item={item} />
+                                            <Block 
+                                                selected={selectedBlockIndex == idx} 
+                                                item={item}
+                                                move={(dir) => {
+                                                    const length = body.length
+                                                    const items = [...body]
+
+                                                    if (dir == 'down') {
+                                                        if (idx < length - 1) {
+                                                            const temp = items[idx]
+                                                            items[idx] = items[idx + 1]
+                                                            items[idx + 1] = temp
+                                                            setBody(items)
+
+                                                            if (selectedBlockIndex !== undefined) {
+                                                                const newIndex = selectedBlockIndex + 1
+                                                                setTimeout(() => {
+                                                                    setSelectedBlockIndex(newIndex)
+                                                                }, 100)
+                                                            }
+                                                        }
+                                                    } else if (dir == 'up') {
+                                                        if (idx > 0) {
+                                                            const temp = items[idx]
+                                                            items[idx] = items[idx - 1]
+                                                            items[idx - 1] = temp
+                                                            setBody(items)
+
+                                                            if (selectedBlockIndex !== undefined) {
+                                                                const newIndex = selectedBlockIndex - 1
+                                                                setTimeout(() => {
+                                                                    setSelectedBlockIndex(newIndex)
+                                                                }, 100)
+                                                            }
+                                                        }
+                                                    }
+                                                }}
+                                            />
                                         </div>
-                                        {/* <div className="w-full relative">
-                                            <img className="w-full" src={URL.createObjectURL(item.file)} />
-                                            <div className="absolute top-0 -right-15 flex flex-col gap-3 p-4 rounded-full bg-accent">
-                                                 <ArrowUp size={18} className="cursor-pointer" />
-                                                 <ArrowDown size={18}  className="cursor-pointer" />
-                                                 <Separator className="bg-neutral-500 my-1" />
-                                                 <Copy size={18}  className="cursor-pointer" />
-                                                 <Separator className="bg-neutral-500 my-1" />
-                                                 <Trash2 size={18}  className="cursor-pointer" />
-                                            </div>
-                                        </div>             */}
                                     </>
                                 )
                             })
