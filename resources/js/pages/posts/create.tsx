@@ -26,7 +26,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
-import { ArrowDown, ArrowUp, Copy, Hammer, Image, Lamp, Plus, SquarePlay, Trash2, Type, Video } from "lucide-react";
+import { ArrowDown, ArrowUp, Copy, Image, Plus, SquarePlay, Trash2, Type } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 
@@ -36,11 +36,12 @@ interface ImageBlock {
     file: File
 }
 
-function PostSidebar({ at, isOpen, onClose, onSelectFile } : {
+function PostSidebar({ at, isOpen, onClose, onSelectFile, selectedBlock } : {
     at: number
     isOpen: boolean 
     onClose?: () => void
     onSelectFile?: (file: File) => void
+    selectedBlock?: ImageBlock
 }) {
 
     const imageInput = useRef<HTMLInputElement>(null)
@@ -57,6 +58,15 @@ function PostSidebar({ at, isOpen, onClose, onSelectFile } : {
         setFileState(null)
         setView('default')
     }, [at])
+
+    useEffect(() => {
+        if (selectedBlock) {
+            if (selectedBlock.type == 'image') {
+                setView('image')
+                setFileState(selectedBlock.file)
+            }
+        }
+    }, [selectedBlock])
 
     return (
         <Sidebar 
@@ -164,11 +174,13 @@ function PostSidebar({ at, isOpen, onClose, onSelectFile } : {
 function Block({
     item, 
     selected=false,
-    move
+    move,
+    del
 } : {
     item: ImageBlock
     selected?: boolean
     move?: (dir: "up"|"down") => void
+    del?: () => void
 }) {
     return (
         <div className="w-full relative">
@@ -211,7 +223,17 @@ function Block({
                         </Tooltip>
                         <Separator className="bg-neutral-500 my-1" />
                         <Tooltip>
-                            <TooltipTrigger><Trash2 size={18}  className="cursor-pointer" /></TooltipTrigger>
+                            <TooltipTrigger>
+                                <Trash2
+                                    onClick={() => {
+                                        if (del) {
+                                            del()
+                                        }
+                                    }}
+                                    size={18}
+                                    className="cursor-pointer"
+                                />
+                            </TooltipTrigger>
                             <TooltipContent side="right">Delete</TooltipContent>
                         </Tooltip>
                     </div>
@@ -285,6 +307,12 @@ export default function CreatePost () {
         }
         return null
     }
+
+    useEffect(() => {
+        if (selectedBlockIndex !== undefined) {
+            setSidebarOpen(true)
+        }
+    }, [selectedBlockIndex])
 
     return (
         <SidebarProvider
@@ -385,6 +413,12 @@ export default function CreatePost () {
                                             <Block 
                                                 selected={selectedBlockIndex == idx} 
                                                 item={item}
+                                                del={() => {
+                                                    setBody((b) => b.filter((_, i) => i !== idx))
+                                                    setTimeout(() => {
+                                                        setSelectedBlockIndex(undefined)
+                                                    }, 100)
+                                                }}
                                                 move={(dir) => {
                                                     const length = body.length
                                                     const items = [...body]
@@ -460,6 +494,7 @@ export default function CreatePost () {
                 
             </div>
             <PostSidebar
+                selectedBlock={selectedBlockIndex === undefined ? selectedBlockIndex : body[selectedBlockIndex]}
                 at={time}
                 isOpen={sidebarOpen} 
                 onClose={() => setSidebarOpen(false)}
