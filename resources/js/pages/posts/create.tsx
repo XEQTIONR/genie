@@ -36,12 +36,19 @@ interface ImageBlock {
     file: File
 }
 
+interface VideoBlock {
+    type: "video"
+    file: File
+}
+
+type MediaBlock = ImageBlock | VideoBlock
+
 function PostSidebar({ at, isOpen, onClose, onSelectFile, selectedBlock } : {
     at: number
     isOpen: boolean 
     onClose?: () => void
     onSelectFile?: (file: File) => void
-    selectedBlock?: ImageBlock
+    selectedBlock?: MediaBlock
 }) {
 
     const imageInput = useRef<HTMLInputElement>(null)
@@ -65,14 +72,31 @@ function PostSidebar({ at, isOpen, onClose, onSelectFile, selectedBlock } : {
                 setView('image')
                 setFileState(selectedBlock.file)
             }
+
+            if (selectedBlock.type == 'video') {
+                setView('video')
+                setFileState(selectedBlock.file)
+            }
         }
     }, [selectedBlock])
 
+    const Render = ({file} : {file: File|null}) => {
+        if (file) {
+            switch(file.type.split('/')[0]) {
+                case "image":
+                    return <img className="w-full" src={URL.createObjectURL(file)} />
+
+                case "video":
+                    return <video className="w-full" autoPlay loop>
+                        <source src={URL.createObjectURL(file)} type={file.type} />
+                    </video>
+            }
+        }
+        return null
+    }
+
     return (
-        <Sidebar 
-            side="right"
-            // variant="floating"
-        >
+        <Sidebar side="right">
             <SidebarHeader>
                 <div>
                     <Button onClick={() => {
@@ -102,7 +126,7 @@ function PostSidebar({ at, isOpen, onClose, onSelectFile, selectedBlock } : {
                                     </SidebarMenuButton>
                                 </SidebarMenuItem>
                                 <SidebarMenuItem className="mb-1.5">
-                                    <SidebarMenuButton className="cursor-pointer">
+                                    <SidebarMenuButton onClick={() => setView('video')} className="cursor-pointer">
                                         <SquarePlay />
                                         Video
                                     </SidebarMenuButton>
@@ -112,16 +136,21 @@ function PostSidebar({ at, isOpen, onClose, onSelectFile, selectedBlock } : {
                     )
                 }
                 {
-                    view == 'image' && (
-                        <SidebarGroup> {/* className="w-1/2" */}
-                            {/* <SidebarGroupLabel className="text-lg mt-3">
-                                <Image size={50} className="mr-3" />
-                                Add Image
-                            </SidebarGroupLabel> */}
-                            {/* <SidebarGroupLabel>Basic</SidebarGroupLabel> */}
+                    (view == 'image' || view == 'video') && (
+                        <SidebarGroup>
                             <div className="flex items-center">
-                                <Image size={24} className="ml-2 mr-2 stroke-sidebar-foreground/70" />
-                                <h1 className="text-xl text-sidebar-foreground/70 font-medium">Add Image</h1>
+                                {
+                                    view == 'image' &&
+                                    <Image size={24} className="ml-2 mr-2 stroke-sidebar-foreground/70" />
+                                }
+                                {
+                                    view == 'video' &&
+                                    <SquarePlay size={24} className="ml-2 mr-2 stroke-sidebar-foreground/70" />
+                                }
+                                
+                                <h1 className="text-xl text-sidebar-foreground/70 font-medium">
+                                    Add {view.charAt(0).toUpperCase() + view.slice(1)}
+                                </h1>
                             </div>
                             <SidebarGroupContent className="mt-3">
                                 <div className="flex flex-col px-3">
@@ -152,10 +181,10 @@ function PostSidebar({ at, isOpen, onClose, onSelectFile, selectedBlock } : {
                                                         variant="outline" 
                                                         className="w-full rounded-full cursor-pointer"
                                                     >
-                                                        Add Image
+                                                        Add {view.charAt(0).toUpperCase() + view.slice(1)}
                                                     </Button>
                                                 </> 
-                                                : <img className="w-full" src={URL.createObjectURL(fileState)} />
+                                                : <Render file={fileState} />
                                         }
                                     </div>
                                 </div>
@@ -163,9 +192,6 @@ function PostSidebar({ at, isOpen, onClose, onSelectFile, selectedBlock } : {
                         </SidebarGroup>
                     )
                 }
-                
-
-                
             </SidebarContent>
         </Sidebar>
     )
@@ -182,9 +208,26 @@ function Block({
     move?: (dir: "up"|"down") => void
     del?: () => void
 }) {
+
+
+    const renderFile = () => {
+        if (item) {
+            switch(item.type.split('/')[0]) {
+                case "image":
+                    return <img className="w-full" src={URL.createObjectURL(item.file)} />
+
+                case "video":
+                    return <video className="w-full" autoPlay loop>
+                        <source src={URL.createObjectURL(item.file)} type={item.file.type} />
+                    </video>
+            }
+        }
+        return null
+    }
+
     return (
         <div className="w-full relative">
-            <img className="w-full" src={URL.createObjectURL(item.file)} />
+            { renderFile() }
             {
                 selected && (
                     <div className="absolute -top-3 -right-16 flex flex-col gap-3 p-4 rounded-full bg-accent">
@@ -300,7 +343,7 @@ export default function CreatePost () {
                     return <img className="w-full max-w-7xl mt-10 mx-auto" src={URL.createObjectURL(file)} />
 
                 case "video":
-                    return <video className="w-full max-w-7xl mt-10 mx-auto" controls autoPlay>
+                    return <video className="w-full max-w-7xl mt-10 mx-auto" autoPlay loop>
                         <source src={URL.createObjectURL(file)} type={fileType} />
                     </video>
             }
@@ -402,7 +445,6 @@ export default function CreatePost () {
                                                 <Separator className="mt-4" />
                                             </div>
                                         </div>
-                                        
                                         <div 
                                             onClick={() => {
                                                 setSelectedBlockIndex(idx)
@@ -501,7 +543,7 @@ export default function CreatePost () {
                 onSelectFile={(f) => {
                     setBody((b) => {
                         const c = [...b]
-                        c.splice(insertAt, 0, { type: "image", file: f })
+                        c.splice(insertAt, 0, { type: f.type.split("/")[0], file: f })
                         return c
                     })
                 }}
