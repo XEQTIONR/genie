@@ -367,7 +367,10 @@ export default function CreatePost () {
         >
             <div 
                 className="w-full min-h-screen flex flex-col items-center px-5 py-6"
-                onClick={() => setSidebarOpen(false)}
+                onClick={() => {
+                    setSidebarOpen(false)
+                    setSelectedBlockIndex(undefined)
+                }}
             >
                 <Head title="Create a new post" />
                 <div className="flex w-full justify-between">
@@ -446,9 +449,10 @@ export default function CreatePost () {
                                             </div>
                                         </div>
                                         <div 
-                                            onClick={() => {
+                                            onClick={(e) => {
                                                 setSelectedBlockIndex(idx)
                                                 console.log('parent')
+                                                e.stopPropagation()
                                             }} 
                                             className={cn("w-full p-1 border-2", selectedBlockIndex == idx ? 'border-accent' : 'border-transparent')}
                                         >
