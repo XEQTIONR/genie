@@ -15,21 +15,23 @@ import {
   SidebarGroupContent,
   SidebarGroupLabel,
   SidebarHeader,
-  SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarProvider,
-  SidebarTrigger,
 } from "@/components/ui/sidebar"
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
-import { ArrowDown, ArrowUp, Copy, Image, Plus, SquarePlay, Trash2, Type } from "lucide-react";
+import { AlignCenter, AlignLeft, AlignRight, ArrowDown, ArrowUp, Bold, Copy, Image, Italic, Plus, SquarePlay, Text, Trash2, Type, Underline } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 
+import Quill from 'quill'
+// import 'quill/dist/quill.bubble.css'
+import '/resources/css/quill.bubble.css'
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 interface ImageBlock {
     type: "image"
@@ -41,13 +43,18 @@ interface VideoBlock {
     file: File
 }
 
-type MediaBlock = ImageBlock | VideoBlock
+interface TextBlock {
+    type: "text"
+}
 
-function PostSidebar({ at, isOpen, onClose, onSelectFile, selectedBlock } : {
+type MediaBlock = ImageBlock | VideoBlock | TextBlock
+
+function PostSidebar({ at, isOpen, onClose, onSelectFile, onSelectText, selectedBlock } : {
     at: number
     isOpen: boolean 
     onClose?: () => void
     onSelectFile?: (file: File) => void
+    onSelectText?: () => void
     selectedBlock?: MediaBlock
 }) {
 
@@ -77,6 +84,11 @@ function PostSidebar({ at, isOpen, onClose, onSelectFile, selectedBlock } : {
                 setView('video')
                 setFileState(selectedBlock.file)
             }
+
+            if (selectedBlock.type == 'text') {
+                setView('text')
+                setFileState(null)
+            }
         }
     }, [selectedBlock])
 
@@ -92,6 +104,7 @@ function PostSidebar({ at, isOpen, onClose, onSelectFile, selectedBlock } : {
                     </video>
             }
         }
+
         return null
     }
 
@@ -114,7 +127,13 @@ function PostSidebar({ at, isOpen, onClose, onSelectFile, selectedBlock } : {
                             {/* <SidebarGroupLabel>Basic</SidebarGroupLabel> */}
                             <SidebarGroupContent className="mt-3">
                                 <SidebarMenuItem className="mb-1.5">
-                                    <SidebarMenuButton className="cursor-pointer">
+                                    <SidebarMenuButton onClick={() => {
+                                            setView('text')
+                                            if (onSelectText) {
+                                                onSelectText()
+                                            }
+                                        }} 
+                                        className="cursor-pointer">
                                         <Type />
                                         Text
                                     </SidebarMenuButton>
@@ -154,7 +173,7 @@ function PostSidebar({ at, isOpen, onClose, onSelectFile, selectedBlock } : {
                             </div>
                             <SidebarGroupContent className="mt-3">
                                 <div className="flex flex-col px-3">
-                                    <h2 className="text-base mt-3">Media</h2>
+                                    <h2 className="text-sm mt-3">Media</h2>
 
                                     <div className={cn(
                                         "w-full mt-2 border rounded flex justify-center items-center",
@@ -192,6 +211,52 @@ function PostSidebar({ at, isOpen, onClose, onSelectFile, selectedBlock } : {
                         </SidebarGroup>
                     )
                 }
+                {
+                    ( view == 'text' ) && (
+                        <SidebarGroup>
+                            <div className="flex items-center">
+                                <Type size={24} className="ml-2 mr-2 stroke-sidebar-foreground/70" />
+                                
+                                <h1 className="text-xl text-sidebar-foreground/70 font-medium">
+                                    Edit Text
+                                </h1>
+                            </div>
+                            <SidebarGroupContent className="mt-3">
+                                <div className="w-full px-2 flex flex-col gap-5">
+                                    <div className="flex flex-col gap-2">
+                                        <h2 className="text-sm mt-3">Formatting</h2>
+                                        <ToggleGroup variant="outline" type="multiple" className="w-full">
+                                            <ToggleGroupItem value="bold" className="w-1/3" variant="outline" type="button">
+                                                <Bold />
+                                            </ToggleGroupItem>
+                                            <ToggleGroupItem value="italic" className="w-1/3" variant="outline" type="button">
+                                                <Italic />
+                                            </ToggleGroupItem>
+                                            <ToggleGroupItem value="underline" className="w-1/3" variant="outline" type="button">
+                                                <Underline />
+                                            </ToggleGroupItem>
+                                        </ToggleGroup>
+                                    </div>
+
+                                    <div className="flex flex-col gap-2">
+                                        <h2 className="text-sm mt-3">Align</h2>
+                                        <ToggleGroup variant="outline" type="multiple" className="w-full">
+                                            <ToggleGroupItem value="bold" className="w-1/3" variant="outline" type="button">
+                                                <AlignLeft />
+                                            </ToggleGroupItem>
+                                            <ToggleGroupItem value="italic" className="w-1/3" variant="outline" type="button">
+                                                <AlignCenter />
+                                            </ToggleGroupItem>
+                                            <ToggleGroupItem value="underline" className="w-1/3" variant="outline" type="button">
+                                                <AlignRight />
+                                            </ToggleGroupItem>
+                                        </ToggleGroup>
+                                    </div>
+                                </div>
+                            </SidebarGroupContent>
+                        </SidebarGroup>
+                    )
+                }
             </SidebarContent>
         </Sidebar>
     )
@@ -203,16 +268,45 @@ function Block({
     move,
     del
 } : {
-    item: ImageBlock
+    item: MediaBlock
     selected?: boolean
     move?: (dir: "up"|"down") => void
     del?: () => void
 }) {
 
+    const containerRef = useRef<HTMLDivElement>(null)
 
-    const renderFile = () => {
+    useEffect(() => {
+        if (containerRef.current) {
+            const container = containerRef.current;
+            const editorContainer = container.appendChild(
+                container.ownerDocument.createElement('div'),
+            )
+            const quill = new Quill(editorContainer, {
+                theme: 'bubble',
+                modules: {
+                    toolbar: [
+                        ['bold', 'italic', 'underline', 'strike'],
+                        ['link'],
+                    ]
+                },
+                formats: [
+                    'bold', 'italic', 'underline', 'strike',
+                    'blockquote',
+                    'header',
+                    'align',
+                    // 'image',
+                    // 'video',
+                ],
+                placeholder: 'Add text...'
+            })
+            containerRef.current = quill
+        }
+    }, [])
+
+    const render = () => {
         if (item) {
-            switch(item.type.split('/')[0]) {
+            switch(item.type) {
                 case "image":
                     return <img className="w-full" src={URL.createObjectURL(item.file)} />
 
@@ -220,14 +314,18 @@ function Block({
                     return <video className="w-full" autoPlay loop>
                         <source src={URL.createObjectURL(item.file)} type={item.file.type} />
                     </video>
+
+                case "text":
+                    return <div ref={containerRef} className="w-full min-h-40" />
             }
         }
+
         return null
     }
 
     return (
         <div className="w-full relative">
-            { renderFile() }
+            { render() }
             {
                 selected && (
                     <div className="absolute -top-3 -right-16 flex flex-col gap-3 p-4 rounded-full bg-accent">
@@ -302,7 +400,7 @@ export default function CreatePost () {
     const [sWidth, setSWidth] = useState("20rem")
     const [sidebarOpen, setSidebarOpen] = useState(false)
     const [hoverAddButton, setHoverAddButton] = useState(false)
-    const [body, setBody] = useState<ImageBlock[]>([])
+    const [body, setBody] = useState<MediaBlock[]>([])
     const [insertAt, setInsertAt] = useState(0)
     const [time, setTime] = useState(Date.now())
     const [selectedBlockIndex, setSelectedBlockIndex] = useState<number|undefined>(undefined)
@@ -336,7 +434,7 @@ export default function CreatePost () {
     }, [apiToken])
 
 
-    const renderFile = () => {
+    const renderCover = () => {
         if (file!== null && fileType!== null) {
             switch(fileType.split('/')[0]) {
                 case "image":
@@ -413,7 +511,7 @@ export default function CreatePost () {
                             <FileDragArea onSelect={handleSelect} />    
                         </div>
                         : <div className="w-full flex flex-col">
-                            { renderFile() }
+                            { renderCover() }
                         </div>
                 }
                 {
@@ -548,6 +646,13 @@ export default function CreatePost () {
                     setBody((b) => {
                         const c = [...b]
                         c.splice(insertAt, 0, { type: f.type.split("/")[0], file: f })
+                        return c
+                    })
+                }}
+                onSelectText={() => {
+                    setBody((b) => {
+                        const c = [...b]
+                        c.splice(insertAt, 0, { type: 'text' })
                         return c
                     })
                 }}
