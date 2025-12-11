@@ -34,8 +34,8 @@ import '/resources/css/quill.bubble.css'
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 interface ImageBlock {
-    type: "image"
-    file: File
+    type: "image",
+    file: File,
 }
 
 interface VideoBlock {
@@ -45,14 +45,28 @@ interface VideoBlock {
 
 interface TextBlock {
     type: "text"
+    formats?: {
+        [format: string]: unknown
+    }
 }
 
 type MediaBlock = ImageBlock | VideoBlock | TextBlock
 
-function PostSidebar({ at, isOpen, onClose, onSelectFile, onSelectText, selectedBlock } : {
+function PostSidebar({ 
+    at,
+    currentFormat,
+    isOpen,
+    onClose,
+    onFormatChange,
+    onSelectFile,
+    onSelectText,
+    selectedBlock 
+} : {
     at: number
+    currentFormat?: {[format: string]: unknown}
     isOpen: boolean 
     onClose?: () => void
+    onFormatChange?: (format: string, ...args: unknown[]) => void
     onSelectFile?: (file: File) => void
     onSelectText?: () => void
     selectedBlock?: MediaBlock
@@ -61,6 +75,21 @@ function PostSidebar({ at, isOpen, onClose, onSelectFile, onSelectText, selected
     const imageInput = useRef<HTMLInputElement>(null)
     const [fileState, setFileState] = useState<File|null>(null)
     const [view, setView] = useState('default')
+
+    // const renderFile = () => {
+    //     if (fileState) {
+    //         switch(fileState.type.split('/')[0]) {
+    //             case "image":
+    //                 return <img className="w-full" src={URL.createObjectURL(fileState)} />
+
+    //             case "video":
+    //                 return <video className="w-full" controls autoPlay>
+    //                     <source src={URL.createObjectURL(fileState)} type={fileState.type} />
+    //                 </video>
+    //         }
+    //     }
+    //     return null
+    // }
 
     useEffect(() => {
         if (!isOpen) {
@@ -225,14 +254,29 @@ function PostSidebar({ at, isOpen, onClose, onSelectFile, onSelectText, selected
                                 <div className="w-full px-2 flex flex-col gap-5">
                                     <div className="flex flex-col gap-2">
                                         <h2 className="text-sm mt-3">Formatting</h2>
-                                        <ToggleGroup variant="outline" type="multiple" className="w-full">
-                                            <ToggleGroupItem value="bold" className="w-1/3" variant="outline" type="button">
+                                        <ToggleGroup value={currentFormat ? Object.keys(currentFormat): []} variant="outline" type="multiple" className="w-full">
+                                            <ToggleGroupItem
+                                                onClick={() => {
+                                                    if (onFormatChange) {
+                                                        onFormatChange('bold', !Object.keys(currentFormat ?? []).includes('bold'))
+                                                    }
+                                                }} value="bold" className="w-1/3" variant="outline" type="button">
                                                 <Bold />
                                             </ToggleGroupItem>
-                                            <ToggleGroupItem value="italic" className="w-1/3" variant="outline" type="button">
+                                            <ToggleGroupItem
+                                                onClick={() => {
+                                                    if (onFormatChange) {
+                                                        onFormatChange('italic', !Object.keys(currentFormat ?? []).includes('italic'))
+                                                    }
+                                                }} value="italic" className="w-1/3" variant="outline" type="button">
                                                 <Italic />
                                             </ToggleGroupItem>
-                                            <ToggleGroupItem value="underline" className="w-1/3" variant="outline" type="button">
+                                            <ToggleGroupItem
+                                                onClick={() => {
+                                                    if (onFormatChange) {
+                                                        onFormatChange('underline', !Object.keys(currentFormat ?? []).includes('underline'))
+                                                    }
+                                                }} value="underline" className="w-1/3" variant="outline" type="button">
                                                 <Underline />
                                             </ToggleGroupItem>
                                         </ToggleGroup>
@@ -240,7 +284,7 @@ function PostSidebar({ at, isOpen, onClose, onSelectFile, onSelectText, selected
 
                                     <div className="flex flex-col gap-2">
                                         <h2 className="text-sm mt-3">Align</h2>
-                                        <ToggleGroup variant="outline" type="multiple" className="w-full">
+                                        <ToggleGroup  variant="outline" type="multiple" className="w-full">
                                             <ToggleGroupItem value="bold" className="w-1/3" variant="outline" type="button">
                                                 <AlignLeft />
                                             </ToggleGroupItem>
@@ -251,6 +295,7 @@ function PostSidebar({ at, isOpen, onClose, onSelectFile, onSelectText, selected
                                                 <AlignRight />
                                             </ToggleGroupItem>
                                         </ToggleGroup>
+                                        { JSON.stringify(currentFormat) }
                                     </div>
                                 </div>
                             </SidebarGroupContent>
@@ -263,18 +308,28 @@ function PostSidebar({ at, isOpen, onClose, onSelectFile, onSelectText, selected
 }
 
 function Block({
+    formats,
     item, 
     selected=false,
     move,
-    del
+    del,
+    onFormatChange
 } : {
+    formats?: {[f: string]: boolean}
     item: MediaBlock
     selected?: boolean
     move?: (dir: "up"|"down") => void
     del?: () => void
+    onFormatChange?: (editor: Quill|null, format: { [format: string]: unknown }|undefined) => void
 }) {
 
     const containerRef = useRef<HTMLDivElement>(null)
+    const editor = useRef<Quill>(null)
+    const [currentFormatting, setCurrentFormatting] = useState<{[format: string]: unknown}|undefined>(undefined)
+
+    useEffect(() => {
+        console.log('last formats:', formats)
+    }, [formats])
 
     useEffect(() => {
         if (containerRef.current) {
@@ -300,7 +355,27 @@ function Block({
                 ],
                 placeholder: 'Add text...'
             })
-            containerRef.current = quill
+            editor.current = quill
+            editor.current.on('editor-change', (name, ...args) => {
+                const now = Date.now()
+                
+                console.log('name:', name, ...args ,now)
+                //console.log(n, y, z, u, now)
+                // console.log('x:', x)
+                //console.log('ranges2:', [range, o])
+                //console.log('o:', o)
+                const format = editor.current?.getFormat()
+                // console.log('format:', format)
+
+                if (currentFormatting !== format) {
+                    setCurrentFormatting(format)
+
+                    if (onFormatChange) {
+                        onFormatChange(editor.current, format)
+                    }
+                }
+            })
+            // editor.current.focus()
         }
     }, [])
 
@@ -404,6 +479,7 @@ export default function CreatePost () {
     const [insertAt, setInsertAt] = useState(0)
     const [time, setTime] = useState(Date.now())
     const [selectedBlockIndex, setSelectedBlockIndex] = useState<number|undefined>(undefined)
+    const [format, setFormat] = useState<{[format: string]: unknown}|undefined>(undefined)
 
     const handleSelect = useCallback((f: File) => {
         console.log('selectedxx: ', f)
@@ -515,7 +591,7 @@ export default function CreatePost () {
                         </div>
                 }
                 {
-                    <div className="w-full max-w-7xl mt-10 flex flex-col grow">
+                    <div className="w-full max-w-7xl mt-10 flex flex-col grow px-10">
                         {
                             body.map((item, idx) => {
                                 return (
@@ -597,6 +673,10 @@ export default function CreatePost () {
                                                         }
                                                     }
                                                 }}
+                                                onFormatChange={(e, f) => {
+                                                    console.log('frmt quill:', e, f)
+                                                    setFormat(f)
+                                                }}
                                             />
                                         </div>
                                     </>
@@ -635,13 +715,33 @@ export default function CreatePost () {
                         </div>
                     )
                 }
-                
             </div>
             <PostSidebar
+                currentFormat={format}
                 selectedBlock={selectedBlockIndex === undefined ? selectedBlockIndex : body[selectedBlockIndex]}
                 at={time}
                 isOpen={sidebarOpen} 
                 onClose={() => setSidebarOpen(false)}
+                onFormatChange={(format, flag) => {
+                    console.log("ON FMT CHANGE")
+                    console.log(format, flag)
+                    if (selectedBlockIndex !== undefined ) {
+                        const block = body[selectedBlockIndex]
+
+                        if (block && block.type == "text") {
+                            block.formats =  {...block.formats}
+                            block.formats[format] = flag
+
+                            setBody((b) => {
+                                const data = [...b]
+                                data[selectedBlockIndex] = block
+                                return data
+                            })
+                        }
+                    }
+                    
+
+                }}
                 onSelectFile={(f) => {
                     setBody((b) => {
                         const c = [...b]
