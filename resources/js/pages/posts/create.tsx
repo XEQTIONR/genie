@@ -46,13 +46,13 @@ interface VideoBlock {
 interface TextBlock {
     type: "text"
     formats?: {
-        [format: string]: unknown
+        [format: string]: boolean
     }
 }
 
 type MediaBlock = ImageBlock | VideoBlock | TextBlock
 
-function PostSidebar({ 
+function  PostSidebar({ 
     at,
     currentFormat,
     isOpen,
@@ -284,14 +284,29 @@ function PostSidebar({
 
                                     <div className="flex flex-col gap-2">
                                         <h2 className="text-sm mt-3">Align</h2>
-                                        <ToggleGroup  variant="outline" type="multiple" className="w-full">
-                                            <ToggleGroupItem value="bold" className="w-1/3" variant="outline" type="button">
+                                        <ToggleGroup value={currentFormat?.align ?? "left"}  variant="outline" type="single" className="w-full">
+                                            <ToggleGroupItem 
+                                            onClick={() => {
+                                                    if (onFormatChange) {
+                                                        onFormatChange('align', 'left')
+                                                    }
+                                                }} value="left" className="w-1/3" variant="outline" type="button">
                                                 <AlignLeft />
                                             </ToggleGroupItem>
-                                            <ToggleGroupItem value="italic" className="w-1/3" variant="outline" type="button">
+                                            <ToggleGroupItem
+                                            onClick={() => {
+                                                    if (onFormatChange) {
+                                                        onFormatChange('align', 'center')
+                                                    }
+                                                }}  value="center" className="w-1/3" variant="outline" type="button">
                                                 <AlignCenter />
                                             </ToggleGroupItem>
-                                            <ToggleGroupItem value="underline" className="w-1/3" variant="outline" type="button">
+                                            <ToggleGroupItem
+                                            onClick={() => {
+                                                    if (onFormatChange) {
+                                                        onFormatChange('align', 'right')
+                                                    }
+                                                }}  value="right" className="w-1/3" variant="outline" type="button">
                                                 <AlignRight />
                                             </ToggleGroupItem>
                                         </ToggleGroup>
@@ -328,7 +343,24 @@ function Block({
     const [currentFormatting, setCurrentFormatting] = useState<{[format: string]: unknown}|undefined>(undefined)
 
     useEffect(() => {
-        console.log('last formats:', formats)
+        console.log('change format:', formats)
+        const s = editor.current?.getSelection()
+        const f = {
+            ...editor.current?.getFormat(),
+            ...formats
+        }
+        Object.keys(f).forEach((key) => {
+            if (s) {
+                if (key == 'align') {
+                    console.log('align to->', f[key])
+                    editor.current?.format('align', f[key] == 'left' ? undefined : f[key])
+                    //editor.current?.
+                    console.log('RIGHT AFTER UPDATE:', editor.current?.getFormat())
+                } else {
+                    editor.current?.formatText(s, key, f[key])
+                }
+            }
+        })
     }, [formats])
 
     useEffect(() => {
@@ -356,26 +388,15 @@ function Block({
                 placeholder: 'Add text...'
             })
             editor.current = quill
-            editor.current.on('editor-change', (name, ...args) => {
-                const now = Date.now()
-                
-                console.log('name:', name, ...args ,now)
-                //console.log(n, y, z, u, now)
-                // console.log('x:', x)
-                //console.log('ranges2:', [range, o])
-                //console.log('o:', o)
+            editor.current.on('editor-change', () => {
                 const format = editor.current?.getFormat()
-                // console.log('format:', format)
-
                 if (currentFormatting !== format) {
                     setCurrentFormatting(format)
-
                     if (onFormatChange) {
                         onFormatChange(editor.current, format)
                     }
                 }
             })
-            // editor.current.focus()
         }
     }, [])
 
@@ -630,7 +651,8 @@ export default function CreatePost () {
                                             }} 
                                             className={cn("w-full p-1 border-2", selectedBlockIndex == idx ? 'border-accent' : 'border-transparent')}
                                         >
-                                            <Block 
+                                            <Block
+                                                formats={item.type == 'text' ? item.formats : undefined } 
                                                 selected={selectedBlockIndex == idx} 
                                                 item={item}
                                                 del={() => {
@@ -674,7 +696,7 @@ export default function CreatePost () {
                                                     }
                                                 }}
                                                 onFormatChange={(e, f) => {
-                                                    console.log('frmt quill:', e, f)
+                                                    // console.log('frmt quill:', e, f)
                                                     setFormat(f)
                                                 }}
                                             />
