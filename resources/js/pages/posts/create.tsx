@@ -28,26 +28,30 @@ import { AlignCenter, AlignLeft, AlignRight, ArrowDown, ArrowUp, Bold, Copy, Ima
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 
-import Quill from 'quill'
+import Quill, { Delta, Op } from 'quill'
 // import 'quill/dist/quill.bubble.css'
 import '/resources/css/quill.bubble.css'
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 interface ImageBlock {
-    type: "image",
-    file: File,
+    block_id: number
+    type: "image"
+    file: File
 }
 
 interface VideoBlock {
+    block_id: number
     type: "video"
     file: File
 }
 
 interface TextBlock {
+    block_id: number
     type: "text"
     formats?: {
         [format: string]: boolean
     }
+    contents?: Delta | Op[] 
 }
 
 type MediaBlock = ImageBlock | VideoBlock | TextBlock
@@ -343,7 +347,12 @@ function Block({
     const editorGetFormat = useCallback(() => {
         return editor.current?.getFormat()
     }, [editor])
-    const [currentFormatting, setCurrentFormatting] = useState<{[format: string]: unknown}|undefined>(formats)
+
+    const editorGetContents = useCallback(() => {
+        return editor.current?.getContents()
+    }, [editor])
+    // const [currentFormatting, setCurrentFormatting] = useState<{[format: string]: unknown}|undefined>(formats)
+    const [contents, setContents] = useState(undefined)
 
     useEffect(() => {
         console.log('change format:', formats)
@@ -367,6 +376,8 @@ function Block({
     }, [formats])
 
     useEffect(() => {
+        console.log('block at:', Date.now())
+        console.log('contents: 🤣', contents)
         if (containerRef.current) {
             const id = '' + Date.now()
             const container = containerRef.current;
@@ -386,10 +397,17 @@ function Block({
                     'header',
                     'align',
                 ],
-                placeholder: 'Add text...' + id
+                placeholder: 'Add text...' + item.block_id
             })
+
+            if (item.type == "text" && item.contents) {
+                console.log('contents:', item.contents)
+                quill.setContents(item.contents)
+            }
+
             editor.current = quill
             editor.current.on('text-change', () => {
+                console.log('textchnge')
                 const format = editorGetFormat()
                 if (onFormatChange) {
                     onFormatChange(editor.current, format)
@@ -397,8 +415,13 @@ function Block({
             })
 
             editor.current.on('selection-change', (range, oldRange, source) => {
+                //console.log('selectionchange')
                 if (range !== null) {
                     const format = editorGetFormat()
+                    const c = editorGetContents()
+                    console.log('c:', c)
+                    //console.log('setContents:', c)
+                    //setContents(c)
                     if (onFormatChange) {
                         onFormatChange(editor.current, format)
                     }
@@ -439,6 +462,7 @@ function Block({
                                     className="cursor-pointer"
                                     onClick={() => {
                                         if (move) {
+                                            //setContents(editor.current?.getContents())
                                             move("up")
                                         }
                                     }}
@@ -453,6 +477,7 @@ function Block({
                                     className="cursor-pointer" 
                                     onClick={() => {
                                         if (move) {
+                                            //setContents(editor.current?.getContents())
                                             move("down")
                                         }
                                     }} 
@@ -659,6 +684,7 @@ export default function CreatePost () {
                                             className={cn("w-full p-1 border-2", selectedBlockIndex == idx ? 'border-accent' : 'border-transparent')}
                                         >
                                             <Block
+                                                key={item.block_id}
                                                 formats={item.type == 'text' ? item.formats : undefined } 
                                                 selected={selectedBlockIndex == idx} 
                                                 item={item}
@@ -670,14 +696,17 @@ export default function CreatePost () {
                                                 }}
                                                 move={(dir) => {
                                                     const length = body.length
-                                                    const items = [...body]
+                                                    //const items = [...body]
 
                                                     if (dir == 'down') {
                                                         if (idx < length - 1) {
-                                                            const temp = items[idx]
-                                                            items[idx] = items[idx + 1]
-                                                            items[idx + 1] = temp
-                                                            setBody(items)
+                                                            setBody((b) => {
+                                                                const temp = b[idx]
+                                                                b[idx] = b[idx + 1]
+                                                                b[idx + 1] = temp
+
+                                                                return b
+                                                            })
 
                                                             if (selectedBlockIndex !== undefined) {
                                                                 const newIndex = selectedBlockIndex + 1
@@ -688,10 +717,12 @@ export default function CreatePost () {
                                                         }
                                                     } else if (dir == 'up') {
                                                         if (idx > 0) {
-                                                            const temp = items[idx]
-                                                            items[idx] = items[idx - 1]
-                                                            items[idx - 1] = temp
-                                                            setBody(items)
+                                                            setBody((b) => {
+                                                                const temp = b[idx]
+                                                                b[idx] = b[idx - 1]
+                                                                b[idx - 1] = temp
+                                                                return b
+                                                            })
 
                                                             if (selectedBlockIndex !== undefined) {
                                                                 const newIndex = selectedBlockIndex - 1
@@ -703,7 +734,17 @@ export default function CreatePost () {
                                                     }
                                                 }}
                                                 onFormatChange={(e, f) => {
-                                                    setFormat(f)
+                                                    console.log('onformatchange:', f)
+                                                    console.log(e?.getContents())
+                                                    setFormat(f) // @TODO
+                                                    setBody(b => b.map((bb, i) => {
+                                                        
+                                                        if (e && i == idx && bb.type == "text") {
+                                                            bb.contents = e.getContents()
+                                                        }
+
+                                                        return bb
+                                                    }))
                                                 }}
                                             />
                                         </div>
@@ -751,6 +792,7 @@ export default function CreatePost () {
                 isOpen={sidebarOpen} 
                 onClose={() => setSidebarOpen(false)}
                 onFormatChange={(format, flag) => {
+                    
                     console.log("ON FMT CHANGE")
                     console.log(format, flag)
                     if (selectedBlockIndex !== undefined ) {
@@ -759,28 +801,28 @@ export default function CreatePost () {
                         if (block && block.type == "text") {
                             block.formats =  {...block.formats}
                             block.formats[format] = flag
-
+                            console.log('going to set body')
+                            setFormat(block.formats)
                             setBody((b) => {
-                                const data = [...b]
-                                data[selectedBlockIndex] = block
-                                return data
+                                //const data = [...b]
+                                b[selectedBlockIndex] = block
+                                return b
                             })
                         }
                     }
-                    
 
                 }}
                 onSelectFile={(f) => {
                     setBody((b) => {
                         const c = [...b]
-                        c.splice(insertAt, 0, { type: f.type.split("/")[0], file: f })
+                        c.splice(insertAt, 0, { type: f.type.split("/")[0], file: f, block_id: Date.now() })
                         return c
                     })
                 }}
                 onSelectText={() => {
                     setBody((b) => {
                         const c = [...b]
-                        c.splice(insertAt, 0, { type: 'text' })
+                        c.splice(insertAt, 0, { type: 'text', block_id: Date.now() })
                         return c
                     })
                 }}
