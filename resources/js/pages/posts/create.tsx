@@ -340,7 +340,10 @@ function Block({
 
     const containerRef = useRef<HTMLDivElement>(null)
     const editor = useRef<Quill>(null)
-    const [currentFormatting, setCurrentFormatting] = useState<{[format: string]: unknown}|undefined>(undefined)
+    const editorGetFormat = useCallback(() => {
+        return editor.current?.getFormat()
+    }, [editor])
+    const [currentFormatting, setCurrentFormatting] = useState<{[format: string]: unknown}|undefined>(formats)
 
     useEffect(() => {
         console.log('change format:', formats)
@@ -365,6 +368,7 @@ function Block({
 
     useEffect(() => {
         if (containerRef.current) {
+            const id = '' + Date.now()
             const container = containerRef.current;
             const editorContainer = container.appendChild(
                 container.ownerDocument.createElement('div'),
@@ -373,25 +377,28 @@ function Block({
                 theme: 'bubble',
                 modules: {
                     toolbar: [
-                        ['bold', 'italic', 'underline', 'strike'],
+                        ['bold', 'italic', 'underline'],
                         ['link'],
                     ]
                 },
                 formats: [
-                    'bold', 'italic', 'underline', 'strike',
-                    'blockquote',
+                    'bold', 'italic', 'underline',
                     'header',
                     'align',
-                    // 'image',
-                    // 'video',
                 ],
-                placeholder: 'Add text...'
+                placeholder: 'Add text...' + id
             })
             editor.current = quill
-            editor.current.on('editor-change', () => {
-                const format = editor.current?.getFormat()
-                if (currentFormatting !== format) {
-                    setCurrentFormatting(format)
+            editor.current.on('text-change', () => {
+                const format = editorGetFormat()
+                if (onFormatChange) {
+                    onFormatChange(editor.current, format)
+                }
+            })
+
+            editor.current.on('selection-change', (range, oldRange, source) => {
+                if (range !== null) {
+                    const format = editorGetFormat()
                     if (onFormatChange) {
                         onFormatChange(editor.current, format)
                     }
@@ -696,7 +703,6 @@ export default function CreatePost () {
                                                     }
                                                 }}
                                                 onFormatChange={(e, f) => {
-                                                    // console.log('frmt quill:', e, f)
                                                     setFormat(f)
                                                 }}
                                             />
