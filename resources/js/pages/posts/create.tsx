@@ -32,17 +32,20 @@ import Quill, { Delta, Op } from 'quill'
 // import 'quill/dist/quill.bubble.css'
 import '/resources/css/quill.bubble.css'
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { store as storePost } from "@/routes/posts";
 
 interface ImageBlock {
     block_id: number
     type: "image"
     file: File
+    url?: string
 }
 
 interface VideoBlock {
     block_id: number
     type: "video"
     file: File
+    url?: string
 }
 
 interface TextBlock {
@@ -384,6 +387,12 @@ function Block({
             const editorContainer = container.appendChild(
                 container.ownerDocument.createElement('div'),
             )
+
+            editorContainer.classList.add('flex')
+            editorContainer.classList.add('flex-col')
+            editorContainer.classList.add('min-h-40')
+            editorContainer.classList.add('w-full')
+            
             const quill = new Quill(editorContainer, {
                 theme: 'bubble',
                 modules: {
@@ -442,7 +451,7 @@ function Block({
                     </video>
 
                 case "text":
-                    return <div ref={containerRef} className="w-full min-h-40" />
+                    return <div ref={containerRef} className="w-full min-h-40 flex items-stretch" />
             }
         }
 
@@ -518,8 +527,16 @@ export default function CreatePost () {
     const titleInput = useRef<HTMLInputElement>(null)
 
     const apiToken = usePage().props.apiToken
-    const {data, setData} = useForm({
-        title: ''
+    const {data, setData, post} = useForm<{
+        title: string
+        cover: string
+        cover_type: string
+        body: any[]
+    }>({
+        title: '',
+        cover: '',
+        cover_type: '',
+        body: []
     })
     
     const [file, setFile] = useState<File|null>(null)
@@ -533,6 +550,7 @@ export default function CreatePost () {
     const [time, setTime] = useState(Date.now())
     const [selectedBlockIndex, setSelectedBlockIndex] = useState<number|undefined>(undefined)
     const [format, setFormat] = useState<{[format: string]: unknown}|undefined>(undefined)
+    const [coverFile, setCoverFile] = useState("")
 
     const handleSelect = useCallback((f: File) => {
         setFileType(f.type)
@@ -540,6 +558,7 @@ export default function CreatePost () {
         const data = new FormData()
         data.append('file', f)
         data.append('mime', f.type)
+        setData('cover_type', f.type)
 
         setFile(f)
 
@@ -549,7 +568,9 @@ export default function CreatePost () {
                 Authorization: 'Bearer ' + apiToken
             }
         }).then((res) => {
-            console.log('success:', res)
+            console.log('success:', res.data.upload)
+            setCoverFile(res.data.upload)
+            setData('cover', res.data.upload)
             setInitialized(true)
             setTimeout(() => {
                 titleInput.current?.focus()
@@ -560,6 +581,38 @@ export default function CreatePost () {
 
     }, [apiToken])
 
+    const submitPost = () => {
+        console.log('submitPost')
+
+        const b = body.map((block) => {
+            return {
+                ...block,
+                mime: (block.type == 'image' || block.type == 'video') ? block.file.type : 'text/html'
+            }
+        })
+        // const parsedBody = body.map((block) => {
+        //     switch(block.type) {
+        //         case "image":
+        //         case "video":
+        //             block.
+        //     }
+        // })
+
+        setData('cover', coverFile)
+        setData('cover_type', fileType ?? '')
+        setData('body', b)
+
+        const d = {
+            title: data.title,
+            cover: coverFile,
+            cover_type: fileType,
+            body: b,
+        }
+
+        console.table(d)
+
+        post(storePost.url())
+    }
 
     const renderCover = () => {
         if (file!== null && fileType!== null) {
@@ -581,6 +634,25 @@ export default function CreatePost () {
             setSidebarOpen(true)
         }
     }, [selectedBlockIndex])
+
+    useEffect(() => {
+        setData('body', body.map(b => {
+            const x: any = {}
+            x.type = b.type
+            
+            if (b.type == 'image' || b.type == 'video') {
+                x.mime = b.file.type
+                x.url = b.url
+            } else {
+                x.mime = 'text/html'
+                x.html = b.html
+            }
+
+            return x
+        }))
+    }, [body, setData])
+
+    
 
     return (
         <SidebarProvider
@@ -614,7 +686,9 @@ export default function CreatePost () {
                     </Button>
                     <div className="flex gap-3">
                         <Button variant="secondary">Save as draft</Button>
-                        <Button>Continue</Button>
+                        <Button type="button" onClick={() => {
+                            submitPost()
+                        }}>Continue</Button>
                     </div>
                 </div>
 
@@ -808,11 +882,30 @@ export default function CreatePost () {
 
                 }}
                 onSelectFile={(f) => {
-                    setBody((b) => {
-                        const c = [...b]
-                        c.splice(insertAt, 0, { type: f.type.split("/")[0], file: f, block_id: Date.now() })
-                        return c
+
+                    const data = new FormData()
+                    data.append('file', f)
+                    data.append('mime', f.type)
+
+                    setFile(f)
+
+                    axios.post(storeImage().url, data, {
+                        headers: {
+                            'Content-Type': 'multipart/form-data',
+                            Authorization: 'Bearer ' + apiToken
+                        }
+                    }).then((res) => {
+                        console.log('success1:', res.data.upload)
+                            setBody((b) => {
+                            const c = [...b]
+                            c.splice(insertAt, 0, { type: f.type.split("/")[0], file: f, block_id: Date.now(), url: res.data.upload })
+                            return c
+                        })
+                    }).catch((e) => {
+                        console.log('error:', e)
                     })
+
+                    
                 }}
                 onSelectText={() => {
                     setBody((b) => {

@@ -19,6 +19,13 @@ class Post extends Model
         'status',
     ];
 
+    protected function casts(): array
+    {
+        return [
+            'body' => 'array',
+        ];
+    }
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);

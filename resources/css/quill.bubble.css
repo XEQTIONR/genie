@@ -37,7 +37,9 @@
     -moz-tab-size:4;
     text-align:left;
     white-space:pre-wrap;
-    word-wrap:break-word
+    word-wrap:break-word;
+    min-height: 100%;
+    flex-grow: 1;
 }
 .ql-editor > *{
     cursor:text

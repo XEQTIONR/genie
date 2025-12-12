@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('slug');
             $table->string('cover');
             $table->string('cover_type');
-            $table->text('body');
+            $table->json('body');
             $table->integer('num_likes')->default(0);
             $table->integer('num_views')->default(0);
             $table->string('status');

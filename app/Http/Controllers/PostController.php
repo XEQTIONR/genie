@@ -3,7 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Post;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 
 class PostController extends Controller
@@ -29,7 +32,33 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'title' => 'required|string',
+            'cover' => 'required|string',
+            'cover_type' => 'required|string',
+            'body' => 'nullable|array',
+        ]);
+
+        $slug = str_replace(' ', '-', strtolower($validated['title']));
+        
+        $existing = Post::where('slug', $slug)->first();
+        $n = 0;
+        while ($existing) {
+            $slug = str_replace(' ', '-', strtolower($validated['title'])) . '-' .(++$n);
+            $existing = Post::where('slug', $slug)->first();
+        }
+        
+
+       
+        $validated['status'] = 'created';
+        $validated['slug'] = $slug;
+
+        $user = User::find(Auth::id());
+
+        $post = new Post($validated);
+        $user->posts()->save($post);
+        
+        return to_route('home');
     }
 
     /**

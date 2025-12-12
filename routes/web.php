@@ -39,6 +39,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::patch('/teams/{team}', [TeamController::class, 'update'])->name('teams.update');
 
     Route::get('/posts/create', [PostController::class, 'create'])->name('posts.create');
+    Route::post('/posts', [PostController::class, 'store'])->name('posts.store');
 });
 
 Route::get('/projects/{project:slug}', [ProjectController::class, 'show'])->name('projects.show');
