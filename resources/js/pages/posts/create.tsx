@@ -49,14 +49,15 @@ interface TextBlock {
     block_id: number
     type: "text"
     formats?: {
-        [format: string]: boolean
+        [format: string]: unknown
     }
-    contents?: Delta | Op[] 
+    contents?: Delta | Op[]
+    html?: string 
 }
 
 type MediaBlock = ImageBlock | VideoBlock | TextBlock
 
-function  PostSidebar({ 
+function PostSidebar({ 
     at,
     currentFormat,
     isOpen,
@@ -358,7 +359,7 @@ function Block({
         console.log('change format:', formats)
         const s = editor.current?.getSelection()
         const f = {
-            ...editor.current?.getFormat(),
+            //...editor.current?.getFormat(),
             ...formats
         }
         Object.keys(f).forEach((key) => {
@@ -379,7 +380,6 @@ function Block({
         console.log('block at:', Date.now())
         console.log('contents: 🤣', contents)
         if (containerRef.current) {
-            const id = '' + Date.now()
             const container = containerRef.current;
             const editorContainer = container.appendChild(
                 container.ownerDocument.createElement('div'),
@@ -397,7 +397,7 @@ function Block({
                     'header',
                     'align',
                 ],
-                placeholder: 'Add text...' + item.block_id
+                placeholder: 'Add text...'
             })
 
             if (item.type == "text" && item.contents) {
@@ -535,14 +535,12 @@ export default function CreatePost () {
     const [format, setFormat] = useState<{[format: string]: unknown}|undefined>(undefined)
 
     const handleSelect = useCallback((f: File) => {
-        console.log('selectedxx: ', f)
-        console.log('type:', f.type)
         setFileType(f.type)
 
         const data = new FormData()
         data.append('file', f)
         data.append('mime', f.type)
-        console.log('apiKey:', apiToken)
+
         setFile(f)
 
         axios.post(storeImage().url, data, {
@@ -733,17 +731,14 @@ export default function CreatePost () {
                                                         }
                                                     }
                                                 }}
-                                                onFormatChange={(e, f) => {
-                                                    console.log('onformatchange:', f)
-                                                    console.log(e?.getContents())
-                                                    setFormat(f) // @TODO
-                                                    setBody(b => b.map((bb, i) => {
-                                                        
-                                                        if (e && i == idx && bb.type == "text") {
-                                                            bb.contents = e.getContents()
+                                                onFormatChange={(editor, f) => {
+                                                    setFormat(f)
+                                                    setBody(b => b.map((block, i) => {
+                                                        if (editor && i == idx && block.type == "text") {
+                                                            block.contents = editor.getContents()
+                                                            block.html = editor.getSemanticHTML()
                                                         }
-
-                                                        return bb
+                                                        return block
                                                     }))
                                                 }}
                                             />
