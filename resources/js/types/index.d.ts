@@ -122,6 +122,14 @@ export interface User {
     [key: string]: unknown // This allows for additional properties...
 }
 
+export type Post = {
+    id: number
+    title: string
+    body: unknown[]
+    cover: string
+    cover_type: string
+}
+
 export type ProjectMember = User & {
     pivot: {
         roles: string[]
