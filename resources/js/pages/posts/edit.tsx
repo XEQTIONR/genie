@@ -32,7 +32,7 @@ import Quill, { Delta, Op } from 'quill'
 // import 'quill/dist/quill.bubble.css'
 import '/resources/css/quill.bubble.css'
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { store as storePost } from "@/routes/posts";
+import { update } from "@/routes/posts";
 import { Post } from "@/types";
 
 interface ImageBlock {
@@ -531,7 +531,7 @@ export default function EditPost ({post} : {post: Post}) {
     const titleInput = useRef<HTMLInputElement>(null)
 
     const apiToken = usePage().props.apiToken
-    const {data, setData, post: postFunc} = useForm<{
+    const {data, setData, put} = useForm<{
         title: string
         cover: string
         cover_type: string
@@ -545,7 +545,7 @@ export default function EditPost ({post} : {post: Post}) {
     
     const [file, setFile] = useState<File|null>(null)
     const [fileType, setFileType] = useState<string|null>(post.cover_type ?? null)
-    const [initialized, setInitialized] = useState(false)
+    const [initialized, setInitialized] = useState(true)
     const [sWidth, setSWidth] = useState("20rem")
     const [sidebarOpen, setSidebarOpen] = useState(false)
     const [hoverAddButton, setHoverAddButton] = useState(false)
@@ -615,7 +615,7 @@ export default function EditPost ({post} : {post: Post}) {
 
         console.table(d)
 
-        //postFunc(storePost.url())
+        put(update.url({ post: post }))
     }
 
     const renderCover = () => {
@@ -708,7 +708,7 @@ export default function EditPost ({post} : {post: Post}) {
                             placeholder="Add a post title"
                         />
                 {
-                    <div className="w-full max-w-7xl mt-10 flex flex-col grow px-10">
+                    <div className="w-full max-w-5xl mt-10 flex flex-col grow">
                         {
                             renderCover()
                         }
