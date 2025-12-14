@@ -7,7 +7,6 @@ import { Badge } from '@/components/ui/badge'
 import { Button, buttonVariants } from '@/components/ui/button'
 import { Combobox, GroupedOptions, Option } from '@/components/ui/combobox'
 import { cn } from '@/lib/utils'
-import { create } from '@/routes/projects'
 import { create as createTeam } from '@/routes/teams'
 import Cropper, { Area, Point } from 'react-easy-crop'
 import {
@@ -57,7 +56,7 @@ import SearchBar from '@/components/ui/search-bar'
 import { Separator } from '@/components/ui/separator'
 import { type SharedData } from '@/types'
 import { show, about } from '@/routes/users'
-import { show as showProject } from '@/routes/projects'
+import { show as showPost } from '@/routes/posts'
 import { show as showTeam } from '@/routes/teams'
 import { Spinner } from '@/components/ui/spinner'
 import { store as storeImage } from '@/routes/api/uploads'
@@ -499,8 +498,6 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
 
     const isPro = true
 
-    const items: Array<string> = (new Array(50)).fill(0)
-
     const skillForm = useForm<{skills: string[], field: string}>({
         field: 'skills',
         skills: user.meta?.skills ?? []
@@ -670,45 +667,47 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
                 return (
                     <div className={cn(
                         "w-full p-5 max-w-9xl mx-auto",
-                        // "grid gap-9 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3",
-                        "flex justify-center items-center"
+                        "grid grid-cols-1 md:grid-cols-3 gap-5"
                     )}>
                     {
-                        // items.map(() => (
-                        //     <div className="flex flex-col gap-3">
-                        //         <GridCard />
-                        //     </div>
-                        // ))
-                    }
-                    {
-                        <Empty className="">
-                            <EmptyHeader>
-                                <EmptyMedia variant="icon">
-                                <LayoutGrid />
-                                </EmptyMedia>
-                                <EmptyTitle>No Posts Yet</EmptyTitle>
-                                <EmptyDescription>
-                                    You haven&apos;t created any posts yet. Get started by creating
-                                    your first post.
-                                </EmptyDescription>
-                            </EmptyHeader>
-                            <EmptyContent>
-                                <div className="flex gap-2">
-                                <Button>Create a post</Button>
-                                <Button variant="outline">Browse posts</Button>
-                                </div>
-                            </EmptyContent>
-                            <Button
-                                variant="link"
-                                asChild
-                                className="text-muted-foreground"
-                                size="sm"
-                            >
-                                <a href="#">
-                                Learn More <ArrowUpRightIcon />
-                                </a>
-                            </Button>
-                        </Empty>
+                        (user.posts && (user.posts.length > 0)) ?
+                        user.posts?.map((post) => (
+                            <div className="flex flex-col gap-3">
+                                <GridCard
+                                    onClick={() => router.visit(showPost({ post: post.id }))} 
+                                    className="cursor-pointer" post={post} 
+                                />
+                            </div>
+                        )) : (
+                            <Empty className="">
+                                <EmptyHeader>
+                                    <EmptyMedia variant="icon">
+                                    <LayoutGrid />
+                                    </EmptyMedia>
+                                    <EmptyTitle>No Posts Yet</EmptyTitle>
+                                    <EmptyDescription>
+                                        You haven&apos;t created any posts yet. Get started by creating
+                                        your first post.
+                                    </EmptyDescription>
+                                </EmptyHeader>
+                                <EmptyContent>
+                                    <div className="flex gap-2">
+                                    <Button>Create a post</Button>
+                                    <Button variant="outline">Browse posts</Button>
+                                    </div>
+                                </EmptyContent>
+                                <Button
+                                    variant="link"
+                                    asChild
+                                    className="text-muted-foreground"
+                                    size="sm"
+                                >
+                                    <a href="#">
+                                    Learn More <ArrowUpRightIcon />
+                                    </a>
+                                </Button>
+                            </Empty>
+                        )
                     }
                     </div>
                 )

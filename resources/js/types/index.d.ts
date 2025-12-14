@@ -120,6 +120,7 @@ export interface User {
     } | null
     owned_projects?: Project[]
     [key: string]: unknown // This allows for additional properties...
+    posts?: Post[]
 }
 
 export type Post = {

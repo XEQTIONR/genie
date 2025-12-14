@@ -13,6 +13,7 @@ use App\Http\Controllers\TeamInvitationController;
 use App\Http\Controllers\UserProfileController;
 use App\Http\Resources\OpportunityResource;
 use App\Models\Opportunity;
+use App\Models\Post;
 use App\Models\Team;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -52,6 +53,7 @@ Route::get('/teams/invitations/{invitation}', [TeamInvitationController::class, 
 Route::put('/teams/invitations/{invitation}', [TeamInvitationController::class, 'update'])->name('teamInvitation.update');
 
 Route::get('/profile/{user:username}', function(User $user) {
+    $user->load(['posts']);
     return Inertia::render('users/show', [
         'user' => $user,
         'tab' => 'showcase'
@@ -108,7 +110,9 @@ Route::get('/teams/{team:slug}/opportunities', function (Team $team) {
 })->name('teams.opportunities.index');
 
 Route::get('/', function () {
-        return Inertia::render('dashboard');
+        return Inertia::render('dashboard', [
+            'posts' => Post::all()
+        ]);
 })->name('home');
 
 require __DIR__.'/settings.php';
