@@ -87,7 +87,21 @@ class PostController extends Controller
      */
     public function update(Request $request, Post $post)
     {
-        //
+        $validated = $request->validate([
+            'title' => 'required|string',
+            'cover' => 'required|string',
+            'cover_type' => 'required|string',
+            'body' => 'nullable|array',
+        ]);
+
+        $post->title = $validated['title'];
+        $post->cover = $validated['cover'];
+        $post->cover_type = $validated['cover_type'];
+        $post->body = $validated['body'];
+
+        $post->save();
+
+        return to_route('posts.show', ['post' => $post]);
     }
 
     /**

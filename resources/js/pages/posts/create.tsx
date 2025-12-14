@@ -558,6 +558,7 @@ export default function CreatePost () {
         const data = new FormData()
         data.append('file', f)
         data.append('mime', f.type)
+
         setData('cover_type', f.type)
 
         setFile(f)
@@ -886,8 +887,6 @@ export default function CreatePost () {
                     const data = new FormData()
                     data.append('file', f)
                     data.append('mime', f.type)
-
-                    setFile(f)
 
                     axios.post(storeImage().url, data, {
                         headers: {

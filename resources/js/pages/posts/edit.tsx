@@ -531,7 +531,7 @@ export default function EditPost ({post} : {post: Post}) {
     const titleInput = useRef<HTMLInputElement>(null)
 
     const apiToken = usePage().props.apiToken
-    const {data, setData} = useForm<{
+    const {data, setData, post: postFunc} = useForm<{
         title: string
         cover: string
         cover_type: string
@@ -591,7 +591,7 @@ export default function EditPost ({post} : {post: Post}) {
         const b = body.map((block) => {
             return {
                 ...block,
-                mime: (block.type == 'image' || block.type == 'video') ? block.file.type : 'text/html'
+                mime: (block.type == 'image' || block.type == 'video') ?( block.file?.type ?? 'filetype not detected') : 'text/html'
             }
         })
         // const parsedBody = body.map((block) => {
@@ -615,7 +615,7 @@ export default function EditPost ({post} : {post: Post}) {
 
         console.table(d)
 
-        post(storePost.url())
+        //postFunc(storePost.url())
     }
 
     const renderCover = () => {
