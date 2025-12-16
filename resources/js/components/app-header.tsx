@@ -36,6 +36,8 @@ import { show } from '@/routes/users'
 import { index as indexPosts } from '@/routes/posts'
 import { index as indexTeams } from '@/routes/teams'
 import { index as indexProjects } from '@/routes/projects'
+import { index as indexJobs } from '@/routes/opportunities'
+import { index as indexUsers } from '@/routes/users';
 import { type BreadcrumbItem, type NavItem, type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
 import { BookOpen, BriefcaseBusiness, Circle, CircleCheck, CircleHelp, Folder, Handshake, Lightbulb, LogIn, LucideIcon, Menu, PencilRuler, User2, UserRoundSearch, UserSearch } from 'lucide-react';
@@ -344,10 +346,10 @@ export function AppHeader({ breadcrumbs = [], maxWidth }: AppHeaderProps) {
                                     <NavigationMenuTrigger>Opportunities</NavigationMenuTrigger>
                                     <NavigationMenuContent>
                                         <ul className="grid p-1 gap-2 sm:w-[350px]">
-                                            <ListItem iconSize="size-5.5" icon={BriefcaseBusiness} title="Find Openings" href="/">
-                                                Create an opening for people to come and help your project.
+                                            <ListItem iconSize="size-4.5" icon={BriefcaseBusiness} title="Find Openings" href={indexJobs.url()}>
+                                               Find opportunites to contribute
                                             </ListItem>
-                                            <ListItem iconSize="size-4.5" icon={UserSearch} title="Find Talent" href="/">
+                                            <ListItem iconSize="size-4.5" icon={UserSearch} title="Find Talent" href={indexUsers.url()}>
                                                 Search user profiles
                                             </ListItem>
                                         </ul>

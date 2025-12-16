@@ -46,12 +46,41 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::put('/posts/{post}', [PostController::class, 'update'])->name('posts.update');
 });
 
-Route::get('/posts', [PostController::class, 'index'])->name('posts.index');
-Route::get('/teams', [TeamController::class, 'index'])->name('teams.index');
-Route::get('/projects', [ProjectController::class, 'index'])->name('projects.index');
+Route::get('/opportunities', [OpportunityController::class, 'index'])->name('opportunities.index');
+Route::get('/opportunities/{opportunity}', [OpportunityController::class, 'show'])->name('opportunities.show');
+Route::post('/opportunities/{opportunity}/inquiry', [OpportunityInquiryController::class, 'store'])->name('opportunities.inquiries.store');
 
+
+Route::get('/posts', [PostController::class, 'index'])->name('posts.index');
 Route::get('/posts/{post}', [PostController::class, 'show'])->name('posts.show');
 
+Route::get('/teams', [TeamController::class, 'index'])->name('teams.index');
+Route::get('/teams/{team:slug}', [TeamController::class, 'show'])->name('teams.show');
+Route::get('/teams/{team:slug}/members', function(Team $team) {
+    $users = $team->users()->get();
+
+    return Inertia::render('teams/show', [
+        'team' => $team,
+        'users' => $users,
+        'user_count' => $users->count(), // cache this later
+        'tab' => 'members'
+    ]);
+})->name('teams.users.index');
+Route::get('/teams/{team:slug}/projects', function(Team $team) {
+    $projects = $team->projects()->get();
+
+    return Inertia::render('teams/show', [
+        'team' => $team,
+        'projects' => $projects,
+        'user_count' => $team->users()->count(), // cache this later
+        'tab' => 'projects'
+    ]);
+})->name('teams.projects.index');
+
+Route::get('/users', [UserProfileController::class, 'index'])->name('users.index');
+
+
+Route::get('/projects', [ProjectController::class, 'index'])->name('projects.index');
 Route::get('/projects/{project:slug}', [ProjectController::class, 'show'])->name('projects.show');
 Route::get('/projects/invitations/{invitation}', [ProjectInvitationController::class, 'show'])->name('projectInvitation.show');
 Route::put('/projects/invitations/{invitation}', [ProjectInvitationController::class, 'update'])->name('projectInvitation.update');
@@ -80,32 +109,6 @@ Route::get('/profile/{user:username}/teams', function(User $user) {
         'tab' => 'teams'
     ]);
 })->name('users.teams.index');
-
-Route::get('/teams/{team:slug}', [TeamController::class, 'show'])->name('teams.show');
-Route::get('/teams/{team:slug}/members', function(Team $team) {
-    $users = $team->users()->get();
-
-    return Inertia::render('teams/show', [
-        'team' => $team,
-        'users' => $users,
-        'user_count' => $users->count(), // cache this later
-        'tab' => 'members'
-    ]);
-})->name('teams.users.index');
-Route::get('/teams/{team:slug}/projects', function(Team $team) {
-    $projects = $team->projects()->get();
-
-    return Inertia::render('teams/show', [
-        'team' => $team,
-        'projects' => $projects,
-        'user_count' => $team->users()->count(), // cache this later
-        'tab' => 'projects'
-    ]);
-})->name('teams.projects.index');
-
-Route::get('/opportunities/{opportunity}', [OpportunityController::class, 'show'])->name('opportunities.show');
-
-Route::post('/opportunities/{opportunity}/inquiry', [OpportunityInquiryController::class, 'store'])->name('opportunities.inquiries.store');
 
 Route::get('/teams/{team:slug}/opportunities', function (Team $team) {
     return Inertia::render('teams/show', [

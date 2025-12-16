@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
+use Inertia\Inertia;
 
 class UserProfileController extends Controller
 {
@@ -15,7 +16,7 @@ class UserProfileController extends Controller
      */
     public function index()
     {
-        //
+        return Inertia::render('users/index', ['users' => User::all()]);
     }
 
     /**

@@ -17,7 +17,7 @@ class OpportunityController extends Controller
      */
     public function index()
     {
-        //
+        return Inertia::render('jobs/index', ['opportunities' => OpportunityResource::collection(Opportunity::all())]);
     }
 
     /**
