@@ -20,7 +20,16 @@ class TeamController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Team $team)
+    public function index()
+    {
+        return Inertia::render('teams/index', [
+            'teams' => Team::all(),
+            //'user_count' => $team->users()->count()
+        ]);
+    }
+
+
+    public function show(Team $team)
     {
         return Inertia::render('teams/show', [
             'team' => $team,

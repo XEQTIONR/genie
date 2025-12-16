@@ -14,7 +14,7 @@ function Avatar({
       data-slot="avatar"
       className={cn(
         "relative flex size-8 shrink-0 overflow-hidden",
-        variant == 'rounded' ? 'rounded-full' : '',
+        variant == 'rounded' ? 'rounded-full' : 'rounded',
         className
       )}
       {...props}
@@ -45,7 +45,7 @@ function AvatarFallback({
       data-slot="avatar-fallback"
       className={cn(
         "bg-muted flex size-full items-center justify-center",
-        variant == 'rounded' ? 'rounded-full' : '',
+        variant == 'rounded' ? 'rounded-full' : 'rounded-lg',
         className
       )}
       {...props}

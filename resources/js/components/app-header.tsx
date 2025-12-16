@@ -33,14 +33,16 @@ import { useInitials } from '@/hooks/use-initials';
 import { cn } from '@/lib/utils';
 import { home } from '@/routes';
 import { show } from '@/routes/users'
-import { index as indexPosts } from '@/routes/posts';
+import { index as indexPosts } from '@/routes/posts'
+import { index as indexTeams } from '@/routes/teams'
+import { index as indexProjects } from '@/routes/projects'
 import { type BreadcrumbItem, type NavItem, type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { BookOpen, BriefcaseBusiness, Circle, CircleCheck, CircleHelp, Folder, Handshake, Lightbulb, LogIn, LucideIcon, Menu, PencilRuler, User2, UserSearch } from 'lucide-react';
+import { BookOpen, BriefcaseBusiness, Circle, CircleCheck, CircleHelp, Folder, Handshake, Lightbulb, LogIn, LucideIcon, Menu, PencilRuler, User2, UserRoundSearch, UserSearch } from 'lucide-react';
 import AppLogo from './app-logo';
 import AppLogoIcon from './app-logo-icon';
 import { useEffect } from 'react';
-import { Separator } from './ui/separator';
+import ShowPost from '@/pages/posts/show';
 
 const components: { title: string; href: string; description: string }[] = [
   {
@@ -96,18 +98,19 @@ const rightNavItems: NavItem[] = [
 
 function ListItem({
   icon,
+  iconSize,
   title,
   children,
   href,
   ...props
-}: React.ComponentPropsWithoutRef<"li"> & { icon?: LucideIcon, href: string }) {
+}: React.ComponentPropsWithoutRef<"li"> & { icon?: LucideIcon, iconSize?: string, href: string }) {
   return (
     <li {...props}>
       <NavigationMenuLink asChild>
         <Link href={href}>
             <div className="flex w-full gap-3 items-start">
                 {/* <Lightbulb /> */}
-                { icon && <Icon className="stroke-foreground size-5" iconNode={icon} /> }
+                { icon && <Icon className={cn("stroke-foreground", iconSize ?? "size-5")} iconNode={icon} /> }
                 <div className="flex flex-col">
                     <div className="text-sm leading-none font-medium">{title}</div>
                     <p className="text-muted-foreground line-clamp-2 text-sm leading-snug">
@@ -315,21 +318,21 @@ export function AppHeader({ breadcrumbs = [], maxWidth }: AppHeaderProps) {
                                         <li>
                                             <NavigationMenuLink asChild>
                                                 <Link className="flex flex-row items-center gap-2 p-2" href={indexPosts.url()}>
-                                                    <Lightbulb className="size-4 stroke-foreground" />
+                                                    <Lightbulb className="size-4.5 stroke-2.5 -ml-0.5 stroke-foreground" />
                                                     <span className="font-medium">Ideas</span>
                                                 </Link>
                                             </NavigationMenuLink>
                                         </li>
                                         <li>
                                             <NavigationMenuLink asChild>
-                                                <Link className="flex flex-row items-center gap-2 p-2" href="#">
+                                                <Link className="flex flex-row items-center gap-2 p-2" href={indexProjects().url}>
                                                     <PencilRuler className="size-4 stroke-foreground" /> 
                                                     <span className="font-medium">Projects</span></Link>
                                             </NavigationMenuLink>
                                         </li>
                                         <li>
                                             <NavigationMenuLink asChild>
-                                                <Link className="flex flex-row items-center gap-2 p-2" href="#">
+                                                <Link className="flex flex-row items-center gap-2 p-2" href={indexTeams.url()}>
                                                     <Handshake className="size-4 stroke-foreground" /> 
                                                     <span className="font-medium">Teams</span></Link>
                                             </NavigationMenuLink>
@@ -341,10 +344,10 @@ export function AppHeader({ breadcrumbs = [], maxWidth }: AppHeaderProps) {
                                     <NavigationMenuTrigger>Opportunities</NavigationMenuTrigger>
                                     <NavigationMenuContent>
                                         <ul className="grid p-1 gap-2 sm:w-[350px]">
-                                            <ListItem icon={BriefcaseBusiness} title="Find Openings" href="/">
+                                            <ListItem iconSize="size-5.5" icon={BriefcaseBusiness} title="Find Openings" href="/">
                                                 Create an opening for people to come and help your project.
                                             </ListItem>
-                                            <ListItem icon={UserSearch} title="Find Talent" href="/">
+                                            <ListItem iconSize="size-4.5" icon={UserSearch} title="Find Talent" href="/">
                                                 Search user profiles
                                             </ListItem>
                                         </ul>

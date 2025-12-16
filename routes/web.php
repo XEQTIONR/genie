@@ -40,13 +40,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::patch('/teams/{team}', [TeamController::class, 'update'])->name('teams.update');
 
     Route::get('/posts/create', [PostController::class, 'create'])->name('posts.create');
-    Route::get('/posts/{post}', [PostController::class, 'show'])->name('posts.show');
+    
     Route::get('/posts/{post}/edit', [PostController::class, 'edit'])->name('posts.edit');
     Route::post('/posts', [PostController::class, 'store'])->name('posts.store');
     Route::put('/posts/{post}', [PostController::class, 'update'])->name('posts.update');
 });
 
 Route::get('/posts', [PostController::class, 'index'])->name('posts.index');
+Route::get('/teams', [TeamController::class, 'index'])->name('teams.index');
+Route::get('/projects', [ProjectController::class, 'index'])->name('projects.index');
+
+Route::get('/posts/{post}', [PostController::class, 'show'])->name('posts.show');
 
 Route::get('/projects/{project:slug}', [ProjectController::class, 'show'])->name('projects.show');
 Route::get('/projects/invitations/{invitation}', [ProjectInvitationController::class, 'show'])->name('projectInvitation.show');
@@ -77,7 +81,7 @@ Route::get('/profile/{user:username}/teams', function(User $user) {
     ]);
 })->name('users.teams.index');
 
-Route::get('/teams/{team:slug}', [TeamController::class, 'index'])->name('teams.show');
+Route::get('/teams/{team:slug}', [TeamController::class, 'show'])->name('teams.show');
 Route::get('/teams/{team:slug}/members', function(Team $team) {
     $users = $team->users()->get();
 
@@ -116,6 +120,10 @@ Route::get('/', function () {
             'posts' => Post::all()
         ]);
 })->name('home');
+
+Route::get('/test', function () {
+    return Inertia::render('tst');
+});
 
 require __DIR__.'/settings.php';
 require __DIR__.'/auth.php';

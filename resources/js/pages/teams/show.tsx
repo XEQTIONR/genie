@@ -528,7 +528,9 @@ export default function TeamProfile({
                                     <AvatarFallback variant="square" className="text-3xl">{team.name.split(' ').map(word => word.charAt(0)).join("")}</AvatarFallback>
                                 </Avatar>
                                 <div className="flex flex-col justify-center">
-                                    <h1 className="text-2xl font-bold text-white">{team.name}</h1>
+                                    <div className="flex items-center gap-2">
+                                        <h1 className="text-2xl font-bold text-white">{team.name}</h1> <span className="px-1 py-0.5 text-xs font-bold rounded bg-foreground text-background">STUDIO</span>
+                                    </div>
                                     <div className="flex gap-1 items-center text-sm text-white"><MapPin size={16} /> Toronto, ON</div>
                                 </div>
                             </div>

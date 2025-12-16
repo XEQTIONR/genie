@@ -19,7 +19,9 @@ class ProjectController extends Controller
      */
     public function index()
     {
-        //
+        $projects = Project::with(['creator', 'owner'])->get();
+
+        return Inertia::render('projects/index', ['projects' => $projects]);
     }
 
     /**
