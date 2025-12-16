@@ -22,6 +22,8 @@ return new class extends Migration
             $table->integer('num_views')->default(0);
             $table->string('status');
             $table->foreignId('user_id');
+            $table->foreignId('owner_id');
+            $table->string('owner_type');
             $table->timestamps();
 
             $table->foreign('user_id')->references('id')->on('users');

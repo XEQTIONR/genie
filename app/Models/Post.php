@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class Post extends Model
 {
@@ -18,6 +19,8 @@ class Post extends Model
         'num_likes',
         'num_views',
         'status',
+        'owner_id',
+        'owner_type'
     ];
 
     protected function casts(): array
@@ -30,5 +33,10 @@ class Post extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function owner(): MorphTo
+    {
+        return $this->morphTo();
     }
 }

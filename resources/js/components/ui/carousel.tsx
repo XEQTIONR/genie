@@ -18,6 +18,8 @@ type CarouselProps = {
   plugins?: CarouselPlugin
   orientation?: "horizontal" | "vertical"
   setApi?: (api: CarouselApi) => void
+  showAutoplay?: boolean
+  defaultPlay?: boolean
 }
 
 type CarouselContextProps = {
@@ -48,6 +50,8 @@ function Carousel({
   plugins,
   className,
   children,
+  showAutoplay = true,
+  defaultPlay = true,
   ...props
 }: React.ComponentProps<"div"> & CarouselProps) {
   const [carouselRef, api] = useEmblaCarousel(
@@ -64,7 +68,7 @@ function Carousel({
     useDotButton(api)
 
   const { autoplayIsPlaying, toggleAutoplay } =
-    useAutoplay(api)
+    useAutoplay(api, defaultPlay)
     
 
   const onSelect = React.useCallback((api: CarouselApi) => {
@@ -135,7 +139,7 @@ function Carousel({
       >
         {
           autoplayIsPlaying &&
-          <div onClick={toggleAutoplay} className="absolute w-full aspect-video top-0 left-0 bg-neutral-950/10 rounded-md z-60"></div>
+          <div onClick={toggleAutoplay} className="absolute w-full aspect-video top-0 left-0 bg-red-950/50 rounded-md z-60"></div>
         }
         {children}
         <div className="w-full flex justify-between items-center pt-4 gap-1 relative -top-3">
@@ -153,11 +157,16 @@ function Carousel({
             ))}
           </div>
           <div className="w-1/12 flex justify-end">
-            <Button variant="ghost" size="icon" onClick={toggleAutoplay}>
+          {
+            showAutoplay && (
+              <Button type="button" variant="ghost" size="icon" onClick={toggleAutoplay}>
               {
                 autoplayIsPlaying ? <Pause className="fill-foreground" /> : <Play className="fill-foreground" />
               }
-            </Button>
+              </Button>
+            )
+          }
+            
           </div>
         </div>
       </div>
@@ -214,6 +223,7 @@ function CarouselPrevious({
 
   return (
     <Button
+      type="button"
       data-slot="carousel-previous"
       variant={variant}
       size={size}
@@ -244,6 +254,7 @@ function CarouselNext({
 
   return (
     <Button
+      type="button"
       data-slot="carousel-next"
       variant={variant}
       size={size}
@@ -333,9 +344,10 @@ type UseAutoplayType = {
 }
 
 export const useAutoplay = (
-  emblaApi: EmblaCarouselType | undefined
+  emblaApi: EmblaCarouselType | undefined,
+  defaultPlay: boolean,
 ): UseAutoplayType => {
-  const [autoplayIsPlaying, setAutoplayIsPlaying] = React.useState(false)
+  const [autoplayIsPlaying, setAutoplayIsPlaying] = React.useState(defaultPlay)
 
   const onAutoplayButtonClick = React.useCallback(
     (callback: () => void) => {

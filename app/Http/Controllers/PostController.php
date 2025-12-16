@@ -17,7 +17,7 @@ class PostController extends Controller
     public function index()
     {
         return Inertia::render('posts/index', [
-            'posts' => Post::all()
+            'posts' => Post::with('owner')->get()
         ]);
     }
 
@@ -45,19 +45,22 @@ class PostController extends Controller
         
         $existing = Post::where('slug', $slug)->first();
         $n = 0;
+
         while ($existing) {
-            $slug = str_replace(' ', '-', strtolower($validated['title'])) . '-' .(++$n);
+            $slug = str_replace(' ', '-', strtolower($validated['title'])) . '-' . (++$n);
             $existing = Post::where('slug', $slug)->first();
         }
-        
 
-       
         $validated['status'] = 'created';
         $validated['slug'] = $slug;
 
         $user = User::find(Auth::id());
 
-        $post = new Post($validated);
+        $post = new Post([
+            ...$validated,
+            'owner_type' => User::class,
+            'owner_id' => $user->id,
+        ]);
         $user->posts()->save($post);
         
         return to_route('home');

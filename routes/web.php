@@ -119,9 +119,9 @@ Route::get('/teams/{team:slug}/opportunities', function (Team $team) {
 })->name('teams.opportunities.index');
 
 Route::get('/', function () {
-        return Inertia::render('dashboard', [
-            'posts' => Post::all()
-        ]);
+    return Inertia::render('dashboard', [
+        'posts' => Post::with('owner')->get()
+    ]);
 })->name('home');
 
 Route::get('/test', function () {

@@ -33,7 +33,7 @@ export default function PostsIndex({posts} : {posts: Post[]}) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Show posts" />
-            <div className="flex h-full flex-1 flex-col justify-center gap-4 overflow-x-auto rounded-xl p-4">
+            <div className="flex h-full flex-col justify-center gap-4 overflow-x-auto rounded-xl p-4">
                 {
                     posts.length > 0 && (
                         <>
@@ -49,10 +49,10 @@ export default function PostsIndex({posts} : {posts: Post[]}) {
                                     </SelectGroup>
                                 </SelectContent>
                             </Select>
-                            <div className="grid auto-rows-min gap-4 md:grid-cols-3">
+                            <div className="grid auto-rows-min gap-8 md:grid-cols-3">
                                 {
                                     posts.map((post) => (
-                                        <div className="relative overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
+                                        <div className="relative overflow-hidden rounded-xl">
                                             <GridCard className="cursor-pointer" onClick={() => router.visit(show({post: post.id}))} post={post} />
                                         </div>
                                     ))

@@ -79,14 +79,14 @@ export default function FileDragArea({
                 <EmptyMedia variant="icon">
                 <ImagePlay />
                 </EmptyMedia>
-                <EmptyTitle>No Projects Yet</EmptyTitle>
+                <EmptyTitle>Add Media</EmptyTitle>
                 <EmptyDescription>
-                    You haven&apos;t created any projects yet. Get started by creating your first project.
+                    Drag and drop an image or browse
                 </EmptyDescription>
             </EmptyHeader>
             <EmptyContent>
                 <div className="flex gap-2">
-                    <Button onClick={() => fileInput.current?.click()}>Browse</Button>
+                    <Button type="button" onClick={() => fileInput.current?.click()}>Browse</Button>
                     <input 
                         ref={fileInput} 
                         className="hidden" 

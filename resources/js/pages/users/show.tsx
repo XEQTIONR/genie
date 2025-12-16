@@ -674,6 +674,7 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
                         user.posts?.map((post) => (
                             <div className="flex flex-col gap-3">
                                 <GridCard
+                                    showAuthor={false}
                                     onClick={() => router.visit(showPost({ post: post.id }))} 
                                     className="cursor-pointer" post={post} 
                                 />

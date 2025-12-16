@@ -129,6 +129,7 @@ export type Post = {
     body: unknown[]
     cover: string
     cover_type: string
+    owner?: User|Team
 }
 
 export type ProjectMember = User & {

@@ -30,9 +30,9 @@ import {
 } from "@/components/ui/select"
 import { PlaceholderPattern } from '@/components/ui/placeholder-pattern'
 
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { AlignCenter, AlignJustify, AlignLeft, AlignRight, Eye, Film, Heading1, Heading2, Image, List, ListChecks, ListOrdered, Lock, PencilRuler, WrapText } from 'lucide-react'
+import { AlignCenter, AlignJustify, AlignLeft, AlignRight, Eye, Film, Heading1, Heading2, Image, List, ListChecks, ListOrdered, Lock, PencilRuler, Trash, WrapText } from 'lucide-react'
 import { Checkbox } from '@/components/ui/checkbox'
 import {
   Dialog,
@@ -53,12 +53,19 @@ import { Label } from '@/components/ui/label'
 import {
   InputGroup,
   InputGroupAddon,
-  InputGroupButton,
   InputGroupInput,
   InputGroupText,
-  InputGroupTextarea,
 } from "@/components/ui/input-group"
+import { Card, CardContent } from "@/components/ui/card"
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel"
 import axios from 'axios'
+import FileDragArea from '@/components/file-drag-area'
 
 function Step({step, heading, children} : {step: number, heading: string, children: React.ReactNode}) {
     return (<>
@@ -106,6 +113,7 @@ export default function CreateProject({ user, teams, apiToken } : { user: User, 
     const videoInput = useRef<HTMLInputElement>(null)
     const imageInput = useRef<HTMLInputElement>(null)
     const [image, setImage] = useState<Blob|null>(null)
+    const [slides, setSlides] = useState([])
 
     useEffect(() => {
         const quill = new Quill('#editor', {
@@ -141,6 +149,37 @@ export default function CreateProject({ user, teams, apiToken } : { user: User, 
 
         return []
     }
+
+    const handleSelect = useCallback((f: File) => {
+        //setFileType(f.type)
+
+        const data = new FormData()
+        data.append('file', f)
+        data.append('mime', f.type)
+
+        //setData('cover_type', f.type)
+
+        //setFile(f)
+
+        axios.post(storeImage().url, data, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+                Authorization: 'Bearer ' + apiToken
+            }
+        }).then((res) => {
+            console.log('success:', res.data.upload)
+            //setCoverFile(res.data.upload)
+            //setData('cover', res.data.upload)
+            //setInitialized(true)
+            // setTimeout(() => {
+            //     titleInput.current?.focus()
+            // }, 100) 
+        }).catch((e) => {
+            console.log('error:', e)
+        })
+
+    }, [apiToken])
+
 
     return (
         <AppLayout maxWidth="md:max-w-7xl" breadcrumbs={breadcrumbs}>
@@ -414,12 +453,38 @@ export default function CreateProject({ user, teams, apiToken } : { user: User, 
                 </Step>
                 <Step step={2} heading={"Configuration"}>
                     <FieldGroup className="mt-2">
-                        {/* <Field className="w-1/2"> */}
-                            <input name="owner_type" type="hidden" value={ownerType ?? ""} />
-                            <input name="owner_id" type="hidden" value={ownerId ?? ""} />
-                            {/* <FieldLabel className="font-semibold">Owner *</FieldLabel> */}
-                            
-                        {/* </Field> */}
+                        <Field>
+                            <FieldLabel>
+                                <div className="flex items-center justify-between w-full">
+                                    <span>Cover Images</span>
+                                    <div className="flex">
+                                        <Button variant="ghost" size="icon-sm"><Trash /></Button>
+                                    </div>
+                                </div>
+                            </FieldLabel>
+                            <div className="flex justify-end">
+                                
+                            </div>
+                            <Carousel defaultPlay={false} showAutoplay={false} className="w-full mx-auto">
+                                <CarouselContent>
+                                    <CarouselItem>
+                                        <div onClick={(e) => console.log('p1 clicked')} className="p-1">
+                                        {/* <Card> */}
+                                            <FileDragArea onSelect={(f) => console.log('file:', f)}  />
+                                            {/* <CardContent className="flex aspect-video items-center justify-center p-6">
+                                            <span className="text-4xl font-semibold">{index + 1}</span>
+                                            </CardContent> */}
+                                        {/* </Card> */}
+                                        </div>
+                                    </CarouselItem>
+                                </CarouselContent>
+                                <CarouselPrevious />
+                                <CarouselNext />
+                            </Carousel>
+                        </Field>
+
+                        <input name="owner_type" type="hidden" value={ownerType ?? ""} />
+                        <input name="owner_id" type="hidden" value={ownerId ?? ""} />
                         <Field>
                             <Item variant="outline">
                                 <ItemContent>

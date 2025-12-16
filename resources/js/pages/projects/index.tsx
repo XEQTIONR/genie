@@ -32,7 +32,7 @@ export default function ProjectsIndex({ projects } : { projects: Project[]}) {
                                     projects.map((project) => (
                                         <Link href={show({project: project.slug})} className="flex w-1/4 gap-6">
                                             <div className="w-full h-full border bg-background overflow-clip  rounded-xl dark:shadow-neutral-900 hover:shadow-lg duration-300">
-                                                <div className="w-full aspect-grid bg-neutral-800">
+                                                <div className="w-full aspect-video bg-neutral-800">
 
                                                 </div>
                                                 <div className="w-full flex justify-between p-4 gap-5">
@@ -51,7 +51,7 @@ export default function ProjectsIndex({ projects } : { projects: Project[]}) {
                                                                     <span className="text-xs font-medium">{project.owner?.name}</span>
                                                                 </div>
                                                             </div>
-                                                            <p className="text-dim">{project.excerpt}</p>
+                                                            <p className="text-dim text-sm">{project.excerpt}</p>
                                                         </div>
                                                     </div>
                                                     <div className="flex gap-3">
