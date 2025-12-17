@@ -23,6 +23,8 @@ export default function ProjectsIndex({ projects } : { projects: Project[]}) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Projects" />
+            <h1 className="text-2xl font-bold mt-5 w-full max-w-9xl mx-auto">Projects</h1>
+            <span className="mb-5 text-sm w-full max-w-9xl mx-auto">Projects people are working on.</span>
             <div className="flex flex-col items-center gap-4 overflow-x-auto rounded-xl p-4">
                 {
                     projects.length > 0 && (

@@ -22,7 +22,9 @@ export default function TeamsIndex({ teams } : { teams: Team[]}) {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Teamw" />
+            <Head title="Team" />
+            <h1 className="text-2xl font-bold mt-5 w-full max-w-9xl mx-auto">Teams</h1>
+            <span className="mb-5 text-sm w-full max-w-9xl mx-auto">Teams of great people.</span>
             <div className="flex flex-col items-center gap-4 overflow-x-auto rounded-xl p-4">
                 {
                     teams.length > 0 && (
@@ -39,13 +41,13 @@ export default function TeamsIndex({ teams } : { teams: Team[]}) {
                                                     </Avatar>
                                                     <div className="flex flex-col gap-2">
                                                         <div className="flex items-center gap-2">
-                                                            <span className="font-bold text-2xl">{team.name}</span>
+                                                            <span className="font-bold text-xl">{team.name}</span>
                                                             <span className="px-1 py-0.5 text-xs font-bold rounded bg-foreground text-background">STUDIO</span>
                                                         </div>
                                                         <div className="flex gap-5">
-                                                            <span className="flex items-center gap-1 text-sm"><Users size={16} /> 52 members</span>
-                                                            <span className="flex items-center gap-1 text-sm"><PencilRuler size={16} /> 5 projects</span>
-                                                            <span className="flex items-center gap-1 text-sm"><BriefcaseBusiness size={16} /> 8 opportunities</span>
+                                                            <span className="flex items-center gap-1 text-sm"><Users size={16} /> {team?.users_count} members</span>
+                                                            <span className="flex items-center gap-1 text-sm"><PencilRuler size={16} /> {team?.projects_count} projects</span>
+                                                            <span className="flex items-center gap-1 text-sm"><BriefcaseBusiness size={16} /> {team?.opportunities_count} opportunities</span>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -56,10 +58,11 @@ export default function TeamsIndex({ teams } : { teams: Team[]}) {
                                                 </div>
                                             </div>
                                             <div className="flex w-full gap-5">
-                                                <div className="w-1/4 aspect-grid border rounded-lg"></div>
-                                                <div className="w-1/4 aspect-grid border rounded-lg"></div>
-                                                <div className="w-1/4 aspect-grid border rounded-lg"></div>
-                                                <div className="w-1/4 aspect-grid border rounded-lg"></div>
+                                                <div className="w-1/5 aspect-grid border rounded-lg"></div>
+                                                <div className="w-1/5 aspect-grid border rounded-lg"></div>
+                                                <div className="w-1/5 aspect-grid border rounded-lg"></div>
+                                                <div className="w-1/5 aspect-grid border rounded-lg"></div>
+                                                <div className="w-1/5 aspect-grid border rounded-lg"></div>
                                             </div>
                                             
                                             {/* {team.avatar} */}

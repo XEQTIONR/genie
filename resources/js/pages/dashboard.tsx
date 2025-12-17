@@ -60,7 +60,7 @@ export default function Dashboard({posts} : {posts: Post[]}) {
                     posts.length > 0 && (
                         <>
                             <h2 className="text-xl font-bold mt-10 mb-5">Discover</h2>
-                            <div className="grid auto-rows-min gap-8 md:grid-cols-3">
+                            <div className="grid auto-rows-min gap-8 md:grid-cols-4">
                                 {
                                     posts.map((post) => (
                                         <div className="relative overflow-hidden rounded-xl">

@@ -32,7 +32,7 @@ export default function UserIndex({users}: {users: User[]}) {
                                     <AvatarFallback>{getInitials(name)}</AvatarFallback>
                                 </Avatar>
                                 <div className="">
-                                    <span className="font-bold">{name}</span>
+                                    <span className="font-medium">{name}</span>
                                 </div>
                             </Link>
                         ))

@@ -23,7 +23,7 @@ class TeamController extends Controller
     public function index()
     {
         return Inertia::render('teams/index', [
-            'teams' => Team::all(),
+            'teams' => Team::withCount(['projects', 'opportunities', 'users'])->get(),
             //'user_count' => $team->users()->count()
         ]);
     }

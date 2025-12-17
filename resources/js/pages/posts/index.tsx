@@ -33,7 +33,7 @@ export default function PostsIndex({posts} : {posts: Post[]}) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Show posts" />
-            <div className="flex h-full flex-col justify-center gap-4 overflow-x-auto rounded-xl p-4">
+            <div className="flex mx-auto max-w-9xl h-full flex-col justify-center gap-4 overflow-x-auto rounded-xl py-4">
                 {
                     posts.length > 0 && (
                         <>
@@ -49,7 +49,7 @@ export default function PostsIndex({posts} : {posts: Post[]}) {
                                     </SelectGroup>
                                 </SelectContent>
                             </Select>
-                            <div className="grid auto-rows-min gap-8 md:grid-cols-3">
+                            <div className="grid auto-rows-min gap-8 md:grid-cols-4">
                                 {
                                     posts.map((post) => (
                                         <div className="relative overflow-hidden rounded-xl">

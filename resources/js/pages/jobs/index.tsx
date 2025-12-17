@@ -14,9 +14,11 @@ export default function JobsIndex({opportunities}: {opportunities: { data: Oppor
     ]
 
     return (
-        <AppLayout maxBodyWidth="md:max-w-10xl" breadcrumbs={breadcrumbs}>
+        <AppLayout maxBodyWidth="md:max-w-9xl" breadcrumbs={breadcrumbs}>
             <Head title="Opportunities" />
-            <div className="w-full flex flex-col px-3">
+            <h1 className="text-2xl font-bold mt-5">Opportunities</h1>
+            <span className="mb-5 text-sm">Find opportunitites on projects or teams where you can help.</span>
+            <div className="w-full flex flex-col">
                 <OpportunityList opportunities={opportunities.data ?? []} />
             </div>
         </AppLayout>

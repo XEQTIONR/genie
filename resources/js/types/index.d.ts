@@ -86,6 +86,8 @@ export interface Team {
     created_at: string
     updated_at: string
     users_count?: number
+    projects_count?: number
+    opportunities_count?: number
     owner_id: number
 }
 
