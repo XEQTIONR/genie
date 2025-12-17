@@ -49,6 +49,7 @@ class ProjectController extends Controller
             'owner_id' => 'required|integer',
             'visibility' => 'required|in:public,private',
             'platforms' => 'required|array',
+            'cover_media' => 'required|array|min:1'
         ]);
 
         $validated['owner_type'] = match ($validated['owner_type']) {

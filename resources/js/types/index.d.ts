@@ -61,6 +61,7 @@ export interface Project {
     owner?: User | Team
     owner_type: ProjectOwner
     members?: ProjectMember[]
+    cover_media: { url: string, mime: string}[]
 }
 
 export interface ProjectInvitation {

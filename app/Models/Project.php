@@ -25,7 +25,8 @@ class Project extends Model
         'owner_id',
         'owner_type',
         'creator_id',
-        'visibility'
+        'visibility',
+        'cover_media',
     ];
 
     protected function casts(): array
@@ -33,7 +34,8 @@ class Project extends Model
         return [
             'platforms' => 'array',
             'tools' => 'array',
-            'released' => 'boolean'
+            'released' => 'boolean',
+            'cover_media' => 'array'
         ];
     }
 

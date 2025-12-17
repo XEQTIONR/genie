@@ -113,7 +113,7 @@ export default function CreateProject({ user, teams, apiToken } : { user: User, 
     const videoInput = useRef<HTMLInputElement>(null)
     const imageInput = useRef<HTMLInputElement>(null)
     const [image, setImage] = useState<Blob|null>(null)
-    const [slides, setSlides] = useState([])
+    const [slides, setSlides] = useState<{url: string, mime: string}[]>([])
 
     useEffect(() => {
         const quill = new Quill('#editor', {
@@ -168,12 +168,7 @@ export default function CreateProject({ user, teams, apiToken } : { user: User, 
             }
         }).then((res) => {
             console.log('success:', res.data.upload)
-            //setCoverFile(res.data.upload)
-            //setData('cover', res.data.upload)
-            //setInitialized(true)
-            // setTimeout(() => {
-            //     titleInput.current?.focus()
-            // }, 100) 
+            setSlides((s) => [...s, { url: res.data.upload, mime: f.type }]) 
         }).catch((e) => {
             console.log('error:', e)
         })
@@ -189,7 +184,8 @@ export default function CreateProject({ user, teams, apiToken } : { user: User, 
                 className="w-full max-w-4xl mx-auto flex flex-col pt-8 px-4"
                 transform={(data) => ({
                     ...data,
-                    description: editor.current?.root.innerHTML
+                    description: editor.current?.root.innerHTML,
+                    cover_media: slides
                 })}
             >
                 <div className="flex items-center gap-3 mb-1">
@@ -217,7 +213,7 @@ export default function CreateProject({ user, teams, apiToken } : { user: User, 
                             <FieldLabel>Description</FieldLabel>
                             {/* <Textarea name="description" className="h-28" /> */}
                             <div className='max-w-full flex justify-start'>
-                                <ButtonGroup>
+                                <ButtonGroup className="flex-wrap">
                                     <ButtonGroup>
                                         <Button type="button" variant="outline" size="icon" onClick={() => {
                                             const [a, b] = selection()
@@ -465,17 +461,40 @@ export default function CreateProject({ user, teams, apiToken } : { user: User, 
                             <div className="flex justify-end">
                                 
                             </div>
-                            <Carousel defaultPlay={false} showAutoplay={false} className="w-full mx-auto">
+                            <Carousel defaultPlay={false} showAutoplay={false} className="max-w-4xl mx-auto">
                                 <CarouselContent>
+                                    {
+                                        slides.map(({ url, mime }) => (
+                                            <CarouselItem>
+                                                
+                                                    {
+                                                        mime.split("/")[0] === 'image' && (
+                                                            <img className="w-full object-cover aspect-grid rounded-lg" src={url} />
+                                                        )
+                                                    }
+                                                    {
+                                                        mime.split("/")[0] === 'video' && (
+                                                            <div className='rounded-lg border overflow-clip'>
+                                                                <video className="w-full">
+                                                                <source src={url} type={mime} />
+                                                            </video>
+                                                            </div>
+                                                            
+                                                        )
+                                                    }
+                                               
+                                            </CarouselItem>
+                                        ))
+                                    }
                                     <CarouselItem>
-                                        <div onClick={(e) => console.log('p1 clicked')} className="p-1">
+                                        
                                         {/* <Card> */}
-                                            <FileDragArea onSelect={(f) => console.log('file:', f)}  />
+                                            <FileDragArea className='h-full' onSelect={handleSelect}  />
                                             {/* <CardContent className="flex aspect-video items-center justify-center p-6">
                                             <span className="text-4xl font-semibold">{index + 1}</span>
                                             </CardContent> */}
                                         {/* </Card> */}
-                                        </div>
+                                        
                                     </CarouselItem>
                                 </CarouselContent>
                                 <CarouselPrevious />

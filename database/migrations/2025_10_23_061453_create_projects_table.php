@@ -20,6 +20,7 @@ return new class extends Migration
             $table->text('excerpt')->nullable();
             $table->text('body')->nullable();
             $table->json('platforms')->nullable();
+            $table->json('cover_media')->nullable();
             $table->string('visibility')->default('public');
             $table->json('tools')->nullable();
             $table->boolean('released')->default(false);

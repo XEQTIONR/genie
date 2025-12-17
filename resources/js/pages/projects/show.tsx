@@ -85,17 +85,23 @@ export default function ShowProject({ project, h } : {
                             ]}
                         >
                             <CarouselContent>
-                                {[
-                                    'https://www.youtube.com/embed/7gTmT-Kko2w?si=tKbW1693_Bo7RVCi',
-                                    'https://www.youtube.com/embed/kAiFVcd9cAA?si=vqD0MBPwIfWG_a80',
-                                    'https://www.kickstarter.com/projects/ivstudios/honors-end/widget/video.html',
-                                ].map((url, index) => (
-                                    <CarouselItem key={index}>
-                                        <div className="aspect-video flex items-center justify-center rounded-md">
-                                            <iframe id={"iframe"+index} className="w-full h-full rounded-md" src={url} title="YouTube video player" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen="true"></iframe>
-                                        </div>
-                                    </CarouselItem>
-                                ))}
+                                {
+                                    project.cover_media.map(({url, mime}) => {
+                                        return <CarouselItem>
+                                            {
+                                                mime.split("/")[0] == 'video'
+                                                    ? (
+                                                        <video controls className="aspect-grid object-cover rounded-lg">
+                                                            <source className="" src={url} type={mime} />
+                                                        </video>
+                                                    ) : (
+                                                        <img className="w-full aspect-grid object-cover rounded-lg" src={url} />
+                                                    )
+                                            }
+                                            
+                                        </CarouselItem>
+                                    })
+                                }
                             </CarouselContent>
                             <CarouselPrevious className="hidden md:flex z-60" />
                             <CarouselNext className="hidden md:flex z-60" />

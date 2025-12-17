@@ -139,7 +139,7 @@ function Carousel({
       >
         {
           autoplayIsPlaying &&
-          <div onClick={toggleAutoplay} className="absolute w-full aspect-video top-0 left-0 bg-red-950/50 rounded-md z-60"></div>
+          <div onClick={toggleAutoplay} className="absolute w-full aspect-video top-0 left-0 bg-neutral-950/10 rounded-md z-60"></div>
         }
         {children}
         <div className="w-full flex justify-between items-center pt-4 gap-1 relative -top-3">

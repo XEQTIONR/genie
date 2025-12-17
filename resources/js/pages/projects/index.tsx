@@ -27,13 +27,22 @@ export default function ProjectsIndex({ projects } : { projects: Project[]}) {
                 {
                     projects.length > 0 && (
                         <>
-                            <div className="flex gap-10 w-full max-w-9xl">
+                            <div className="grid grid-cols-4 gap-10 w-full max-w-9xl">
                                 {
                                     projects.map((project) => (
-                                        <Link href={show({project: project.slug})} className="flex w-1/4 gap-6">
+                                        <Link href={show({project: project.slug})} className="flex gap-6">
                                             <div className="w-full h-full border bg-background overflow-clip  rounded-xl dark:shadow-neutral-900 hover:shadow-lg duration-300">
-                                                <div className="w-full aspect-video bg-neutral-800">
-
+                                                <div className="w-full aspect-grid bg-neutral-800">
+                                                    {
+                                                        project.cover_media[0].mime.split("/")[0] == 'video'
+                                                        ? (
+                                                            <video className="aspect-grid object-cover rounded-lg">
+                                                                <source className="" src={project.cover_media[0].url} type={project.cover_media[0].mime} />
+                                                            </video>
+                                                        ) : (
+                                                            <img className="w-full aspect-grid object-cover rounded-lg" src={project.cover_media[0].url} />
+                                                        )
+                                                    }
                                                 </div>
                                                 <div className="w-full flex justify-between p-4 gap-5">
                                                     <div className="flex gap-3 grow">
@@ -51,7 +60,6 @@ export default function ProjectsIndex({ projects } : { projects: Project[]}) {
                                                                     <span className="text-xs font-medium">{project.owner?.name}</span>
                                                                 </div>
                                                             </div>
-                                                            <p className="text-dim text-sm">{project.excerpt}</p>
                                                         </div>
                                                     </div>
                                                     <div className="flex gap-3">
@@ -59,10 +67,8 @@ export default function ProjectsIndex({ projects } : { projects: Project[]}) {
                                                         <Button variant="outline" className="rounded-full" size="icon-sm"><Heart /></Button>
                                                     </div>
                                                 </div>
+                                                <p className="pb-4 px-4 text-dim text-sm">{project.excerpt}</p>
                                             </div>
-                                            
-                                            
-                                            {/* {team.avatar} */}
                                         </Link>
                                     ))
                                 }
