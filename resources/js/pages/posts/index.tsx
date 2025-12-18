@@ -24,8 +24,6 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-const items: Array<string> = []//(new Array(50)).fill(0)
-
 
 export default function PostsIndex({posts} : {posts: Post[]}) {
     const [q, setQ] = useState("")
@@ -37,7 +35,6 @@ export default function PostsIndex({posts} : {posts: Post[]}) {
                 {
                     posts.length > 0 && (
                         <>
-                            {/* <h2 className="text-xl font-bold">Discover</h2> */}
                             <Select defaultValue="popular">
                                 <SelectTrigger className="w-[180px] font-semibold">
                                     <SelectValue placeholder="Select a fruit" />

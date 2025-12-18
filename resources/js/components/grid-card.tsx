@@ -1,22 +1,31 @@
-import { useRef, useState } from "react";
-import { Eye, Heart } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { Post } from "@/types";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { useInitials } from "@/hooks/use-initials";
+import axios from 'axios'
+import { useRef, useState } from "react"
+import { Eye, Heart } from "lucide-react"
+import { cn } from "@/lib/utils"
+import { Post, SharedData } from "@/types"
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
+import { useInitials } from "@/hooks/use-initials"
+import { usePage } from "@inertiajs/react"
+import { store, destroy } from '@/routes/api/likes'
+
 export default function GridCard({
     className = "", 
     post,
     onClick,
     showAuthor = true
 } : {
-    className?: string, 
-    post: Post,
+    className?: string
+    post: Post
     onClick?: () => void
     showAuthor?: boolean
 })  {
 
+    const { apiToken } = usePage<SharedData>().props
+
     const [hovered, setHovered] = useState(false)
+    const [numLikes, setNumLikes] = useState(post.likes_count ?? post.num_likes ?? 0)
+    const [likes, setILike] = useState(post.likes ?? [])
+    const [likeClasses, setLikeClasses] = useState('')
 
     const getInitials = useInitials()
     
@@ -40,7 +49,6 @@ export default function GridCard({
                     post.cover_type.split("/")[0] == "video" && (
                         <video ref={video} muted playsInline loop className="min-h-full min-w-full object-cover"
                             onMouseEnter={(e) => {
-                                console.log('enter')
                                 video.current?.play()
                             }}
                             onMouseLeave={(e) => video.current?.pause()}
@@ -81,13 +89,64 @@ export default function GridCard({
                     <div className="w-full flex justify-between">
                         <span className="font-semibold text-sm">{post.owner?.name}</span>
                         <div className="flex gap-5">
-                            <div className="flex items-center gap-1">
-                                <Heart strokeWidth={2.5} className="size-4" />
-                                <span className="text-sm font-semibold">45</span>
+                            <div className="flex items-center gap-1.5">
+                                <Heart 
+                                    strokeWidth={2.5} 
+                                    className={cn(
+                                        "size-4 cursor-pointer",
+                                        (likes.length > 0) ? "fill-pink-600 stroke-pink-600 " : "hover:fill-pink-600 hover:stroke-pink-600",
+                                        likeClasses
+                                    )} 
+                                    onClick={() => {
+                                        
+                                        if (likes.length === 0) {
+                                            axios.post(store().url, {
+                                                likeable_id: post.id,
+                                                likeable_type: 'post'
+                                            }, {
+                                                headers: {
+                                                    'Content-Type': 'multipart/form-data',
+                                                    Authorization: 'Bearer ' + apiToken
+                                                }
+                                            }).then(res => {
+                                                setNumLikes(l => l+1)
+                                                setILike(l => {
+                                                    if (l) {
+                                                        return [...l, res.data]
+                                                    }
+                                                    return [res.data]
+                                                })
+                                                setLikeClasses("")
+                                                setTimeout(() => {
+                                                    setLikeClasses("animate-wave fill-pink-600 stroke-pink-600 ")
+                                                }, 100)
+                                            }).catch(e => {
+                                                console.log('like error:', e)
+                                            })
+                                        } else {
+                                            axios.delete(destroy({ like: likes[0].id }).url, {
+                                                headers: {
+                                                    'Content-Type': 'multipart/form-data',
+                                                    Authorization: 'Bearer ' + apiToken
+                                                }
+                                            }).then(() => {
+                                                setNumLikes(l => l - 1)
+                                                setILike([])
+                                                setLikeClasses("")
+                                                setTimeout(() => {
+                                                    setLikeClasses("animate-wave")
+                                                }, 100)
+                                            }).catch((e) => {
+                                                console.log('unlike error:', e)
+                                            })
+                                        }
+                                    }}
+                                />
+                                <span className="text-sm font-semibold min-w-5">{numLikes}</span>
                             </div>
-                            <div className="flex items-center gap-1">
-                                <Eye strokeWidth={2.5} className="size-4 " />
-                                <span className="text-sm font-semibold">500</span>
+                            <div className="flex items-center gap-1.5">
+                                <Eye strokeWidth={2.5} className="size-4" />
+                                <span className="text-sm font-semibold min-w-5">{post.num_views}</span>
                             </div>
                         </div>
                     </div>

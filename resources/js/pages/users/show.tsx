@@ -56,7 +56,7 @@ import SearchBar from '@/components/ui/search-bar'
 import { Separator } from '@/components/ui/separator'
 import { type SharedData } from '@/types'
 import { show, about } from '@/routes/users'
-import { show as showPost } from '@/routes/posts'
+import { index as indexPost, create as createPost, show as showPost } from '@/routes/posts'
 import { show as showTeam } from '@/routes/teams'
 import { Spinner } from '@/components/ui/spinner'
 import { store as storeImage } from '@/routes/api/uploads'
@@ -667,7 +667,10 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
                 return (
                     <div className={cn(
                         "w-full p-5 max-w-9xl mx-auto",
-                        "grid grid-cols-1 md:grid-cols-3 gap-5"
+                        
+                        (user.posts && (user.posts.length > 0)) 
+                            ? "grid grid-cols-1 md:grid-cols-3 gap-5"
+                            : "flex justify-center"
                     )}>
                     {
                         (user.posts && (user.posts.length > 0)) ?
@@ -680,7 +683,7 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
                                 />
                             </div>
                         )) : (
-                            <Empty className="">
+                            <Empty>
                                 <EmptyHeader>
                                     <EmptyMedia variant="icon">
                                     <LayoutGrid />
@@ -693,8 +696,8 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
                                 </EmptyHeader>
                                 <EmptyContent>
                                     <div className="flex gap-2">
-                                    <Button>Create a post</Button>
-                                    <Button variant="outline">Browse posts</Button>
+                                    <Button className="cursor-pointer" onClick={() => router.visit(createPost())}>Create a post</Button>
+                                    <Button className="cursor-pointer" onClick={() => router.visit(indexPost())} variant="outline">Browse posts</Button>
                                     </div>
                                 </EmptyContent>
                                 <Button

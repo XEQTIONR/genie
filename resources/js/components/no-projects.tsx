@@ -8,6 +8,8 @@ import {
 } from "@/components/ui/empty"
 import { ArrowUpRight, PencilRuler } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { create } from "@/routes/projects"
+import { router } from "@inertiajs/react"
 
 export default function NoProjects() {
     return (
@@ -23,7 +25,7 @@ export default function NoProjects() {
             </EmptyHeader>
             <EmptyContent>
                 <div className="flex gap-2"> 
-                    <Button className="cursor-pointer">Create a new project</Button>
+                    <Button onClick={() => router.visit(create())} className="cursor-pointer">Create a new project</Button>
                     {/* <Button className="cursor-pointer" variant="outline">Join existing team</Button> */}
                 </div>
             </EmptyContent>

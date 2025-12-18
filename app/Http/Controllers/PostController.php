@@ -4,9 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Post;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 
 class PostController extends Controller
@@ -16,8 +16,14 @@ class PostController extends Controller
      */
     public function index()
     {
+        $posts = Post::with('owner')->withCount(['likes', 'views'])->get();
+        
+        $posts->load(['likes' => function(MorphMany $query) {
+            $query->where('user_id', Auth::id());
+        }]);
+
         return Inertia::render('posts/index', [
-            'posts' => Post::with('owner')->get()
+            'posts' => $posts
         ]);
     }
 

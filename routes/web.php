@@ -18,6 +18,7 @@ use App\Models\Team;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/teams', [TeamController::class, 'store'])->name('teams.store');
@@ -119,8 +120,13 @@ Route::get('/teams/{team:slug}/opportunities', function (Team $team) {
 })->name('teams.opportunities.index');
 
 Route::get('/', function () {
+    $posts = Post::with('owner')->withCount(['likes', 'views'])->get();
+    $posts->load(['likes' => function($query) {
+        $query->where('user_id', Auth::id());
+    }]);
+
     return Inertia::render('dashboard', [
-        'posts' => Post::with('owner')->get()
+        'posts' => $posts
     ]);
 })->name('home');
 

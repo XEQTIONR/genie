@@ -133,6 +133,10 @@ export type Post = {
     cover: string
     cover_type: string
     owner?: User|Team
+    num_likes?: number
+    num_views?: number
+    likes_count?: number
+    likes?: Like[]
 }
 
 export type ProjectMember = User & {
@@ -156,4 +160,11 @@ export interface Opportunity {
     owner?: Team | Project
     owner_type: 'Team' | 'Project'
     created_at: string
+}
+
+export interface Like {
+    id: number
+    likeable_type: string
+    likeable_id: number
+    user_id: number
 }

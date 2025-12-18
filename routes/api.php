@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\LikeController;
 use App\Http\Controllers\UploadController;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -19,5 +20,9 @@ Route::name('api.')->group(function() {
         Route::get('/users', function(Request $request) {
             return User::whereAny(['username', 'email'], $request->q)->first();
         })->name('users.index');
+
+        Route::post('/like', [LikeController::class, 'store'])->name('likes.store');
+        Route::delete('/like/{like}', [LikeController::class, 'destroy'])->name('likes.destroy');
+
     });
 });
