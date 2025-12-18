@@ -134,7 +134,7 @@ export type Post = {
     cover_type: string
     owner?: User|Team
     num_likes?: number
-    num_views?: number
+    views_count?: number
     likes_count?: number
     likes?: Like[]
 }

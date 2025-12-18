@@ -20,7 +20,7 @@ export default function GridCard({
     showAuthor?: boolean
 })  {
 
-    const { apiToken } = usePage<SharedData>().props
+    const { apiToken, auth } = usePage<SharedData>().props
 
     const [hovered, setHovered] = useState(false)
     const [numLikes, setNumLikes] = useState(post.likes_count ?? post.num_likes ?? 0)
@@ -99,54 +99,57 @@ export default function GridCard({
                                     )} 
                                     onClick={() => {
                                         
-                                        if (likes.length === 0) {
-                                            axios.post(store().url, {
-                                                likeable_id: post.id,
-                                                likeable_type: 'post'
-                                            }, {
-                                                headers: {
-                                                    'Content-Type': 'multipart/form-data',
-                                                    Authorization: 'Bearer ' + apiToken
-                                                }
-                                            }).then(res => {
-                                                setNumLikes(l => l+1)
-                                                setILike(l => {
-                                                    if (l) {
-                                                        return [...l, res.data]
+                                        if (auth.user) {
+                                            if (likes.length === 0) {
+                                                axios.post(store().url, {
+                                                    likeable_id: post.id,
+                                                    likeable_type: 'post'
+                                                }, {
+                                                    headers: {
+                                                        'Content-Type': 'multipart/form-data',
+                                                        Authorization: 'Bearer ' + apiToken
                                                     }
-                                                    return [res.data]
+                                                }).then(res => {
+                                                    setNumLikes(l => l+1)
+                                                    setILike(l => {
+                                                        if (l) {
+                                                            return [...l, res.data]
+                                                        }
+                                                        return [res.data]
+                                                    })
+                                                    setLikeClasses("")
+                                                    setTimeout(() => {
+                                                        setLikeClasses("animate-wave fill-pink-600 stroke-pink-600 ")
+                                                    }, 100)
+                                                }).catch(e => {
+                                                    console.log('like error:', e)
                                                 })
-                                                setLikeClasses("")
-                                                setTimeout(() => {
-                                                    setLikeClasses("animate-wave fill-pink-600 stroke-pink-600 ")
-                                                }, 100)
-                                            }).catch(e => {
-                                                console.log('like error:', e)
-                                            })
-                                        } else {
-                                            axios.delete(destroy({ like: likes[0].id }).url, {
-                                                headers: {
-                                                    'Content-Type': 'multipart/form-data',
-                                                    Authorization: 'Bearer ' + apiToken
-                                                }
-                                            }).then(() => {
-                                                setNumLikes(l => l - 1)
-                                                setILike([])
-                                                setLikeClasses("")
-                                                setTimeout(() => {
-                                                    setLikeClasses("animate-wave")
-                                                }, 100)
-                                            }).catch((e) => {
-                                                console.log('unlike error:', e)
-                                            })
+                                            } else {
+                                                axios.delete(destroy({ like: likes[0].id }).url, {
+                                                    headers: {
+                                                        'Content-Type': 'multipart/form-data',
+                                                        Authorization: 'Bearer ' + apiToken
+                                                    }
+                                                }).then(() => {
+                                                    setNumLikes(l => l - 1)
+                                                    setILike([])
+                                                    setLikeClasses("")
+                                                    setTimeout(() => {
+                                                        setLikeClasses("animate-wave")
+                                                    }, 100)
+                                                }).catch((e) => {
+                                                    console.log('unlike error:', e)
+                                                })
+                                            }
                                         }
+                                        
                                     }}
                                 />
                                 <span className="text-sm font-semibold min-w-5">{numLikes}</span>
                             </div>
                             <div className="flex items-center gap-1.5">
                                 <Eye strokeWidth={2.5} className="size-4" />
-                                <span className="text-sm font-semibold min-w-5">{post.num_views}</span>
+                                <span className="text-sm font-semibold min-w-5">{post.views_count}</span>
                             </div>
                         </div>
                     </div>

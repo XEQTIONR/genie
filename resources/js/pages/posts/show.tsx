@@ -1,5 +1,9 @@
 import AppLayout from '@/layouts/app-layout'
-import { Post, BreadcrumbItem } from '@/types';
+import { Post, BreadcrumbItem, SharedData } from '@/types';
+import { useEffect } from 'react';
+import { store as storeView } from '@/routes/api/views';
+import axios from 'axios'
+import { usePage } from '@inertiajs/react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -15,6 +19,20 @@ function replaceNbsps(str: string) {
 
 export default function ShowPost({post} : {post: Post}) {
 
+    const { apiToken } = usePage<SharedData>().props
+    useEffect(() => {
+        console.log('storeView')
+        axios.post(storeView().url, {
+            viewable_type: 'post',
+            viewable_id: post.id
+        }, {
+            headers: {
+                Authorization: 'Bearer ' + apiToken
+            }
+        })
+            .then(res => console.log('storeView response:', res))
+            .catch(e => console.log('error:', e))
+    }, [])
     return <AppLayout breadcrumbs={breadcrumbs}>
         {
             <div className="w-full flex flex-col gap-7 mx-auto max-w-5xl">
