@@ -355,10 +355,7 @@ export function AppHeader({ breadcrumbs = [], maxWidth }: AppHeaderProps) {
                                         </ul>
                                     </NavigationMenuContent>
                                 </NavigationMenuItem>
-                                <NavigationMenuItem>
-                                    {/* <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
-                                        <Link href="/">Home</Link>
-                                    </NavigationMenuLink> */}
+                                {/* <NavigationMenuItem>
                                     <NavigationMenuTrigger>Start</NavigationMenuTrigger>
                                     <NavigationMenuContent >
                                         <ul className="grid gap-2 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
@@ -388,7 +385,7 @@ export function AppHeader({ breadcrumbs = [], maxWidth }: AppHeaderProps) {
                                         </ListItem>
                                         </ul>
                                     </NavigationMenuContent>
-                                </NavigationMenuItem>
+                                </NavigationMenuItem> */}
                                 {/* <NavigationMenuItem>
                                 <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
                                     <Link href="/docs">Docs</Link>
