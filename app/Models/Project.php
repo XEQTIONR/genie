@@ -61,4 +61,14 @@ class Project extends Model
     {
         return $this->morphMany(Opportunity::class, 'owner');
     }
+
+    public function likes(): MorphMany
+    {
+        return $this->morphMany(Like::class, 'likeable');
+    }
+
+    public function views(): MorphMany
+    {
+        return $this->morphMany(View::class, 'viewable');
+    }
 }

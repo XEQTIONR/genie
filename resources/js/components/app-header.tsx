@@ -46,45 +46,6 @@ import AppLogoIcon from './app-logo-icon';
 import { useEffect } from 'react';
 import ShowPost from '@/pages/posts/show';
 
-const components: { title: string; href: string; description: string }[] = [
-  {
-    title: "Ideas",
-    href: "/docs/primitives/alert-dialog",
-    description:
-      "Inspirational ideas worth sharing.",
-  },
-  
-  {
-    title: "Teams",
-    href: "/docs/primitives/progress",
-    description:
-      "Group of talented people that work on game projects and releases",
-  },
-  {
-    title: "Projects",
-    href: "/docs/primitives/hover-card",
-    description:
-      "Game development projects that people and teams are working on.",
-  },
-  {
-    title: "Releases",
-    href: "/docs/primitives/scroll-area",
-    description: "Finished development titles that are availble to the public.",
-  },
-  {
-    title: "Openings",
-    href: "/docs/primitives/tabs",
-    description:
-      "Help people finish their existing projects.",
-  },
-  {
-    title: "Users",
-    href: "/docs/primitives/tooltip",
-    description:
-      "All people that are on this app.",
-  },
-]
-
 const rightNavItems: NavItem[] = [
     {
         title: 'Repository',
@@ -120,7 +81,6 @@ function ListItem({
                     </p>
                 </div>
             </div>
-          
         </Link>
       </NavigationMenuLink>
     </li>
@@ -313,7 +273,7 @@ export function AppHeader({ breadcrumbs = [], maxWidth }: AppHeaderProps) {
                                         </ul>
                                     </NavigationMenuContent>
                                 </NavigationMenuItem> */}
-                                <NavigationMenuItem className="hidden md:block">
+                                <NavigationMenuItem key="explore">
                                     <NavigationMenuTrigger>Explore</NavigationMenuTrigger>
                                     <NavigationMenuContent>
                                     <ul className="grid w-[200px] p-1">
@@ -342,7 +302,7 @@ export function AppHeader({ breadcrumbs = [], maxWidth }: AppHeaderProps) {
                                     </ul>
                                     </NavigationMenuContent>
                                 </NavigationMenuItem>
-                                <NavigationMenuItem>
+                                <NavigationMenuItem key="opportunites">
                                     <NavigationMenuTrigger>Opportunities</NavigationMenuTrigger>
                                     <NavigationMenuContent>
                                         <ul className="grid p-1 gap-2 sm:w-[350px]">

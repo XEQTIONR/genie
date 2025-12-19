@@ -1,5 +1,5 @@
 import AppLayout from "@/layouts/app-layout";
-import { BreadcrumbItem, Project, ProjectMember } from "@/types";
+import { BreadcrumbItem, Project, ProjectMember, SharedData } from "@/types";
 import { Head, Link } from "@inertiajs/react";
 import {
   Sheet,
@@ -12,8 +12,8 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet"
 import { Button } from "@/components/ui/button";
-import { ChartNoAxesColumnIncreasing, ChevronDown, Code, CodeXml, Facebook, Heart, Mail, Menu, Twitter } from "lucide-react";
-import { useRef, useState } from "react";
+import { Bookmark, ChartNoAxesColumnIncreasing, ChevronDown, Code, CodeXml, Facebook, Heart, Mail, Menu, Twitter } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import {
   Carousel,
@@ -40,6 +40,9 @@ import '/resources/css/projects.css'
 import ThreeColLayout from "./components/three-col-layout";
 import { Separator } from "@/components/ui/separator";
 import { TEAMMODEL } from "@/types/values";
+import axios from 'axios'
+import { usePage } from '@inertiajs/react'
+import { store as storeView } from '@/routes/api/views'
 
 export default function ShowProject({ project, h } : { 
     project: Project 
@@ -66,6 +69,20 @@ export default function ShowProject({ project, h } : {
     const [currentTab, setCurrentTab] = useState("kontent")
     const [sidebarOpen, setSidebarOpen] = useState(false)
     const sectionNav = useRef(null)
+
+    const { apiToken } = usePage<SharedData>().props
+    useEffect(() => {
+        axios.post(storeView().url, {
+            viewable_type: 'project',
+            viewable_id: project.id
+        }, {
+            headers: {
+                Authorization: 'Bearer ' + apiToken
+            }
+        })
+            .then(res => console.log('storeView response:', res))
+            .catch(e => console.log('error:', e))
+    }, [])
 
     return (
         <AppLayout maxBodyWidth="w-full" breadcrumbs={breadcrumbs}>
@@ -108,8 +125,22 @@ export default function ShowProject({ project, h } : {
                         </Carousel>
                         <div className="md:w-1/3 my-5 mb-18 p-5 hidden md:flex flex-col bg-background rounded justify-between">
                             <div>
-                                <h1 className="text-2xl font-semibold">{project.title}</h1>
-                                <h2 className="mt-5">{project.excerpt}</h2>
+                                <div className="flex justify-between items-center mt-3">
+                                    <h1 className="text-2xl font-semibold">{project.title}</h1>
+                                    <Button className="rounded-full" variant="outline" size="icon">
+                                        <Bookmark />
+                                    </Button>
+                                </div>
+                                <div className="flex items-center gap-2 mt-2">
+                                    {/* <span>by</span> */}
+                                    <Avatar variant={project.owner_type === TEAMMODEL ? "square" : "rounded"} className="size-7">
+                                        <AvatarImage src={project.owner?.avatar} />
+                                        <AvatarFallback className="text-xs" variant={project.owner_type === TEAMMODEL ? "square" : "rounded"}>{project.owner?.name.split(' ').map(word => word.charAt(0)).join("")}</AvatarFallback>
+                                    </Avatar>
+                                    <span className="text-sm">{project.owner?.name}</span>
+                                </div>
+                                <Separator className="mt-3" />
+                                <h2 className="mt-3">{project.excerpt}</h2>
                                 {/* {
                                     project.owner &&
                                     <div className="w-full block text-sm mt-1">

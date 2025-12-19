@@ -1,9 +1,9 @@
 import AppLayout from '@/layouts/app-layout'
-import { Post, BreadcrumbItem, SharedData } from '@/types';
-import { useEffect } from 'react';
-import { store as storeView } from '@/routes/api/views';
+import { Post, BreadcrumbItem, SharedData } from '@/types'
+import { useEffect } from 'react'
+import { store as storeView } from '@/routes/api/views'
 import axios from 'axios'
-import { usePage } from '@inertiajs/react';
+import { usePage } from '@inertiajs/react'
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -21,7 +21,6 @@ export default function ShowPost({post} : {post: Post}) {
 
     const { apiToken } = usePage<SharedData>().props
     useEffect(() => {
-        console.log('storeView')
         axios.post(storeView().url, {
             viewable_type: 'post',
             viewable_id: post.id
