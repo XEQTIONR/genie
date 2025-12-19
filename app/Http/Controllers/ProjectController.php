@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Project;
 use App\Models\Team;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
@@ -19,7 +20,11 @@ class ProjectController extends Controller
      */
     public function index()
     {
-        $projects = Project::with(['creator', 'owner'])->get();
+        $projects = Project::with(['creator', 'owner'])->withCount(['likes', 'views'])->get();
+
+        $projects->load(['likes' => function(MorphMany $query) {
+            $query->where('user_id', Auth::id());
+        }]);
 
         return Inertia::render('projects/index', ['projects' => $projects]);
     }
@@ -101,7 +106,11 @@ class ProjectController extends Controller
             }
         }
 
-        $project->load(['owner', 'creator', 'members']);
+        $project->load(['owner', 'creator', 'members'])->withCount(['likes', 'views']);
+
+        $project->load(['likes' => function(MorphMany $query) {
+            $query->where('user_id', Auth::id());
+        }]);
 
         $dom = new \DOMDocument();
         libxml_use_internal_errors(true);

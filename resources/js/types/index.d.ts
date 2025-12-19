@@ -62,6 +62,9 @@ export interface Project {
     owner_type: ProjectOwner
     members?: ProjectMember[]
     cover_media: { url: string, mime: string}[]
+    views_count?: number
+    likes_count?: number
+    likes: Like[]
 }
 
 export interface ProjectInvitation {

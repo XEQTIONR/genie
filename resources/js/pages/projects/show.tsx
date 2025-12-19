@@ -1,5 +1,5 @@
 import AppLayout from "@/layouts/app-layout";
-import { BreadcrumbItem, Project, ProjectMember, SharedData } from "@/types";
+import { BreadcrumbItem, Like, Project, ProjectMember, SharedData } from "@/types";
 import { Head, Link } from "@inertiajs/react";
 import {
   Sheet,
@@ -43,6 +43,7 @@ import { TEAMMODEL } from "@/types/values";
 import axios from 'axios'
 import { usePage } from '@inertiajs/react'
 import { store as storeView } from '@/routes/api/views'
+import { store, destroy } from '@/routes/api/likes'
 
 export default function ShowProject({ project, h } : { 
     project: Project 
@@ -70,7 +71,11 @@ export default function ShowProject({ project, h } : {
     const [sidebarOpen, setSidebarOpen] = useState(false)
     const sectionNav = useRef(null)
 
-    const { apiToken } = usePage<SharedData>().props
+    const [numLikes, setNumLikes] = useState(project.likes_count ?? 0)
+    const [likes, setILike] = useState<Like[]>(project.likes ?? [])
+    const [likeClasses, setLikeClasses] = useState('')
+
+    const { apiToken, auth } = usePage<SharedData>().props
     useEffect(() => {
         axios.post(storeView().url, {
             viewable_type: 'project',
@@ -127,8 +132,63 @@ export default function ShowProject({ project, h } : {
                             <div>
                                 <div className="flex justify-between items-center mt-3">
                                     <h1 className="text-2xl font-semibold">{project.title}</h1>
-                                    <Button className="rounded-full" variant="outline" size="icon">
-                                        <Bookmark />
+                                    <Button 
+                                        className="rounded-full" 
+                                        variant="outline" 
+                                        size="icon"
+                                        onClick={() => {
+                                            if (auth.user) {
+                                                if (likes.length === 0) {
+                                                    axios.post(store().url, {
+                                                        likeable_id: project.id,
+                                                        likeable_type: 'project'
+                                                    }, {
+                                                        headers: {
+                                                            'Content-Type': 'multipart/form-data',
+                                                            Authorization: 'Bearer ' + apiToken
+                                                        }
+                                                    }).then(res => {
+                                                        setNumLikes(l => l+1)
+                                                        setILike(l => {
+                                                            if (l) {
+                                                                return [...l, res.data]
+                                                            }
+                                                            return [res.data]
+                                                        })
+                                                        setLikeClasses("")
+                                                        setTimeout(() => {
+                                                            setLikeClasses("animate-wave fill-yellow-400 stroke-yellow-400 ")
+                                                        }, 100)
+                                                    }).catch(e => {
+                                                        console.log('like error:', e)
+                                                    })
+                                                } else {
+                                                    axios.delete(destroy({ like: likes[0].id }).url, {
+                                                        headers: {
+                                                            'Content-Type': 'multipart/form-data',
+                                                            Authorization: 'Bearer ' + apiToken
+                                                        }
+                                                    }).then(() => {
+                                                        setNumLikes(l => l - 1)
+                                                        setILike([])
+                                                        setLikeClasses("")
+                                                        setTimeout(() => {
+                                                            setLikeClasses("animate-wave")
+                                                        }, 100)
+                                                    }).catch((e) => {
+                                                        console.log('unlike error:', e)
+                                                    })
+                                                }
+                                            }
+                                        }}
+                                    >
+                                        <Bookmark 
+                                            className={cn(
+                                                // "size-4 cursor-pointer",
+                                                (likes.length > 0) ? "fill-yellow-400 stroke-yellow-400 " : "hover:fill-yellow-400 hover:stroke-yellow-400",
+                                                likeClasses
+                                            )}
+                                        />
                                     </Button>
                                 </div>
                                 <div className="flex items-center gap-2 mt-2">
