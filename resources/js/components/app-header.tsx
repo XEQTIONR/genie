@@ -43,8 +43,9 @@ import { Link, usePage } from '@inertiajs/react';
 import { BookOpen, BriefcaseBusiness, Circle, CircleCheck, CircleHelp, Folder, Handshake, Lightbulb, LogIn, LucideIcon, Menu, PencilRuler, User2, UserRoundSearch, UserSearch } from 'lucide-react';
 import AppLogo from './app-logo';
 import AppLogoIcon from './app-logo-icon';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import ShowPost from '@/pages/posts/show';
+import { useDebouncedCallback } from 'use-debounce'
 
 const rightNavItems: NavItem[] = [
     {
@@ -97,6 +98,13 @@ export function AppHeader({ breadcrumbs = [], maxWidth }: AppHeaderProps) {
     const { auth, notification } = page.props;
     const getInitials = useInitials();
 
+    const [scrollY, setScrollY] = useState(window.scrollY ?? 0)
+
+    const fn = useDebouncedCallback(() => {
+        console.log('setScrollY', window.scrollY)
+        setScrollY(window.scrollY)
+    }, 100)
+
     const mainNavItems: NavItem[] = [
         {
             title: 'Home',
@@ -125,12 +133,28 @@ export function AppHeader({ breadcrumbs = [], maxWidth }: AppHeaderProps) {
 
     const isMobile = useIsMobile()
 
+    useEffect(() => {
+        const f = () => {
+            // console.log(window.scrollY)
+            fn()
+        }
+        window.addEventListener('scroll', f)
+
+        return () => window.removeEventListener('scroll', f)
+    }, [])
+
     return (
         <>
-            <div className="h-20 sticky top-0 z-50 bg-background">
-                <div className="w-full fixed h-20 ">
+            <div className={cn(
+                "h-20 top-0 z-50 bg-background",
+                scrollY > 300 ? "sticky" : null
+            )}>
+                <div className={cn(
+                    "w-full h-20",
+                    scrollY > 300 ? "fixed" : null
+                )}>
                     <div className={cn(
-                        "mx-auto flex gap-20 items-center px-4 my-auto h-20",
+                        "mx-auto flex justify-between gap-20 items-center px-4 my-auto h-20",
                         maxWidth
                     )}>
                         {/* Mobile Menu */}
@@ -219,7 +243,7 @@ export function AppHeader({ breadcrumbs = [], maxWidth }: AppHeaderProps) {
                         </Link>
 
                         {/* Desktop Navigation */}
-                        <NavigationMenu className="flex" viewport={false}>
+                        <NavigationMenu className="hidden lg:flex" viewport={false}>
                             <NavigationMenuList>
                                 
                                 {/* <NavigationMenuItem>
@@ -381,7 +405,7 @@ export function AppHeader({ breadcrumbs = [], maxWidth }: AppHeaderProps) {
                             </NavigationMenuList>
                         </NavigationMenu>
 
-                        <div className="ml-auto flex items-center space-x-2">
+                        <div className="flex items-center space-x-2">
                             <div className="relative flex items-center space-x-1">
                                 {/* <Button
                                     variant="ghost"
