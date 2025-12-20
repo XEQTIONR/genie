@@ -32,19 +32,21 @@ export default function Dashboard({posts} : {posts: Post[]}) {
                     <div className="w-full lg:w-1/2 flex gap-6 flex-col justify-center border-sidebar-border/70 dark:border-sidebar-border">
                         <p className="text-6xl md:text-6xl font-bold">Find passionate people <br className="hidden md:inline" /> to build games with <br className="hidden md:inline" /> in 3 clicks.</p>
                         <form className="w-full relative">
-                            <SearchIcon className="absolute left-2.5 top-1/2 transform -translate-y-1/2 text-ring" />
+                            {/* <Search size={16} className='absolute top-[13px] left-2' /> */}
+                            <SearchIcon size={18} className='absolute top-3 left-3' />
+                            {/* <Input placeholder='Search for ideas, projects or opportunites' className="pl-7 py-5 min-w-md" /> */}
                             <Input
                                 value={q}
                                 onChange={({target}) => setQ(target.value)} 
-                                className="pl-10 py-6 text-lg"
-                                textSizeClasses="text-lg" 
-                                placeholder="What are you looking for?"
+                                className="pl-10 py-5"
+                                placeholder='Search for ideas, projects or opportunites'
                             />
                             {
                                 q.length > 0 &&
                                 <XIcon
+                                    size={18}
                                     onClick={() => setQ("")} 
-                                    className="absolute hover:text-foreground cursor-pointer right-3 top-1/2 transform -translate-y-1/2 text-ring" 
+                                    className="absolute hover:text-foreground cursor-pointer right-5 top-5 transform text-ring" 
                                 />
                             }
                             
