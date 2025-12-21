@@ -17,10 +17,19 @@ import {
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu"
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuPortal,
+  DropdownMenuSeparator,
+  DropdownMenuShortcut,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import {
     Sheet,
     SheetContent,
@@ -40,11 +49,10 @@ import { index as indexJobs } from '@/routes/opportunities'
 import { index as indexUsers } from '@/routes/users';
 import { type BreadcrumbItem, type NavItem, type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { BookOpen, BriefcaseBusiness, Circle, CircleCheck, CircleHelp, Folder, Handshake, Lightbulb, LogIn, LucideIcon, Menu, PencilRuler, Search, User2, UserRoundSearch, UserSearch } from 'lucide-react';
+import { BookOpen, BriefcaseBusiness, ChevronDown, Folder, Handshake, Lightbulb, LogIn, LucideIcon, Menu, PencilRuler, Search, User2, UserRoundSearch, UserSearch } from 'lucide-react';
 import AppLogo from './app-logo';
 import AppLogoIcon from './app-logo-icon';
 import { useEffect, useState } from 'react';
-import ShowPost from '@/pages/posts/show';
 import { useDebouncedCallback } from 'use-debounce'
 import { Input } from './ui/input';
 
@@ -100,6 +108,8 @@ export function AppHeader({ breadcrumbs = [], maxWidth }: AppHeaderProps) {
     const getInitials = useInitials();
 
     const [scrollY, setScrollY] = useState(window.scrollY ?? 0)
+    const [searchType, setSearchType] = useState('Ideas')
+    const [showMobileSearchBar, setShowMobileSearchBar] = useState(false)
 
     const fn = useDebouncedCallback(() => {
         console.log('setScrollY', window.scrollY)
@@ -146,13 +156,15 @@ export function AppHeader({ breadcrumbs = [], maxWidth }: AppHeaderProps) {
 
     return (
         <>
+            
+            
             <div className={cn(
                 "h-20 top-0 z-50 bg-background",
-                scrollY > 300 ? "sticky" : null
+                scrollY > 400 ? "sticky" : null
             )}>
                 <div className={cn(
                     "w-full h-20",
-                    scrollY > 300 ? "fixed" : null
+                    scrollY > 400 ? "fixed" : null
                 )}>
                     <div className={cn(
                         "mx-auto flex justify-between gap-20 items-center px-4 my-auto h-20",
@@ -235,11 +247,17 @@ export function AppHeader({ breadcrumbs = [], maxWidth }: AppHeaderProps) {
                             </Sheet>
                         </div>
                         
-                        <div className='flex items-center gap-2'>
+                        <div className={cn(
+                            'flex items-center gap-2',
+                            'relative'
+                        )}>
                             <Link
                                 href={home()}
                                 prefetch
-                                className="flex items-center space-x-2"
+                                className={cn(
+                                    "flex items-center space-x-2 absolute lg:relative",
+                                    
+                                )}
                             >
                                 <AppLogo />
                             </Link>
@@ -408,10 +426,31 @@ export function AppHeader({ breadcrumbs = [], maxWidth }: AppHeaderProps) {
                                 </NavigationMenuList>
                             </NavigationMenu>
                             {
-                                scrollY > 300 && (
-                                    <div className="relative hidden lg:flex">
+                                scrollY > 400 && (
+                                    <div className="relative hidden lg:flex animate-fadein">
                                         <Search size={16} className='absolute top-[13px] left-3' />
-                                        <Input placeholder='Search for ideas, projects or opportunites' className="pl-9 py-5 min-w-md" />
+                                        <Input placeholder='Search for ideas, projects or opportunites' className="pl-9 pr-28 py-5 min-w-md" />
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger size="sm" className='relative -translate-x-full -left-1 top-1' asChild>
+                                                <Button variant="outline">
+                                                    {searchType}
+                                                    <ChevronDown />
+                                                </Button>
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent className="w-36" align="end">
+                                                <DropdownMenuGroup>
+                                                    <DropdownMenuItem onSelect={() => setSearchType('Ideas')}>
+                                                        Ideas
+                                                    </DropdownMenuItem>
+                                                    <DropdownMenuItem onSelect={() => setSearchType('Projects')}>
+                                                        Projects
+                                                    </DropdownMenuItem>
+                                                    <DropdownMenuItem onSelect={() => setSearchType('Opportunities')}>
+                                                        Opportunities
+                                                    </DropdownMenuItem>
+                                                </DropdownMenuGroup>
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
                                     </div>
                                 )
                             }
@@ -423,13 +462,18 @@ export function AppHeader({ breadcrumbs = [], maxWidth }: AppHeaderProps) {
                         {/* Right Navigation */}
                         <div className="flex items-center space-x-2">
                             <div className="relative flex items-center space-x-1">
-                                {/* <Button
+                                <Button
+                                    onClick={() => {
+                                        console.log(showMobileSearchBar)
+                                        console.log('setShowMobileSearchBar')
+                                        setShowMobileSearchBar(v => !v)
+                                    }} 
                                     variant="ghost"
                                     size="icon"
-                                    className="group h-9 w-9 cursor-pointer"
+                                    className="group h-9 w-9 cursor-pointer lg:hidden"
                                 >
                                     <Search className="!size-5 opacity-80 group-hover:opacity-100" />
-                                </Button> */}
+                                </Button>
                                 {/* <div className="hidden lg:flex">
                                     {rightNavItems.map((item) => (
                                         <TooltipProvider
@@ -510,6 +554,15 @@ export function AppHeader({ breadcrumbs = [], maxWidth }: AppHeaderProps) {
                     </div>
                 </div>
             )}
+            {
+                showMobileSearchBar && scrollY > 400 &&  (
+                    <div className='inline lg:hidden w-full px-4 sticky top-16 z-60'>
+                        <Search className='relative size-5 top-7 left-2' />
+                        <Input placeholder='Search for ideas, projects or opportunities' className='pl-8  bg-background' />
+                    </div>
+                )
+            }
+            
         </>
     );
 }

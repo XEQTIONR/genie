@@ -10,6 +10,7 @@
 
 @theme {
     --animate-wave: wave 0.3s ease-out;
+    --animate-fadein: fadein 0.3s ease-out;
 
     /* Define the actual keyframes using a standard @keyframes rule */
     @keyframes wave {
@@ -21,6 +22,14 @@
       }
       100% {
         transform: scale(1);
+      }
+    }
+    @keyframes fadein {
+      0% {
+        opacity: 0;
+      }
+      100% {
+        opacity: 100%;
       }
     }
     --font-sans:
