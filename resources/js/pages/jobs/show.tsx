@@ -2,6 +2,7 @@ import AppLayout from "@/layouts/app-layout"
 import { show } from "@/routes/opportunities"
 import { show as showUser } from "@/routes/users"
 import { show as showTeam } from "@/routes/teams"
+import { show as showProject } from "@/routes/projects"
 import { store } from "@/routes/opportunities/inquiries"
 import { BreadcrumbItem, Opportunity } from "@/types"
 import {
@@ -25,7 +26,7 @@ import { useEffect, useState } from "react"
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { Send } from "lucide-react"
+import { PencilRuler, Send } from "lucide-react"
 
 export default function ShowJobPosting({ job, notification } : { job: { data: Opportunity }, notification: object }) {
 
@@ -96,8 +97,41 @@ export default function ShowJobPosting({ job, notification } : { job: { data: Op
                 </DialogContent>
 
             </Dialog>
-            <div className="w-full flex flex-col px-4">
-                <h1 className="mt-14 text-xl font-medium mb-0.5">{job.data.title}</h1>
+            <div className="w-full flex flex-col px-4 mt-5 ">
+                {
+                    job.data.owner_type == 'Team' &&
+                    
+                        <Link 
+                            href={showTeam({ slug: job.data.owner?.slug })} 
+                            className="flex items-center gap-2 mb-2"
+                        >
+                            <Avatar variant="square">
+                                <AvatarImage src={job.data.owner?.avatar} />
+                                <AvatarFallback variant="square">{ getInitials(job.data.owner?.name ?? "") }</AvatarFallback>
+                            </Avatar>
+                            <div className="flex flex-col">
+                                <span className="text-sm font-semibold">{job.data.owner?.name}</span>
+                                {/* <span className="text-xs">{(new Date(job.data.created_at)).toDateString()}</span> */}
+                            </div>
+                        </Link>
+
+                }
+                {
+                    job.data.owner_type == 'Project' &&
+                    
+                        <Link 
+                            href={showProject({ slug: job.data.owner?.slug })}
+                            className="flex items-center gap-2 mb-2"
+                        >
+                            <PencilRuler className="size-5" />
+                            <div className="flex flex-col">
+                                <span className="text-sm font-semibold">{job.data.owner?.title}</span>
+                                {/* <span className="text-xs">{(new Date(job.data.created_at)).toDateString()}</span> */}
+                            </div>
+                        </Link>
+
+                }
+                <h1 className="text-xl font-medium mb-0.5">{job.data.title}</h1>
                 <div className="flex flex-wrap gap-4 mb-3 text-dim text-sm">{
                     job.data.location_type == 'global' 
                         ? "WorldWide"

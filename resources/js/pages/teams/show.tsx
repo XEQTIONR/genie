@@ -12,7 +12,8 @@ import { index as projectsIndex } from '@/routes/teams/projects'
 import { index as jobsIndex } from '@/routes/teams/opportunities'
 import { Opportunity, NavItem, Project, ProjectMember, Team, type BreadcrumbItem } from '@/types'
 import { Head, Link } from '@inertiajs/react'
-import { Camera, Eraser, Facebook, Globe, Instagram, MapPin, Pencil, PencilRuler, Twitch, Twitter, Youtube } from 'lucide-react'
+import { Camera, Eraser, Globe, MapPin, Pencil, PencilRuler, Instagram } from 'lucide-react'
+import { Discord, Facebook, LinkedIn, Twitter, Twitch, Youtube } from '@/components/icons/svgs'
 import {
     Dialog,
     DialogClose,
@@ -497,13 +498,13 @@ export default function TeamProfile({
                                 </div>
                             </div>
                             <p className="text-sm text-white">{team.description}</p>
-                            <div className='flex gap-2.5 text-white'>
-                                <Facebook size={16} />
-                                <Twitter size={16} />
+                            <div className='flex items-center gap-3.5 text-white'>
+                                <Facebook className="size-4.5" />
+                                <Twitter className="size-4.5" />
                                 <Instagram size={16} />
-                                <Youtube size={16} />
-                                <Twitch size={16} />
-                                <Globe size={16} />
+                                <Youtube className="size-4.5" />
+                                <Twitch className="size-4.5" />
+                                <Globe className="size-4.5" />
                             </div>
                         </div>
                     {

@@ -796,7 +796,7 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
                     }
                     </div>
                 </div>
-                <div className="relative -top-60 -mb-44 flex flex-col items-center gap-3 w-full">
+                <div className="relative -top-68 -mb-44 flex flex-col items-center gap-3 w-full">
                     <Avatar className="size-24 ring-background">
                         {
                             auth.user && auth.user.id === user.id &&
@@ -830,6 +830,7 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
                         }
                         </span>
                     </div>
+                    <Button variant="secondary" >Follow</Button>
                 </div>
                 <div className="w-full flex flex-col mx-auto gap-0 items-center">
                     {/* <div className="flex flex-col md:flex-row md:gap-4 relative -top-11 -mb-11 w-full md:max-w-10xl px-4 md:mx-0">

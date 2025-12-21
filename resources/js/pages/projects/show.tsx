@@ -12,7 +12,8 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet"
 import { Button } from "@/components/ui/button";
-import { Bookmark, ChartNoAxesColumnIncreasing, ChevronDown, Code, CodeXml, Facebook, Heart, Mail, Menu, Twitter } from "lucide-react";
+import { Bookmark, ChartNoAxesColumnIncreasing, ChevronDown, Code, CodeXml, Heart, Mail, Menu, Share, Share2 } from "lucide-react";
+import { Facebook,Twitch,Twitter, Youtube } from "@/components/icons/svgs";
 import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import {
@@ -44,6 +45,9 @@ import axios from 'axios'
 import { usePage } from '@inertiajs/react'
 import { store as storeView } from '@/routes/api/views'
 import { store, destroy } from '@/routes/api/likes'
+import { Badge } from "@/components/ui/badge";
+import { platform } from "os";
+import { Toggle } from "@/components/ui/toggle";
 
 export default function ShowProject({ project, h } : { 
     project: Project 
@@ -89,6 +93,54 @@ export default function ShowProject({ project, h } : {
             .catch(e => console.log('error:', e))
     }, [])
 
+    const PlatformBadge = ({platform} : {platform: string}) => {
+
+        const label = (platform: string) => {
+            switch(platform) {
+                case "android":
+                    return "Android"
+                case "ios":
+                    return "iOS"
+                case "mac":
+                    return "Mac"
+                case "pc":
+                    return "PC"
+                case "ps":
+                    return "PlayStation"
+                case "switch":
+                    return "Switch"
+                case "xbox":
+                default:
+                    return "XBox"
+            }
+        }
+
+        const badgeClassNames = (platform: string) => {
+            switch(platform) {
+                case "android":
+                    return "border-green-500  text-green-500"
+                case "ios":
+                    return "border-foreground dark:border-neutral-100  dark:text-neutral-100"
+                case "mac":
+                    return "border-foreground dark:border-neutral-100 dark:text-neutral-100"
+                case "pc":
+                    return "border-sky-500 text-sky-500"
+                case "ps":
+                    return "border-blue-700 text-blue-700"
+                case "switch":
+                    return "border-red-600 text-red-600"
+                case "xbox":
+                default:
+                    return "border-green-700 text-green-700"
+            }
+        }
+
+        return <Badge className={cn(badgeClassNames(platform), 'font-semibold rounded-full')} variant="outline">{
+            label(platform)
+            }
+        </Badge>
+    }
+
     return (
         <AppLayout maxBodyWidth="w-full" breadcrumbs={breadcrumbs}>
             <Head title="Show Project" />
@@ -132,11 +184,100 @@ export default function ShowProject({ project, h } : {
                             <div>
                                 <div className="flex justify-between items-center mt-3">
                                     <h1 className="text-2xl font-semibold">{project.title}</h1>
-                                    <Button 
-                                        className="rounded-full" 
-                                        variant="outline" 
-                                        size="icon"
-                                        onClick={() => {
+                                    <Button className="cursor-pointer" variant="outline" size="icon">
+                                        <Share2 />
+                                    </Button>
+                                </div>
+                                
+                                <div className="flex justify-between">
+                                    <h2 className="mb-3">{project.excerpt}</h2>
+                                </div>
+                                <div className="flex gap-2 items-center mt-1">
+                                    <Facebook className="size-4.5" />
+                                    <Twitter className="size-4.5" />
+                                    <Youtube className="size-4.5" />
+                                    <Twitch className="size-4.5" />
+                                    {/* <Mail />
+                                    <CodeXml /> */}
+                                </div>
+                                
+                                
+                                <Separator className="my-3" />
+                                <div className="flex flex-col gap-7">
+                                    <div className="flex flex-col gap-1">
+                                        <span className="uppercase text-xs">Created By</span>
+                                        <div className="flex items-center gap-2">
+                                            <Avatar variant={project.owner_type === TEAMMODEL ? "square" : "rounded"} className="size-7">
+                                                <AvatarImage src={project.owner?.avatar} />
+                                                <AvatarFallback className="text-xs" variant={project.owner_type === TEAMMODEL ? "square" : "rounded"}>{project.owner?.name.split(' ').map(word => word.charAt(0)).join("")}</AvatarFallback>
+                                            </Avatar>
+                                            <span className="text-sm">{project.owner?.name}</span>
+                                        </div>
+                                    </div>
+                                    <div className="flex">
+                                        <div className="flex flex-col gap-1 w-2/5">
+                                            <span className="uppercase text-xs">Age</span>
+                                            <div className="flex items-center gap-2">
+                                                10+
+                                                {/* <ul>
+                                                    <li>PlayStation</li>
+                                                    <li>Xbox</li>
+                                                    <li>PC</li>
+                                                </ul> */}
+                                            </div>
+                                        </div>
+                                        <div className="flex flex-col gap-1 w-3/5">
+                                            <span className="uppercase text-xs">Genre</span>
+                                            <div className="flex items-center gap-2">
+                                                First-person shooter
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="flex flex-col gap-2 w-full">
+                                            <span className="uppercase text-xs">Platforms</span>
+                                            <div className="flex flex-wrap items-center gap-2">
+                                                
+                                                    {
+                                                        project.platforms 
+                                                            ? project.platforms.map(platform => <PlatformBadge platform={platform} />)
+                                                            : <span className="italic">Not specified</span>
+                                                    }
+                                                
+                                            </div>
+                                    </div>
+                                </div>
+                                
+                                
+                                {/* <h2 className="mt-3">{project.excerpt}</h2> */}
+                                {/* {
+                                    project.owner &&
+                                    <div className="w-full block text-sm mt-1">
+                                        by <Link 
+                                            href={project.owner_type == ProjectOwnerTypeTeam ? showTeam(project.owner) : showUser(project.owner)} 
+                                            className="font-semibold hover:underline"
+                                        >
+                                            {project.owner?.name}
+                                        </Link>
+                                        
+                                    </div>
+                                } */}
+                            </div>
+                            
+                            <div className="flex flex-col gap-3">
+                                {/* <div className="w-full flex gap-5 items-center">
+                                    <span className="rounded-sm">Share this</span>
+                                    <div className="flex gap-5">
+                                        <Facebook className="size-6" />
+                                        <Twitter className="size-6" />
+                                        <Mail />
+                                        <CodeXml />
+                                    </div>
+                                    
+                                </div> */}
+                                <Toggle
+                                    pressed={likes.length > 0} 
+                                    className="w-full cursor-pointer data-[state=on]:bg-transparent data-[state=on]:*:[svg]:fill-blue-500 data-[state=on]:*:[svg]:stroke-blue-500"
+                                    onPressedChange={() => {
                                             if (auth.user) {
                                                 if (likes.length === 0) {
                                                     axios.post(store().url, {
@@ -180,53 +321,12 @@ export default function ShowProject({ project, h } : {
                                                     })
                                                 }
                                             }
-                                        }}
+                                        }} 
+                                    variant="outline"
                                     >
-                                        <Bookmark 
-                                            className={cn(
-                                                // "size-4 cursor-pointer",
-                                                (likes.length > 0) ? "fill-yellow-400 stroke-yellow-400 " : "hover:fill-yellow-400 hover:stroke-yellow-400",
-                                                likeClasses
-                                            )}
-                                        />
-                                    </Button>
-                                </div>
-                                <div className="flex items-center gap-2 mt-2">
-                                    {/* <span>by</span> */}
-                                    <Avatar variant={project.owner_type === TEAMMODEL ? "square" : "rounded"} className="size-7">
-                                        <AvatarImage src={project.owner?.avatar} />
-                                        <AvatarFallback className="text-xs" variant={project.owner_type === TEAMMODEL ? "square" : "rounded"}>{project.owner?.name.split(' ').map(word => word.charAt(0)).join("")}</AvatarFallback>
-                                    </Avatar>
-                                    <span className="text-sm">{project.owner?.name}</span>
-                                </div>
-                                <Separator className="mt-3" />
-                                <h2 className="mt-3">{project.excerpt}</h2>
-                                {/* {
-                                    project.owner &&
-                                    <div className="w-full block text-sm mt-1">
-                                        by <Link 
-                                            href={project.owner_type == ProjectOwnerTypeTeam ? showTeam(project.owner) : showUser(project.owner)} 
-                                            className="font-semibold hover:underline"
-                                        >
-                                            {project.owner?.name}
-                                        </Link>
-                                        
-                                    </div>
-                                } */}
-                            </div>
-                            
-                            <div className="flex flex-col gap-3">
-                                <div className="w-full flex gap-5 items-center">
-                                    <span className="rounded-sm">Share this</span>
-                                    <div className="flex gap-5">
-                                        <Facebook />
-                                        <Twitter />
-                                        <Mail />
-                                        <CodeXml />
-                                    </div>
-                                    
-                                </div>
-                                <Button className="w-full rounded-sm">Learn More</Button>
+                                    <Bookmark className={likeClasses} />
+                                    {likes.length > 0 ? "Following" : "Follow"}
+                                </Toggle>
                             </div>
                         </div>
                     </div>
