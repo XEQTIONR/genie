@@ -41,7 +41,7 @@ export default function Dashboard({posts} : {posts: Post[]}) {
     const [searchType, setSearchType] = useState('Ideas')
 
     return (
-        <AppLayout breadcrumbs={breadcrumbs}>
+        <AppLayout breadcrumbs={breadcrumbs} stickyAfter={300}>
             <Head title="Dashboard" />
             <div className="flex h-full flex-1 flex-col justify-center gap-4 overflow-x-auto rounded-xl p-4">
                 

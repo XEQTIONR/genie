@@ -3,7 +3,6 @@ import { Icon } from '@/components/icon';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { router } from '@inertiajs/react'
-import { create } from '@/actions/App/Http/Controllers/Auth/AuthenticatedSessionController';
 import { login } from '@/routes';
 import { toast } from "sonner"
 import { useIsMobile } from "@/hooks/use-mobile"
@@ -42,14 +41,14 @@ import { useInitials } from '@/hooks/use-initials';
 import { cn } from '@/lib/utils';
 import { home } from '@/routes';
 import { show } from '@/routes/users'
-import { index as indexPosts } from '@/routes/posts'
+import { index as indexPosts, create as createPost } from '@/routes/posts'
 import { index as indexTeams } from '@/routes/teams'
 import { index as indexProjects } from '@/routes/projects'
 import { index as indexJobs } from '@/routes/opportunities'
 import { index as indexUsers } from '@/routes/users';
 import { type BreadcrumbItem, type NavItem, type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { BookOpen, BriefcaseBusiness, ChevronDown, Folder, Handshake, Lightbulb, LogIn, LucideIcon, Menu, PencilRuler, Search, User2, UserRoundSearch, UserSearch } from 'lucide-react';
+import { BadgeHelpIcon, Bell, BookOpen, BriefcaseBusiness, ChevronDown, Folder, Handshake, Lightbulb, LogIn, LucideIcon, Menu, MessageCircle, MessageSquareText, PencilRuler, Plus, Search, User2, UserRoundSearch, UserSearch } from 'lucide-react';
 import AppLogo from './app-logo';
 import AppLogoIcon from './app-logo-icon';
 import { useEffect, useState } from 'react';
@@ -100,9 +99,10 @@ function ListItem({
 interface AppHeaderProps {
     breadcrumbs?: BreadcrumbItem[]
     maxWidth: string
+    stickyAfter?: number
 }
 
-export function AppHeader({ breadcrumbs = [], maxWidth }: AppHeaderProps) {
+export function AppHeader({ breadcrumbs = [], maxWidth, stickyAfter = 0 }: AppHeaderProps) {
     const page = usePage<SharedData>();
     const { auth, notification } = page.props;
     const getInitials = useInitials();
@@ -160,14 +160,14 @@ export function AppHeader({ breadcrumbs = [], maxWidth }: AppHeaderProps) {
             
             <div className={cn(
                 "h-20 top-0 z-50 bg-background",
-                scrollY > 400 ? "sticky" : null
+                scrollY >= stickyAfter ? "sticky" : null
             )}>
                 <div className={cn(
                     "w-full h-20",
-                    scrollY > 400 ? "fixed" : null
+                    scrollY >= stickyAfter ? "fixed" : null
                 )}>
                     <div className={cn(
-                        "mx-auto flex justify-between gap-20 items-center px-4 my-auto h-20",
+                        "mx-auto flex justify-between lg:gap-5 items-center px-4 my-auto h-20",
                         maxWidth
                     )}>
                         {/* Mobile Menu */}
@@ -248,14 +248,13 @@ export function AppHeader({ breadcrumbs = [], maxWidth }: AppHeaderProps) {
                         </div>
                         
                         <div className={cn(
-                            'flex items-center gap-2',
-                            'relative'
+                            'flex items-center grow gap-2',
                         )}>
                             <Link
                                 href={home()}
                                 prefetch
                                 className={cn(
-                                    "flex items-center space-x-2 absolute lg:relative",
+                                    "flex space-x-2 left-1/2 -translate-x-1/2 lg:-translate-x-0 lg:left-auto absolute lg:relative",
                                     
                                 )}
                             >
@@ -266,58 +265,6 @@ export function AppHeader({ breadcrumbs = [], maxWidth }: AppHeaderProps) {
                             {/* <div className='flex'> */}
                             <NavigationMenu className="hidden lg:flex" viewport={false}>
                                 <NavigationMenuList>
-                                    
-                                    {/* <NavigationMenuItem>
-                                        <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
-                                            <Link href="/">Home</Link>
-                                        </NavigationMenuLink>
-                                        <NavigationMenuTrigger>Home</NavigationMenuTrigger>
-                                        <NavigationMenuContent >
-                                            <ul className="grid gap-2 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
-                                            <li className="row-span-3">
-                                                <NavigationMenuLink asChild>
-                                                <a
-                                                    className="from-muted/50 to-muted flex h-full w-full flex-col justify-end rounded-md bg-linear-to-b p-4 no-underline outline-hidden transition-all duration-200 select-none focus:shadow-md md:p-6"
-                                                    href="/"
-                                                >
-                                                    <div className="mb-2 text-lg font-medium sm:mt-4">
-                                                    shadcn/ui
-                                                    </div>
-                                                    <p className="text-muted-foreground text-sm leading-tight">
-                                                    Beautifully designed components built with Tailwind CSS.
-                                                    </p>
-                                                </a>
-                                                </NavigationMenuLink>
-                                            </li>
-                                            <ListItem href="/docs" title="Introduction">
-                                                Re-usable components built using Radix UI and Tailwind CSS.
-                                            </ListItem>
-                                            <ListItem href="/docs/installation" title="Installation">
-                                                How to install dependencies and structure your app.
-                                            </ListItem>
-                                            <ListItem href="/docs/primitives/typography" title="Typography">
-                                                Styles for headings, paragraphs, lists...etc
-                                            </ListItem>
-                                            </ul>
-                                        </NavigationMenuContent>
-                                    </NavigationMenuItem> */}
-                                    
-                                    {/* <NavigationMenuItem>
-                                        <NavigationMenuTrigger>Explore</NavigationMenuTrigger>
-                                        <NavigationMenuContent>
-                                            <ul className="grid gap-2 sm:w-[400px] md:w-[500px] md:grid-cols-2 lg:w-[600px]">
-                                            {components.map((component) => (
-                                                <ListItem
-                                                key={component.title}
-                                                title={component.title}
-                                                href={component.href}
-                                                >
-                                                {component.description}
-                                                </ListItem>
-                                            ))}
-                                            </ul>
-                                        </NavigationMenuContent>
-                                    </NavigationMenuItem> */}
                                     <NavigationMenuItem key="explore">
                                         <NavigationMenuTrigger>Explore</NavigationMenuTrigger>
                                         <NavigationMenuContent>
@@ -360,76 +307,26 @@ export function AppHeader({ breadcrumbs = [], maxWidth }: AppHeaderProps) {
                                             </ul>
                                         </NavigationMenuContent>
                                     </NavigationMenuItem>
-                                    {/* <NavigationMenuItem>
-                                        <NavigationMenuTrigger>Start</NavigationMenuTrigger>
-                                        <NavigationMenuContent >
-                                            <ul className="grid gap-2 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
-                                            <li className="row-span-3">
-                                                <NavigationMenuLink asChild>
-                                                <a
-                                                    className="from-muted/50 to-muted flex h-full w-full flex-col justify-end rounded-md bg-linear-to-b p-4 no-underline outline-hidden transition-all duration-200 select-none focus:shadow-md md:p-6"
-                                                    href="/"
-                                                >
-                                                    <div className="mb-2 text-lg font-medium sm:mt-4">
-                                                    shadcn/ui
-                                                    </div>
-                                                    <p className="text-muted-foreground text-sm leading-tight">
-                                                    Beautifully designed components built with Tailwind CSS.
-                                                    </p>
-                                                </a>
-                                                </NavigationMenuLink>
-                                            </li>
-                                            <ListItem href="/docs" title="Introduction">
-                                                Re-usable components built using Radix UI and Tailwind CSS.
-                                            </ListItem>
-                                            <ListItem href="/docs/installation" title="Installation">
-                                                How to install dependencies and structure your app.
-                                            </ListItem>
-                                            <ListItem href="/docs/primitives/typography" title="Typography">
-                                                Styles for headings, paragraphs, lists...etc
-                                            </ListItem>
+                                    <NavigationMenuItem key="community">
+                                        <NavigationMenuTrigger>Community</NavigationMenuTrigger>
+                                        <NavigationMenuContent>
+                                            <ul className="grid p-1 gap-2 sm:w-[350px]">
+                                                <ListItem iconSize="size-4.5" icon={MessageSquareText} title="Blog" href={indexJobs.url()}>
+                                                    Latest stories and developments
+                                                </ListItem>
+                                                <ListItem iconSize="size-4.5" icon={BadgeHelpIcon} title="Help Center" href={indexUsers.url()}>
+                                                    Get quick answers and learn how to use GamingJinn
+                                                </ListItem>
                                             </ul>
                                         </NavigationMenuContent>
-                                    </NavigationMenuItem> */}
-                                    {/* <NavigationMenuItem>
-                                    <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
-                                        <Link href="/docs">Docs</Link>
-                                    </NavigationMenuLink>
                                     </NavigationMenuItem>
-                                    <NavigationMenuItem className="hidden md:block">
-                                    <NavigationMenuTrigger>With Icon</NavigationMenuTrigger>
-                                    <NavigationMenuContent>
-                                        <ul className="grid w-[200px] gap-4">
-                                        <li>
-                                            <NavigationMenuLink asChild>
-                                            <Link href="#" className="flex-row items-center gap-2">
-                                                <CircleHelp />
-                                                Backlog
-                                            </Link>
-                                            </NavigationMenuLink>
-                                            <NavigationMenuLink asChild>
-                                            <Link href="#" className="flex-row items-center gap-2">
-                                                <Circle />
-                                                To Do
-                                            </Link>
-                                            </NavigationMenuLink>
-                                            <NavigationMenuLink asChild>
-                                            <Link href="#" className="flex-row items-center gap-2">
-                                                <CircleCheck />
-                                                Done
-                                            </Link>
-                                            </NavigationMenuLink>
-                                        </li>
-                                        </ul>
-                                    </NavigationMenuContent>
-                                    </NavigationMenuItem> */}
                                 </NavigationMenuList>
                             </NavigationMenu>
                             {
-                                scrollY > 400 && (
-                                    <div className="relative hidden lg:flex animate-fadein">
+                                scrollY >= stickyAfter && (
+                                    <div className={cn("relative hidden lg:flex grow max-w-lg")}>
                                         <Search size={16} className='absolute top-[13px] left-3' />
-                                        <Input placeholder='Search for ideas, projects or opportunites' className="pl-9 pr-28 py-5 min-w-md" />
+                                        <Input placeholder='Search for ideas, projects or opportunites' className="pl-9 pr-28 py-5 grow shrink-0" />
                                         <DropdownMenu>
                                             <DropdownMenuTrigger size="sm" className='relative -translate-x-full -left-1 top-1' asChild>
                                                 <Button variant="outline">
@@ -461,7 +358,11 @@ export function AppHeader({ breadcrumbs = [], maxWidth }: AppHeaderProps) {
                         
                         {/* Right Navigation */}
                         <div className="flex items-center space-x-2">
-                            <div className="relative flex items-center space-x-1">
+                            <div className="relative flex items-center gap-3">
+                                <Button className="hidden lg:flex cursor-pointer" onClick={() => router.visit(createPost()) }>
+                                    <Plus />
+                                    Share Work
+                                </Button>
                                 <Button
                                     onClick={() => {
                                         console.log(showMobileSearchBar)
@@ -470,9 +371,23 @@ export function AppHeader({ breadcrumbs = [], maxWidth }: AppHeaderProps) {
                                     }} 
                                     variant="ghost"
                                     size="icon"
-                                    className="group h-9 w-9 cursor-pointer lg:hidden"
+                                    className="group cursor-pointer lg:hidden"
                                 >
                                     <Search className="!size-5 opacity-80 group-hover:opacity-100" />
+                                </Button>
+                                {/* <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="group cursor-pointer"
+                                >
+                                    <MessageCircle className="!size-5 opacity-80 group-hover:opacity-100" />
+                                </Button> */}
+                                <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="group cursor-pointer"
+                                >
+                                    <Bell className="!size-5 opacity-80 group-hover:opacity-100" />
                                 </Button>
                                 {/* <div className="hidden lg:flex">
                                     {rightNavItems.map((item) => (
@@ -536,10 +451,16 @@ export function AppHeader({ breadcrumbs = [], maxWidth }: AppHeaderProps) {
                                         </DropdownMenuContent>
                                     </DropdownMenu>
                                 ) : (
-                                    <Button onClick={() => router.visit(login())} className="cursor-pointer" variant="outline">
-                                        <LogIn />
-                                        Sign In
-                                    </Button>
+                                    <>
+                                        <Button size="icon" onClick={() => router.visit(login())} className="cursor-pointer lg:hidden" variant="outline">
+                                            <LogIn />
+                                        </Button>
+                                        <Button onClick={() => router.visit(login())} className="cursor-pointer hidden lg:flex" variant="outline">
+                                            <LogIn />
+                                            Sign In
+                                        </Button>
+                                    </>
+
                                 )
                             }
                             
@@ -555,8 +476,8 @@ export function AppHeader({ breadcrumbs = [], maxWidth }: AppHeaderProps) {
                 </div>
             )}
             {
-                showMobileSearchBar && scrollY > 400 &&  (
-                    <div className='inline lg:hidden w-full px-4 sticky top-16 z-60'>
+                showMobileSearchBar && scrollY >= stickyAfter &&  (
+                    <div className='inline lg:hidden w-full px-4 sticky top-16 z-60 -mt-14'>
                         <Search className='relative size-5 top-7 left-2' />
                         <Input placeholder='Search for ideas, projects or opportunities' className='pl-8  bg-background' />
                     </div>

@@ -10,6 +10,7 @@ interface AppLayoutProps {
     maxWidth?: string,
     maxHeaderWidth?: string,
     maxBodyWidth?: string,
+    stickyAfter?: number
 }
 
 export default ({ 
@@ -18,6 +19,7 @@ export default ({
     maxWidth='md:max-w-10xl',
     maxHeaderWidth,
     maxBodyWidth,
+    stickyAfter = 0,
     ...props 
 }: AppLayoutProps) => {
     const { appearance } = useAppearance();
@@ -25,6 +27,7 @@ export default ({
     const bWidth = maxBodyWidth ?? maxWidth
     return (
         <AppLayoutTemplate
+            stickyAfter={stickyAfter}
             maxHeaderWidth={hWidth}
             maxBodyWidth={bWidth}
             breadcrumbs={breadcrumbs} 

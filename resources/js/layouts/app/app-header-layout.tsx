@@ -9,14 +9,16 @@ export default function AppHeaderLayout({
     breadcrumbs,
     maxHeaderWidth,
     maxBodyWidth,
+    stickyAfter = 0,
 }: PropsWithChildren<{ 
     breadcrumbs?: BreadcrumbItem[],
     maxHeaderWidth: string, 
     maxBodyWidth: string, 
+    stickyAfter?: number
 }>) {
     return (
         <AppShell>
-            <AppHeader maxWidth={maxHeaderWidth} breadcrumbs={breadcrumbs} />
+            <AppHeader stickyAfter={stickyAfter} maxWidth={maxHeaderWidth} breadcrumbs={breadcrumbs} />
             <AppContent maxWidth={maxBodyWidth}>{children}</AppContent>
         </AppShell>
     );
