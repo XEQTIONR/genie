@@ -52,6 +52,11 @@ class Team extends Model
         return $this->morphMany(Project::class, 'owner');
     }
 
+    public function posts(): MorphMany
+    {
+        return $this->morphMany(Post::class, 'owner');
+    }
+
     public function opportunities(): MorphMany
     {
         return $this->morphMany(Opportunity::class, 'owner');

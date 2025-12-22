@@ -82,7 +82,7 @@ class PostController extends Controller
         $post = new Post([
             ...$validated,
             'owner_type' => $author::class,
-            'owner_id' => $user->id,
+            'owner_id' => $author->id,
         ]);
         $user->posts()->save($post);
 

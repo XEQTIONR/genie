@@ -65,6 +65,7 @@ export interface Project {
     views_count?: number
     likes_count?: number
     likes: Like[]
+    posts?: Post[]
 }
 
 export interface ProjectInvitation {
@@ -92,6 +93,7 @@ export interface Team {
     projects_count?: number
     opportunities_count?: number
     owner_id: number
+    posts?: Post[]
 }
 
 export interface TeamInvitation {

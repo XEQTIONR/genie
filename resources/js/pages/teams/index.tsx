@@ -7,6 +7,7 @@ import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { useInitials } from '@/hooks/use-initials';
 import { Bookmark, BriefcaseBusiness, Heart, PencilRuler, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import GridCard from '@/components/grid-card';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -57,12 +58,10 @@ export default function TeamsIndex({ teams } : { teams: Team[]}) {
                                                     <Button className="rounded-3xl">Get in touch</Button>
                                                 </div>
                                             </div>
-                                            <div className="flex w-full gap-5">
-                                                <div className="w-1/5 aspect-grid border rounded-lg"></div>
-                                                <div className="w-1/5 aspect-grid border rounded-lg"></div>
-                                                <div className="w-1/5 aspect-grid border rounded-lg"></div>
-                                                <div className="w-1/5 aspect-grid border rounded-lg"></div>
-                                                <div className="w-1/5 aspect-grid border rounded-lg"></div>
+                                            <div className="grid grid-cols-5 w-full gap-5">
+                                                {
+                                                    team.posts?.map((post) => <GridCard post={post} showAuthor={false} />)
+                                                }
                                             </div>
                                             
                                             {/* {team.avatar} */}
