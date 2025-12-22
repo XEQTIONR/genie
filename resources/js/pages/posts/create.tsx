@@ -7,7 +7,15 @@ import FileDragArea from "@/components/file-drag-area"
 import { store as storeImage } from '@/routes/api/uploads'
 import axios from "axios";
 import { Input } from "@/components/ui/input"
-
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import {
   Sidebar,
   SidebarContent,
@@ -24,7 +32,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
-import { AlignCenter, AlignLeft, AlignRight, ArrowDown, ArrowUp, Bold, Copy, Image, Italic, Plus, SquarePlay, Text, Trash2, Type, Underline } from "lucide-react";
+import { AlignCenter, AlignLeft, AlignRight, ArrowDown, ArrowUp, Bold, Copy, Image, Italic, PencilRuler, Plus, SquarePlay, Text, Trash2, Type, Underline } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 
@@ -33,6 +41,11 @@ import Quill, { Delta, Op } from 'quill'
 import '/resources/css/quill.bubble.css'
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { store as storePost } from "@/routes/posts";
+import { Project, SharedData, Team } from "@/types";
+import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Field, FieldLabel } from "@/components/ui/field"
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
+import { useInitials } from "@/hooks/use-initials"
 
 interface ImageBlock {
     block_id: number
@@ -522,21 +535,25 @@ function Block({
     )
 }
 
-export default function CreatePost () {
+export default function CreatePost ({ projects, teams } : { projects: Project[], teams: Team[]}) {
 
     const titleInput = useRef<HTMLInputElement>(null)
 
-    const apiToken = usePage().props.apiToken
+    const { apiToken, auth } = usePage<SharedData>().props
     const {data, setData, post} = useForm<{
         title: string
         cover: string
         cover_type: string
+        author_type: string
+        author_id: number
         body: any[]
     }>({
         title: '',
         cover: '',
         cover_type: '',
-        body: []
+        body: [],
+        author_type: 'user',
+        author_id: auth.user.id
     })
     
     const [file, setFile] = useState<File|null>(null)
@@ -551,6 +568,9 @@ export default function CreatePost () {
     const [selectedBlockIndex, setSelectedBlockIndex] = useState<number|undefined>(undefined)
     const [format, setFormat] = useState<{[format: string]: unknown}|undefined>(undefined)
     const [coverFile, setCoverFile] = useState("")
+    const [ author, setAuthor ] = useState<string|undefined>()
+
+    const getInitials = useInitials()
 
     const handleSelect = useCallback((f: File) => {
         setFileType(f.type)
@@ -569,7 +589,6 @@ export default function CreatePost () {
                 Authorization: 'Bearer ' + apiToken
             }
         }).then((res) => {
-            console.log('success:', res.data.upload)
             setCoverFile(res.data.upload)
             setData('cover', res.data.upload)
             setInitialized(true)
@@ -583,35 +602,6 @@ export default function CreatePost () {
     }, [apiToken])
 
     const submitPost = () => {
-        console.log('submitPost')
-
-        const b = body.map((block) => {
-            return {
-                ...block,
-                mime: (block.type == 'image' || block.type == 'video') ? block.file.type : 'text/html'
-            }
-        })
-        // const parsedBody = body.map((block) => {
-        //     switch(block.type) {
-        //         case "image":
-        //         case "video":
-        //             block.
-        //     }
-        // })
-
-        setData('cover', coverFile)
-        setData('cover_type', fileType ?? '')
-        setData('body', b)
-
-        const d = {
-            title: data.title,
-            cover: coverFile,
-            cover_type: fileType,
-            body: b,
-        }
-
-        console.table(d)
-
         post(storePost.url())
     }
 
@@ -653,6 +643,21 @@ export default function CreatePost () {
         }))
     }, [body, setData])
 
+    useEffect(() => {
+        setData('cover', coverFile)
+    }, [coverFile, setData])
+
+    useEffect(() => {
+        setData('cover_type', fileType ?? '')
+    }, [fileType, setData])
+
+    useEffect(() => {
+        const at = author?.split('-')[0] ?? ""
+        const id = parseInt(author?.split('-')[1] ?? '0')
+        setData('author_id', id)
+        setData('author_type', at)
+    }, [author, setData])
+
     
 
     return (
@@ -687,9 +692,82 @@ export default function CreatePost () {
                     </Button>
                     <div className="flex gap-3">
                         <Button variant="secondary">Save as draft</Button>
-                        <Button type="button" onClick={() => {
-                            submitPost()
-                        }}>Continue</Button>
+                        <Dialog>
+                            <DialogTrigger asChild>
+                                <Button type="button" onClick={() => {
+                                    //submitPost()
+                                }}>Continue</Button>
+                            </DialogTrigger>
+                            <DialogContent>
+                                <DialogHeader>
+                                    <DialogTitle>Create Post</DialogTitle>
+                                    {/* <DialogDescription>Select who you want to post as.</DialogDescription> */}
+                                </DialogHeader>
+                                <div className="w-full">
+                                    <Field>
+                                        <FieldLabel>Select who to post as</FieldLabel>
+                                        <Select defaultValue={author} onValueChange={setAuthor}>
+                                            <SelectTrigger className="py-5">
+                                                <SelectValue placeholder="Author" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectGroup>
+                                                    <SelectLabel>Users</SelectLabel>
+                                                    <SelectItem value={'user-' + auth.user.id}>
+                                                        <Avatar className="size-6">
+                                                            <AvatarImage src={auth.user.avatar} />
+                                                            <AvatarFallback className="text-xs">{getInitials(auth.user.name)}</AvatarFallback>
+                                                        </Avatar>
+                                                        {auth.user.name}
+                                                    </SelectItem>
+                                                </SelectGroup>
+                                                <SelectGroup>
+                                                    <SelectLabel>Teams</SelectLabel>
+                                                    {
+                                                        teams.map((team) => (
+                                                            <SelectItem value={'team-' + team.id}>
+                                                                <Avatar className="size-6" variant="square">
+                                                                    <AvatarImage src={team.avatar} />
+                                                                    <AvatarFallback variant="square">{getInitials(team.name)}</AvatarFallback>
+                                                                </Avatar>
+                                                            {team.name}
+                                                        </SelectItem>
+                                                        ))
+                                                    }
+                                                </SelectGroup>
+                                                <SelectGroup>
+                                                    <SelectLabel>Projects</SelectLabel>
+                                                    {
+                                                        projects.map((project) => (
+                                                            <SelectItem value={'project-' + project.id}>
+                                                            <PencilRuler className="size-4 ml-1" />
+                                                            {project.title}
+                                                        </SelectItem>
+                                                        ))
+                                                    }
+                                                </SelectGroup>
+                                            </SelectContent>
+                                        </Select>
+                                    </Field>
+                                    
+                                </div>
+                                <DialogFooter>
+                                    <DialogClose>
+                                        <Button variant="outline">Cancel</Button>
+                                    </DialogClose>
+                                    <Button 
+                                        type="button" 
+                                        onClick={() => {
+                                            submitPost()
+                                        }}
+                                    >
+                                        Submit
+                                    </Button>
+                                </DialogFooter>
+                            </DialogContent>
+                            
+                        </Dialog>
+                        
                     </div>
                 </div>
 

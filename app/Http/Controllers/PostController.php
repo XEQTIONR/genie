@@ -3,10 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\Post;
+use App\Models\Project;
+use App\Models\Team;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 
 class PostController extends Controller
@@ -32,7 +35,12 @@ class PostController extends Controller
      */
     public function create()
     {
-        return Inertia::render('posts/create');
+        $user = User::find(Auth::id());
+
+        return Inertia::render('posts/create', [
+            'projects' => $user->ownedProjects()->get(),
+            'teams' => $user->ownedTeams()->get(),
+        ]);
     }
 
     /**
@@ -40,11 +48,14 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
+        Log::info($request);
         $validated = $request->validate([
             'title' => 'required|string',
             'cover' => 'required|string',
             'cover_type' => 'required|string',
             'body' => 'nullable|array',
+            'author_type' => 'required|in:user,team,project',
+            'author_id' => 'required|numeric'
         ]);
 
         $slug = str_replace(' ', '-', strtolower($validated['title']));
@@ -60,14 +71,23 @@ class PostController extends Controller
         $validated['status'] = 'created';
         $validated['slug'] = $slug;
 
+        $author = match($validated['author_type']) {
+            'user' =>  User::find(Auth::id()),
+            'project' => Project::find($validated['author_id']),
+            'team' => Team::find($validated['author_id'])
+        };
+
         $user = User::find(Auth::id());
 
         $post = new Post([
             ...$validated,
-            'owner_type' => User::class,
+            'owner_type' => $author::class,
             'owner_id' => $user->id,
         ]);
         $user->posts()->save($post);
+
+        Log::info('new Post id ', );
+        Log::info($post->id );
         
         return to_route('home');
     }

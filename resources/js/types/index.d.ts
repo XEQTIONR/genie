@@ -135,7 +135,8 @@ export type Post = {
     body: unknown[]
     cover: string
     cover_type: string
-    owner?: User|Team
+    owner?: User|Team|Project
+    owner_type: string
     num_likes?: number
     views_count?: number
     likes_count?: number

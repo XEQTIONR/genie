@@ -1,6 +1,6 @@
 import axios from 'axios'
 import { useRef, useState } from "react"
-import { Eye, Heart } from "lucide-react"
+import { Eye, Heart, PencilRuler } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Post, SharedData } from "@/types"
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
@@ -28,6 +28,8 @@ export default function GridCard({
     const [likeClasses, setLikeClasses] = useState('')
 
     const getInitials = useInitials()
+
+    const variant = post.owner?.username ? 'rounded' : (post.owner?.name ? 'square' : undefined)
     
     const video = useRef<HTMLVideoElement>(null)
     return (
@@ -41,7 +43,7 @@ export default function GridCard({
                 onMouseLeave={() => setHovered(false)} 
                 onMouseEnter={() => setHovered(true)} 
                 className={cn(
-                    "relative aspect-grid overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border",
+                    "relative aspect-grid overflow-hidden rounded-md border border-sidebar-border/70 dark:border-sidebar-border",
                     className
                 )}
             >
@@ -82,12 +84,19 @@ export default function GridCard({
             {
                 showAuthor &&
                 <div className="flex items-center gap-1.5">
-                    <Avatar>
-                        <AvatarImage src={post.owner?.avatar} />
-                        <AvatarFallback className="text-xs">{getInitials(post.owner?.name ?? "")}</AvatarFallback>
-                    </Avatar>
+                    {
+                        variant ? (
+                            <Avatar variant={variant}>
+                                <AvatarImage src={post.owner?.avatar} />
+                                <AvatarFallback variant={variant} className="text-xs">{getInitials(post.owner?.name ?? "")}</AvatarFallback>
+                            </Avatar>
+                        ) : (
+                            <PencilRuler className='size-6' />
+                        )
+                    }
+                    
                     <div className="w-full flex justify-between">
-                        <span className="font-semibold text-sm">{post.owner?.name}</span>
+                        <span className="font-semibold text-sm">{post.owner?.name ?? post.owner?.title}</span>
                         <div className="flex gap-5">
                             <div className="flex items-center gap-1.5">
                                 <Heart 

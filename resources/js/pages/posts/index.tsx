@@ -49,7 +49,7 @@ export default function PostsIndex({posts} : {posts: Post[]}) {
                             <div className="grid auto-rows-min gap-8 md:grid-cols-4">
                                 {
                                     posts.map((post) => (
-                                        <div className="relative overflow-hidden rounded-xl">
+                                        <div className="relative overflow-hidden">
                                             <GridCard className="cursor-pointer" onClick={() => router.visit(show({post: post.id}))} post={post} />
                                         </div>
                                     ))
