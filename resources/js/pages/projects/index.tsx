@@ -33,7 +33,7 @@ export default function ProjectsIndex({ projects } : { projects: Project[]}) {
                 {
                     projects.length > 0 && (
                         <>
-                            <div className="grid grid-cols-4 gap-10 w-full max-w-9xl items-start">
+                            <div className="grid grid-cols-4 gap-8 w-full max-w-9xl items-start">
                                 {
                                     projects.map((project) => (
                                         <ProjectGridCard project={project} />

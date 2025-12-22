@@ -5,9 +5,11 @@ import { index, show } from '@/routes/teams'
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 // import { AvatarImage } from '@radix-ui/react-avatar';
 import { useInitials } from '@/hooks/use-initials';
-import { Bookmark, BriefcaseBusiness, Heart, PencilRuler, Users } from 'lucide-react';
+import { Bookmark, BriefcaseBusiness, GalleryHorizontalEnd, Heart, Lightbulb, Moon, PencilRuler, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import GridCard from '@/components/grid-card';
+import { cn } from '@/lib/utils';
+import { Empty, EmptyHeader, EmptyMedia, EmptyTitle } from '@/components/ui/empty';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -20,6 +22,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 export default function TeamsIndex({ teams } : { teams: Team[]}) {
 
     const getInitials = useInitials()
+    const cl = 'col-span-1 col-span-2 col-span-3 col-span-4 col-span-5'
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -58,18 +61,46 @@ export default function TeamsIndex({ teams } : { teams: Team[]}) {
                                                     <Button className="rounded-3xl">Get in touch</Button>
                                                 </div>
                                             </div>
+
+                                            <div className="grid grid-cols-5 w-full gap-5">
                                             {
-                                                (team.posts?.length ?? 0) > 0 && (
-                                                        <div className="grid grid-cols-5 w-full gap-5">
-                                                    {
-                                                        team.posts?.map((post) => <GridCard post={post} showAuthor={false} />)
-                                                    }
-                                                </div>
-                                                )
+                                                team.posts?.map((post) => <GridCard post={post} showAuthor={false} />)
                                             }
-                                            
-                                            
-                                            {/* {team.avatar} */}
+                                            {
+                                                ((5 - (team.posts?.length ?? 0)) < 5  && (5 - (team.posts?.length ?? 0)) > 0)?
+                                                <div 
+                                                    className={cn('w-full h-full flex justify-center items-center rounded bg-foreground/5 col-span-' + (5 - (team.posts?.length ?? 0)))}
+                                                >
+                                                    <Empty>
+                                                        <EmptyHeader>
+                                                            <EmptyMedia className="bg-background dark:bg-muted" variant="icon">
+                                                                <GalleryHorizontalEnd />
+                                                            </EmptyMedia>
+                                                            <EmptyTitle>No more posts to show</EmptyTitle>
+                                                        </EmptyHeader>
+                                                    </Empty>
+                                                </div>: null
+                                            }
+                                            {
+                                                team.posts?.length == 0 &&
+                                                <div 
+                                                    className={'w-full col-span-5 flex justify-center   rounded bg-foreground/5'}
+                                                >
+                                                    
+                                                    {/* <div className="absolute left-1/2 top-1/2">No more</div> */}
+                                                    <div className='h-full aspect-grid w-1/5 flex justify-center items-center'>
+                                                        <Empty>
+                                                            <EmptyHeader>
+                                                                <EmptyMedia className="bg-background dark:bg-muted" variant="icon">
+                                                                    <GalleryHorizontalEnd />
+                                                                </EmptyMedia>
+                                                                <EmptyTitle>This team has no posts</EmptyTitle>
+                                                            </EmptyHeader>
+                                                        </Empty>
+                                                    </div>
+                                                </div>
+                                            }
+                                            </div>
                                         </Link>
                                     ))
                                 }

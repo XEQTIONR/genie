@@ -6,8 +6,9 @@ import OpportunityList from "@/components/opportunity-list"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { useInitials } from "@/hooks/use-initials"
 import GridCard from "@/components/grid-card"
-import { PencilRuler, Users } from "lucide-react"
+import { GalleryHorizontalEnd, PencilRuler, Users } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { Empty, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty"
 
 export default function UserIndex({users}: {users: User[]}) {
     
@@ -46,24 +47,45 @@ export default function UserIndex({users}: {users: User[]}) {
                                 </div>
                                 
                                 {
-                                    owned_posts && owned_posts.length > 0 && (
-                                        <div className="w-full grid  grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5">
+                                    owned_posts && (
+                                        <div className="grid grid-cols-5 w-full gap-5">
                                         {
-                                            owned_posts.map((post, index) => <GridCard 
-                                                className={cn(
-                                                    index < 2 ? "flex" : "hidden", 
-                                                    index == 4 && "xl:flex",
-                                                    index == 3 && "lg:flex",
-                                                    index == 2 && "md:flex",
-                                                )} 
-                                                post={post} 
-                                                showAuthor={false} 
-                                            />)
+                                            owned_posts.map((post) => <GridCard post={post} showAuthor={false} />)
+                                        }
+                                        {
+                                            ((5 - (owned_posts.length ?? 0)) < 5  && (5 - (owned_posts.length ?? 0)) > 0)?
+                                            <div className={cn(
+                                                'w-full h-full flex justify-center items-center rounded bg-foreground/5 col-span-' 
+                                                    + (5 - (owned_posts.length ?? 0))
+                                            )}>
+                                                <Empty>
+                                                    <EmptyHeader>
+                                                        <EmptyMedia className="bg-background dark:bg-muted" variant="icon">
+                                                            <GalleryHorizontalEnd />
+                                                        </EmptyMedia>
+                                                        <EmptyTitle>No more posts to show</EmptyTitle>
+                                                    </EmptyHeader>
+                                                </Empty>
+                                            </div>: null
+                                        }
+                                        {
+                                            owned_posts.length == 0 &&
+                                            <div className="w-full col-span-5 flex justify-center   rounded bg-foreground/5">
+                                                <div className="h-full aspect-grid w-1/5 flex justify-center items-center">
+                                                    <Empty>
+                                                        <EmptyHeader>
+                                                            <EmptyMedia className="bg-background dark:bg-muted" variant="icon">
+                                                                <GalleryHorizontalEnd />
+                                                            </EmptyMedia>
+                                                            <EmptyTitle>This user has no posts</EmptyTitle>
+                                                        </EmptyHeader>
+                                                    </Empty>
+                                                </div>
+                                            </div>
                                         }
                                         </div>
                                     )
                                 }
-                                
                             </Link>
                         ))
                     }
