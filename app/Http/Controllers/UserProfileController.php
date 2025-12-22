@@ -16,7 +16,14 @@ class UserProfileController extends Controller
      */
     public function index()
     {
-        return Inertia::render('users/index', ['users' => User::all()]);
+        return Inertia::render('users/index', [
+            'users' => User::withCount(['teams', 'projects'])
+                ->with([
+                'ownedPosts' => function($query) {
+                    $query->latest()->limit(5);
+                } 
+            ])->get()
+        ]);
     }
 
     /**

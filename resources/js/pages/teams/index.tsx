@@ -46,9 +46,9 @@ export default function TeamsIndex({ teams } : { teams: Team[]}) {
                                                             <span className="px-1 py-0.5 text-xs font-bold rounded bg-foreground text-background">STUDIO</span>
                                                         </div>
                                                         <div className="flex gap-5">
-                                                            <span className="flex items-center gap-1 text-sm"><Users size={16} /> {team?.users_count} members</span>
-                                                            <span className="flex items-center gap-1 text-sm"><PencilRuler size={16} /> {team?.projects_count} projects</span>
-                                                            <span className="flex items-center gap-1 text-sm"><BriefcaseBusiness size={16} /> {team?.opportunities_count} opportunities</span>
+                                                            <span className="flex items-center gap-1 font-semibold text-sm"><Users size={16} /> {team?.users_count} members</span>
+                                                            <span className="flex items-center gap-1 font-semibold text-sm"><PencilRuler size={16} /> {team?.projects_count} projects</span>
+                                                            <span className="flex items-center gap-1 font-semibold text-sm"><BriefcaseBusiness size={16} /> {team?.opportunities_count} opportunities</span>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -58,11 +58,16 @@ export default function TeamsIndex({ teams } : { teams: Team[]}) {
                                                     <Button className="rounded-3xl">Get in touch</Button>
                                                 </div>
                                             </div>
-                                            <div className="grid grid-cols-5 w-full gap-5">
-                                                {
-                                                    team.posts?.map((post) => <GridCard post={post} showAuthor={false} />)
-                                                }
-                                            </div>
+                                            {
+                                                (team.posts?.length ?? 0) > 0 && (
+                                                        <div className="grid grid-cols-5 w-full gap-5">
+                                                    {
+                                                        team.posts?.map((post) => <GridCard post={post} showAuthor={false} />)
+                                                    }
+                                                </div>
+                                                )
+                                            }
+                                            
                                             
                                             {/* {team.avatar} */}
                                         </Link>
