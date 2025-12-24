@@ -37,41 +37,16 @@ import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 
 import Quill, { Delta, Op } from 'quill'
-// import 'quill/dist/quill.bubble.css'
 import '/resources/css/quill.bubble.css'
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { store as storePost } from "@/routes/posts";
-import { Project, SharedData, Team } from "@/types";
+import { Project, SharedData, Team, MediaBlock } from "@/types";
 import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Field, FieldLabel } from "@/components/ui/field"
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import { useInitials } from "@/hooks/use-initials"
 
-interface ImageBlock {
-    block_id: number
-    type: "image"
-    file: File
-    url?: string
-}
 
-interface VideoBlock {
-    block_id: number
-    type: "video"
-    file: File
-    url?: string
-}
-
-interface TextBlock {
-    block_id: number
-    type: "text"
-    formats?: {
-        [format: string]: unknown
-    }
-    contents?: Delta | Op[]
-    html?: string 
-}
-
-type MediaBlock = ImageBlock | VideoBlock | TextBlock
 
 function PostSidebar({ 
     at,
@@ -96,21 +71,6 @@ function PostSidebar({
     const imageInput = useRef<HTMLInputElement>(null)
     const [fileState, setFileState] = useState<File|null>(null)
     const [view, setView] = useState('default')
-
-    // const renderFile = () => {
-    //     if (fileState) {
-    //         switch(fileState.type.split('/')[0]) {
-    //             case "image":
-    //                 return <img className="w-full" src={URL.createObjectURL(fileState)} />
-
-    //             case "video":
-    //                 return <video className="w-full" controls autoPlay>
-    //                     <source src={URL.createObjectURL(fileState)} type={fileState.type} />
-    //                 </video>
-    //         }
-    //     }
-    //     return null
-    // }
 
     useEffect(() => {
         if (!isOpen) {
@@ -841,8 +801,9 @@ export default function CreatePost ({ projects, teams } : { projects: Project[],
                         ? <div className="w-full max-w-7xl mt-10 flex flex-col grow">
                             <FileDragArea onSelect={handleSelect} />    
                         </div>
-                        : <div className="w-full flex flex-col">
+                        : <div className="w-full flex flex-col relative">
                             { renderCover() }
+                            <Button size="icon-lg" variant="destructive" className="absolute top-10 right-0 cursor-pointer" onClick={() => setFile(null)}><Trash2 /></Button>
                         </div>
                 }
                 {

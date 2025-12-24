@@ -5,14 +5,11 @@ use App\Http\Controllers\OpportunityInquiryController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\ProjectInvitationController;
-use App\Http\Controllers\ProjectJobController;
 use App\Http\Controllers\ProjectMembershipController;
-use App\Http\Controllers\ProjectOpeningController;
 use App\Http\Controllers\TeamController;
 use App\Http\Controllers\TeamInvitationController;
 use App\Http\Controllers\UserProfileController;
 use App\Http\Resources\OpportunityResource;
-use App\Models\Opportunity;
 use App\Models\Post;
 use App\Models\Team;
 use Illuminate\Support\Facades\Route;
@@ -30,8 +27,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->name('projects.members.create');
     Route::post('/projects/{project:slug}/members', [ProjectMembershipController::class, 'store'])
         ->name('project.members.store');
-
-    //Route::get('/projects/{project:slug}/job-openings', [ProjectJobController::class, 'index'])->name('projects.jobs.index');
 
     Route::get('/opportunities/create', [OpportunityController::class, 'create'])->name('opportunities.create');
     Route::post('/opportunities', [OpportunityController::class, 'store'])->name('opportunities.store');

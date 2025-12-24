@@ -177,3 +177,29 @@ export interface Like {
     likeable_id: number
     user_id: number
 }
+
+export interface ImageBlock {
+    block_id: number
+    type: "image"
+    file: File
+    url?: string
+}
+
+export interface VideoBlock {
+    block_id: number
+    type: "video"
+    file: File
+    url?: string
+}
+
+export interface TextBlock {
+    block_id: number
+    type: "text"
+    formats?: {
+        [format: string]: unknown
+    }
+    contents?: Delta | Op[]
+    html?: string 
+}
+
+export type MediaBlock = ImageBlock | VideoBlock | TextBlock
