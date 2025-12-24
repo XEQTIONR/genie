@@ -52,7 +52,7 @@ export function AppSidebar() {
                 </SidebarMenu>
             </SidebarHeader>
 
-            <SidebarContent>
+            <SidebarContent className='z-200 bg-amber-300'>
                 <NavMain items={mainNavItems} />
             </SidebarContent>
 
