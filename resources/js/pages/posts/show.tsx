@@ -4,6 +4,7 @@ import { useEffect } from 'react'
 import { store as storeView } from '@/routes/api/views'
 import axios from 'axios'
 import { usePage } from '@inertiajs/react'
+import '/resources/css/projects.css'
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -55,7 +56,7 @@ export default function ShowPost({post} : {post: Post}) {
                     post.body.map((block) => {
 
                         if (block.type == "text") {
-                            return <div className="max-w-full wrap-anywhere" dangerouslySetInnerHTML={{__html: replaceNbsps(block.html)}}>
+                            return <div className="max-w-full wrap-anywhere description" dangerouslySetInnerHTML={{__html: replaceNbsps(block.html)}}>
                                 
                                 </div>
                         }
