@@ -165,7 +165,13 @@ class ProjectController extends Controller
      */
     public function edit(Project $project)
     {
-        //
+        $user = Auth::user();
+
+        $project->load('owner');
+        
+        $teams = $user->teams;
+
+        return Inertia::render('projects/edit', compact('project', 'user', 'teams'));
     }
 
     /**

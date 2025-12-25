@@ -59,6 +59,7 @@ export interface Project {
     status: string | null
     creator?: User
     owner?: User | Team
+    owner_id: string | number
     owner_type: ProjectOwner
     members?: ProjectMember[]
     cover_media: { url: string, mime: string}[]
@@ -66,6 +67,7 @@ export interface Project {
     likes_count?: number
     likes: Like[]
     posts?: Post[]
+    visibility: "public" | "private"
 }
 
 export interface ProjectInvitation {

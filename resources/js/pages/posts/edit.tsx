@@ -113,31 +113,29 @@ function PostSidebar({
     }
 
     const RenderWithStrUrl = ({ url } : {url: string}) => {
+        
+        const p = url.split('.')
+        const ext = p[p.length - 1]
+        let mime = ""
+        switch(ext) {
+            case "jpg":
+            case "jpeg":
+                mime = 'image/jpeg'
+                break
+            case "mp4":
+                mime = 'video/mp4'
+                break
+        }
 
-        console.log('url:', url)
-            const p = url.split('.')
-            const ext = p[p.length - 1]
-            let mime = ""
-            switch(ext) {
-                case "jpg":
-                case "jpeg":
-                    mime = 'image/jpeg'
-                    break
-                case "mp4":
-                    mime = 'video/mp4'
-                    break
-            }
-            console.log('ext:', ext)
-            console.log('mime:', mime)
-            switch(mime) {
-                case "image/jpeg":
-                    return <img className="w-full" src={url} />
+        switch(mime) {
+            case "image/jpeg":
+                return <img className="w-full" src={url} />
 
-                case "video/mp4":
-                    return <video className="w-full" autoPlay loop>
-                        <source src={url} type={mime} />
-                    </video>
-            }
+            case "video/mp4":
+                return <video className="w-full" autoPlay loop>
+                    <source src={url} type={mime} />
+                </video>
+        }
 
         return null
     }
