@@ -7,7 +7,12 @@ import FileDragArea from "@/components/file-drag-area"
 import { store as storeImage } from '@/routes/api/uploads'
 import axios from "axios";
 import { Input } from "@/components/ui/input"
-
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+} from "@/components/ui/select"
 import {
   Sidebar,
   SidebarContent,
@@ -24,42 +29,18 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
-import { AlignCenter, AlignLeft, AlignRight, ArrowDown, ArrowUp, Bold, Copy, Image, Italic, Plus, SquarePlay, Text, Trash2, Type, Underline } from "lucide-react";
+import { AlignCenter, AlignLeft, AlignRight, ArrowDown, ArrowUp, Bold, Copy, Heading1, Heading2, Image, Italic, PencilRuler, Plus, SquarePlay, Trash2, Type, Underline } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 
-import Quill, { Delta, Op } from 'quill'
-// import 'quill/dist/quill.bubble.css'
+import Quill from 'quill'
 import '/resources/css/quill.bubble.css'
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { update } from "@/routes/posts";
-import { Post } from "@/types";
+import { update as updatePost } from "@/routes/posts";
+import { Project, SharedData, Team, MediaBlock, Post } from "@/types";
+import { useInitials } from "@/hooks/use-initials"
 
-interface ImageBlock {
-    block_id: number
-    type: "image"
-    file: File
-    url?: string
-}
 
-interface VideoBlock {
-    block_id: number
-    type: "video"
-    file: File
-    url?: string
-}
-
-interface TextBlock {
-    block_id: number
-    type: "text"
-    formats?: {
-        [format: string]: unknown
-    }
-    contents?: Delta | Op[]
-    html?: string 
-}
-
-type MediaBlock = ImageBlock | VideoBlock | TextBlock
 
 function PostSidebar({ 
     at,
@@ -82,7 +63,7 @@ function PostSidebar({
 }) {
 
     const imageInput = useRef<HTMLInputElement>(null)
-    const [fileState, setFileState] = useState<File|null|string>(null)
+    const [fileState, setFileState] = useState<File|null>(null)
     const [view, setView] = useState('default')
 
     useEffect(() => {
@@ -100,12 +81,12 @@ function PostSidebar({
         if (selectedBlock) {
             if (selectedBlock.type == 'image') {
                 setView('image')
-                setFileState(selectedBlock.file ?? selectedBlock.url)
+                setFileState(selectedBlock.file)
             }
 
             if (selectedBlock.type == 'video') {
                 setView('video')
-                setFileState(selectedBlock.file ?? selectedBlock.url)
+                setFileState(selectedBlock.file)
             }
 
             if (selectedBlock.type == 'text') {
@@ -115,36 +96,50 @@ function PostSidebar({
         }
     }, [selectedBlock])
 
-    const Render = ({file, view="image"} : {file: File|null|string, view: 'image'|'video'}) => {
+    const Render = ({file} : {file: File|null}) => {
         if (file) {
-            console.log("yes file")
-            if (typeof file == "string") {
-                console.log("yes X2 file is string:", file)
-                switch(view) {
-                    case "image":
-                        return <img className="w-full" src={file} />
+            switch(file.type.split('/')[0]) {
+                case "image":
+                    return <img className="w-full" src={URL.createObjectURL(file)} />
 
-                    case "video":
-                        return <video className="w-full" autoPlay loop>
-                            <source src={file} />
-                        </video>
-                }
-
-            } else {
-                switch(file.type.split('/')[0]) {
-                    case "image":
-                        return <img className="w-full" src={URL.createObjectURL(file)} />
-
-                    case "video":
-                        return <video className="w-full" autoPlay loop>
-                            <source src={URL.createObjectURL(file)} type={file.type} />
-                        </video>
-                }
+                case "video":
+                    return <video className="w-full" autoPlay loop>
+                        <source src={URL.createObjectURL(file)} type={file.type} />
+                    </video>
             }
-            
         }
-        console.log("nofile:", file)
-        return "No File"
+
+        return null
+    }
+
+    const RenderWithStrUrl = ({ url } : {url: string}) => {
+
+        console.log('url:', url)
+            const p = url.split('.')
+            const ext = p[p.length - 1]
+            let mime = ""
+            switch(ext) {
+                case "jpg":
+                case "jpeg":
+                    mime = 'image/jpeg'
+                    break
+                case "mp4":
+                    mime = 'video/mp4'
+                    break
+            }
+            console.log('ext:', ext)
+            console.log('mime:', mime)
+            switch(mime) {
+                case "image/jpeg":
+                    return <img className="w-full" src={url} />
+
+                case "video/mp4":
+                    return <video className="w-full" autoPlay loop>
+                        <source src={url} type={mime} />
+                    </video>
+            }
+
+        return null
     }
 
     return (
@@ -220,7 +215,9 @@ function PostSidebar({
                                     )}>
                                         {
                                             !fileState
-                                                ? <>
+                                                ?
+                                                    selectedBlock?.url ? <RenderWithStrUrl url={selectedBlock.url} /> : 
+                                                    <>
                                                     <input
                                                         onChange={(e) => {
                                                             if (e.target.files && e.target.files.length > 0) {
@@ -242,7 +239,7 @@ function PostSidebar({
                                                         Add {view.charAt(0).toUpperCase() + view.slice(1)}
                                                     </Button>
                                                 </> 
-                                                : <Render view={view} file={fileState} />
+                                                : <Render file={fileState} />
                                         }
                                     </div>
                                 </div>
@@ -262,6 +259,45 @@ function PostSidebar({
                             </div>
                             <SidebarGroupContent className="mt-3">
                                 <div className="w-full px-2 flex flex-col gap-5">
+                                    <div className="flex flex-col gap-2">
+                                        <h2 className="text-sm mt-3">Size</h2>
+                                        <Select value={
+                                            currentFormat?.header === 1 ? "h1"
+                                                : currentFormat?.header === 2 ? "h2"
+                                                : "p"
+                                        
+                                        } onValueChange={(v) => {
+                                            console.log('change:', v)
+                                            if (onFormatChange)
+                                            switch (v) {
+                                                case "h1":
+                                                    onFormatChange('header', 1)
+                                                    break
+                                                case "h2":
+                                                    onFormatChange('header', 2)
+                                                    break
+                                                case "p":
+                                                    onFormatChange('p')
+                                                    break
+                                            }
+                                        }}>
+                                            <SelectTrigger>
+                                                {
+                                            currentFormat?.header === 1 ? <><Heading1 /> Heading</>
+                                                : currentFormat?.header === 2 ? <><Heading2 /> Sub-heading</>
+                                                : <><AlignLeft /> Paragraph</>
+                                        
+                                        }
+
+
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="h1"><Heading1 /> Heading</SelectItem>
+                                                <SelectItem value="h2"><Heading2 /> Sub-heading</SelectItem>
+                                                <SelectItem value="p"><AlignLeft /> Paragraph</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
                                     <div className="flex flex-col gap-2">
                                         <h2 className="text-sm mt-3">Formatting</h2>
                                         <ToggleGroup value={currentFormat ? Object.keys(currentFormat): []} variant="outline" type="multiple" className="w-full">
@@ -368,13 +404,25 @@ function Block({
             ...formats
         }
         Object.keys(f).forEach((key) => {
+            // console.log('formattt')
             if (s) {
                 if (key == 'align') {
-                    console.log('align to->', f[key])
+                    // console.log('align to->', f[key])
                     editor.current?.format('align', f[key] == 'left' ? undefined : f[key])
                     //editor.current?.
-                    console.log('RIGHT AFTER UPDATE:', editor.current?.getFormat())
-                } else {
+                    // console.log('RIGHT AFTER UPDATE:', editor.current?.getFormat())
+                } 
+                else if (key == 'header') {
+
+                    console.log('format header')
+                    editor.current?.formatLine(s.index, s.length, 'header', f[key])
+                }
+                else if (key == 'p') {
+                    console.log('format p')
+                    editor.current?.removeFormat(s.index, s.length)
+                }
+                else {
+                    console.log('format ', key)
                     editor.current?.formatText(s, key, f[key])
                 }
             }
@@ -382,8 +430,6 @@ function Block({
     }, [formats])
 
     useEffect(() => {
-        console.log('block at:', Date.now())
-        console.log('contents: 🤣', contents)
         if (containerRef.current) {
             const container = containerRef.current;
             const editorContainer = container.appendChild(
@@ -408,18 +454,21 @@ function Block({
                     'header',
                     'align',
                 ],
-                placeholder: 'Add text...'
+                placeholder: 'Add post text...'
             })
 
+            
             if (item.type == "text") {
-                console.log('contents:', item.contents)
-                console.log('html:', item.html)
-                quill.setContents(quill.clipboard.convert({ html: item.html }))
+
+                if(item.html) {
+                    quill.clipboard.dangerouslyPasteHTML(0, item.html)
+                } else if (item.contents)
+                    quill.setContents(item.contents)
             }
 
             editor.current = quill
             editor.current.on('text-change', () => {
-                console.log('textchnge')
+                // console.log('textchnge')
                 const format = editorGetFormat()
                 if (onFormatChange) {
                     onFormatChange(editor.current, format)
@@ -431,7 +480,7 @@ function Block({
                 if (range !== null) {
                     const format = editorGetFormat()
                     const c = editorGetContents()
-                    console.log('c:', c)
+                    // console.log('c:', c)
                     //console.log('setContents:', c)
                     //setContents(c)
                     if (onFormatChange) {
@@ -444,14 +493,13 @@ function Block({
 
     const render = () => {
         if (item) {
-            console.log('item:', item)
             switch(item.type) {
                 case "image":
-                    return <img className="w-full" src={item.url} />
+                    return <img className="w-full" src={item.url ?? URL.createObjectURL(item.file)} />
 
                 case "video":
-                    return <video className="w-full" autoPlay loop controls>
-                        <source src={item.url} type={item.mime} />
+                    return <video className="w-full" autoPlay loop>
+                        <source src={item.url ?? URL.createObjectURL(item.file)} type={item.mime ?? item.file.type} />
                     </video>
 
                 case "text":
@@ -526,26 +574,27 @@ function Block({
     )
 }
 
-export default function EditPost ({post} : {post: Post}) {
+export default function EditPost ({ post } : { post: Post }) {
 
     const titleInput = useRef<HTMLInputElement>(null)
 
-    const apiToken = usePage().props.apiToken
+    const { apiToken, auth } = usePage<SharedData>().props
     const {data, setData, put} = useForm<{
         title: string
         cover: string
         cover_type: string
+        // author_type: string
+        // author_id: number
         body: any[]
     }>({
         title: post.title,
         cover: post.cover,
         cover_type: post.cover_type,
-        body: post.body
+        body: post.body,
+        // author_type: 'user',
+        // author_id: auth.user.id
     })
-    
-    const [file, setFile] = useState<File|null>(null)
-    const [fileType, setFileType] = useState<string|null>(post.cover_type ?? null)
-    const [initialized, setInitialized] = useState(true)
+
     const [sWidth, setSWidth] = useState("20rem")
     const [sidebarOpen, setSidebarOpen] = useState(false)
     const [hoverAddButton, setHoverAddButton] = useState(false)
@@ -554,83 +603,21 @@ export default function EditPost ({post} : {post: Post}) {
     const [time, setTime] = useState(Date.now())
     const [selectedBlockIndex, setSelectedBlockIndex] = useState<number|undefined>(undefined)
     const [format, setFormat] = useState<{[format: string]: unknown}|undefined>(undefined)
-    const [coverFile, setCoverFile] = useState(post.cover)
-
-    const handleSelect = useCallback((f: File) => {
-        setFileType(f.type)
-
-        const data = new FormData()
-        data.append('file', f)
-        data.append('mime', f.type)
-        setData('cover_type', f.type)
-
-        setFile(f)
-
-        axios.post(storeImage().url, data, {
-            headers: {
-                'Content-Type': 'multipart/form-data',
-                Authorization: 'Bearer ' + apiToken
-            }
-        }).then((res) => {
-            console.log('success:', res.data.upload)
-            setCoverFile(res.data.upload)
-            setData('cover', res.data.upload)
-            setInitialized(true)
-            setTimeout(() => {
-                titleInput.current?.focus()
-            }, 100) 
-        }).catch((e) => {
-            console.log('error:', e)
-        })
-
-    }, [apiToken])
 
     const submitPost = () => {
-        console.log('submitPost')
-
-        const b = body.map((block) => {
-            return {
-                ...block,
-                mime: (block.type == 'image' || block.type == 'video') ?( block.file?.type ?? 'filetype not detected') : 'text/html'
-            }
-        })
-        // const parsedBody = body.map((block) => {
-        //     switch(block.type) {
-        //         case "image":
-        //         case "video":
-        //             block.
-        //     }
-        // })
-
-        setData('cover', coverFile)
-        setData('cover_type', fileType ?? '')
-        setData('body', b)
-
-        const d = {
-            title: data.title,
-            cover: coverFile,
-            cover_type: fileType,
-            body: b,
-        }
-
-        console.table(d)
-
-        put(update.url({ post: post }))
+        put(updatePost.url({post: post.id}))
     }
 
     const renderCover = () => {
-        if ((file!== null || post.cover )&& fileType!== null) {
-            switch(fileType.split('/')[0]) {
-                case "image":
-                    return <img className="w-full max-w-7xl mt-10 mx-auto" src={file ? URL.createObjectURL(file) : post.cover} />
+        switch(data.cover_type.split('/')[0]) {
+            case "image":
+                return <img className="w-full max-w-7xl mt-10 mx-auto" src={data.cover} />
 
-                case "video":
-                    return <video className="w-full max-w-7xl mt-10 mx-auto" controls={true}>
-                        <source src={file ? URL.createObjectURL(file) : post.cover} type={fileType} />
-                    </video>
-            }
+            case "video":
+                return <video className="w-full max-w-7xl mt-10 mx-auto" autoPlay loop>
+                    <source src={data.cover} type={data.cover_type} />
+                </video>
         }
-        return null
     }
 
     useEffect(() => {
@@ -645,7 +632,7 @@ export default function EditPost ({post} : {post: Post}) {
             x.type = b.type
             
             if (b.type == 'image' || b.type == 'video') {
-                x.mime = b.file?.type ?? b.mime
+                x.mime = b.mime ?? b.file.type
                 x.url = b.url
             } else {
                 x.mime = 'text/html'
@@ -691,27 +678,28 @@ export default function EditPost ({post} : {post: Post}) {
                     <div className="flex gap-3">
                         <Button variant="secondary">Save as draft</Button>
                         <Button type="button" onClick={() => {
-                            submitPost()
-                        }}>Continue</Button>
+                                    submitPost()
+                                }}>Continue</Button>
+                        
                     </div>
                 </div>
-                        <Input
-                            onFocus={() => setSidebarOpen(false)}
-                            onClick={(e) => e.stopPropagation()} 
-                            onChange={(e) => {
-                                setData('title', e.target.value)
-                            }} 
-                            value={data.title} 
-                            ref={titleInput} 
-                            textSizeClasses="text-3xl"
-                            className="mt-14 font-bold max-w-4xl min-h-14" 
-                            placeholder="Add a post title"
-                        />
+
+                <Input
+                    onFocus={() => setSidebarOpen(false)}
+                    onClick={(e) => e.stopPropagation()} 
+                    onChange={(e) => setData('title', e.target.value)} 
+                    value={data.title} 
+                    ref={titleInput} 
+                    textSizeClasses="text-3xl"
+                    className="mt-14 font-bold max-w-4xl min-h-14" 
+                    placeholder="Add a post title"
+                />
+                
+                <div className="w-full flex flex-col">
+                    { renderCover() }
+                </div>
                 {
-                    <div className="w-full max-w-5xl mt-10 flex flex-col grow">
-                        {
-                            renderCover()
-                        }
+                    <div className="w-full max-w-7xl mt-10 flex flex-col grow px-10">
                         {
                             body.map((item, idx) => {
                                 return (
@@ -745,7 +733,6 @@ export default function EditPost ({post} : {post: Post}) {
                                         <div 
                                             onClick={(e) => {
                                                 setSelectedBlockIndex(idx)
-                                                console.log('parent')
                                                 e.stopPropagation()
                                             }} 
                                             className={cn("w-full p-1 border-2", selectedBlockIndex == idx ? 'border-accent' : 'border-transparent')}
@@ -763,7 +750,6 @@ export default function EditPost ({post} : {post: Post}) {
                                                 }}
                                                 move={(dir) => {
                                                     const length = body.length
-                                                    //const items = [...body]
 
                                                     if (dir == 'down') {
                                                         if (idx < length - 1) {
@@ -818,8 +804,7 @@ export default function EditPost ({post} : {post: Post}) {
                         }
                     </div>
                 }
-                {
-                    initialized && (
+                
                         <div className="flex items-center w-full mt-5 max-w-7xl">
                             <div className="grow h-full w-full">
                                 <Separator className="mt-4" />
@@ -846,8 +831,7 @@ export default function EditPost ({post} : {post: Post}) {
                                 <Separator className="mt-4" />
                             </div>
                         </div>
-                    )
-                }
+                
             </div>
             <PostSidebar
                 currentFormat={format}
@@ -856,18 +840,19 @@ export default function EditPost ({post} : {post: Post}) {
                 isOpen={sidebarOpen} 
                 onClose={() => setSidebarOpen(false)}
                 onFormatChange={(format, flag) => {
-                    
-                    console.log("ON FMT CHANGE")
-                    console.log(format, flag)
                     if (selectedBlockIndex !== undefined ) {
                         const block = body[selectedBlockIndex]
+
                         if (block && block.type == "text") {
                             block.formats =  {...block.formats}
                             block.formats[format] = flag
-                            console.log('going to set body')
+
+                            if (format == "p") {
+                                delete block.formats['header']
+                            }
+
                             setFormat(block.formats)
                             setBody((b) => {
-                                //const data = [...b]
                                 b[selectedBlockIndex] = block
                                 return b
                             })
@@ -881,15 +866,12 @@ export default function EditPost ({post} : {post: Post}) {
                     data.append('file', f)
                     data.append('mime', f.type)
 
-                    setFile(f)
-
                     axios.post(storeImage().url, data, {
                         headers: {
                             'Content-Type': 'multipart/form-data',
                             Authorization: 'Bearer ' + apiToken
                         }
                     }).then((res) => {
-                        console.log('success1:', res.data.upload)
                             setBody((b) => {
                             const c = [...b]
                             c.splice(insertAt, 0, { type: f.type.split("/")[0], file: f, block_id: Date.now(), url: res.data.upload })

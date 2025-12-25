@@ -89,7 +89,7 @@ class PostController extends Controller
         Log::info('new Post id ', );
         Log::info($post->id );
         
-        return to_route('home');
+        return to_route('posts.show', ['post' => $post]);
     }
 
     /**
@@ -106,8 +106,7 @@ class PostController extends Controller
      * Show the form for editing the specified resource.
      */
     public function edit(Post $post)
-    {
-        //
+    {   
         return Inertia::render('posts/edit', [
             'post' => $post
         ]);
