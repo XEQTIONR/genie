@@ -1,4 +1,4 @@
-import { store } from '@/routes/projects'
+import { store, update } from '@/routes/projects'
 import { store as storeImage } from '@/routes/api/uploads'
 import { Form, usePage } from '@inertiajs/react'
 import { Separator } from '@/components/ui/separator'
@@ -90,10 +90,22 @@ function Step({step, heading, children} : {step: number, heading: string, childr
     </>)
 }
 
-export default function ProjectForm({user, teams, project} : {user: User, teams: Team[], project?: Project}) {
+export default function ProjectForm({
+    user,
+    teams,
+    project,
+    id,
+    action = 'store'
+} : {
+    user: User,
+    teams: Team[],
+    project?: Project,
+    id?: string,
+    action?: 'store' | 'update'
+}) {
     const { apiToken } = usePage<SharedData>().props
-    const [ownerType, setOwnerType] = useState<string|null>(null)
-    const [ownerId, setOwnerId] = useState<number|null>(null)
+    const [ownerType, setOwnerType] = useState<string|null>(project?.owner_type ? project.owner_type.split('\\')[2]?.toLowerCase() : null)
+    const [ownerId, setOwnerId] = useState<number|null>(project?.owner_id ?? null)
     const [ownerLabel, setOwnerLabel] = useState<string>('public')
 
     const [insertVideoDialogOpen, setInsertVideoDialogOpen] = useState<boolean>(false)
@@ -173,8 +185,9 @@ export default function ProjectForm({user, teams, project} : {user: User, teams:
     
 
 
-    return <Form 
-                action={store()} 
+    return <Form
+                id={id} 
+                action={action == 'store' ? store() : update(project?.id)} 
                 className="w-full max-w-4xl mx-auto flex flex-col pt-8 px-4"
                 transform={(data) => ({
                     ...data,

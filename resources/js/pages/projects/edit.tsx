@@ -19,7 +19,7 @@ export default function EditProject({ user, teams, project } : { user: User, tea
     return (
         <AppLayout maxWidth="md:max-w-7xl" breadcrumbs={breadcrumbs}>
             <Head title="Edit project" />
-            <ProjectForm project={project} user={user} teams={teams} />
+            <ProjectForm action="update" project={project} user={user} teams={teams} />
         </AppLayout>
     )
 }

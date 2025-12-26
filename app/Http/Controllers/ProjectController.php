@@ -168,7 +168,7 @@ class ProjectController extends Controller
         $user = Auth::user();
 
         $project->load('owner');
-        
+
         $teams = $user->teams;
 
         return Inertia::render('projects/edit', compact('project', 'user', 'teams'));
@@ -180,6 +180,40 @@ class ProjectController extends Controller
     public function update(Request $request, Project $project)
     {
         //
+        $validated = $request->validate([
+            'title' => 'required|string|max:50',
+            'excerpt' => 'nullable|string|max:200',
+            'description' => 'nullable|string',
+            'owner_type' => 'required|in:user,team',
+            'owner_id' => 'required|integer',
+            'visibility' => 'required|in:public,private',
+            'platforms' => 'required|array',
+            'cover_media' => 'required|array|min:1'
+        ]);
+
+        $validated['owner_type'] = match ($validated['owner_type']) {
+            'user' => User::class,
+            'team' => Team::class,
+        };
+
+        $validated['platforms'] = [...array_filter($validated['platforms'], fn($platform) => $platform !== NULL)];
+        
+        if ($validated['platforms'] === []) {
+            $validated['platforms'] = NULL;
+        }
+
+        $project->title = $validated['title'];
+        $project->excerpt = $validated['excerpt'];
+        $project->description = $validated['description'];
+        $project->owner_type = $validated['owner_type'];
+        $project->owner_id = $validated['owner_id'];
+        $project->visibility = $validated['visibility'];
+        $project->platforms = $validated['platforms'];
+        $project->cover_media = $validated['cover_media'];
+
+        $project->save();
+
+        return to_route('projects.show', ['project' => $project]);
     }
 
     /**
