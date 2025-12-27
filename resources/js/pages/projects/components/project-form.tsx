@@ -64,6 +64,8 @@ import {
 } from "@/components/ui/carousel"
 import axios from 'axios'
 import FileDragArea from '@/components/file-drag-area'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { useInitials } from '@/hooks/use-initials'
 
 function Step({step, heading, children} : {step: number, heading: string, children: React.ReactNode}) {
     return (<>
@@ -118,6 +120,7 @@ export default function ProjectForm({
     const [image, setImage] = useState<Blob|null>(null)
     const [slides, setSlides] = useState<{url: string, mime: string}[]>(project?.cover_media ?? [])
 
+    const getInitials = useInitials()
     
 
     useEffect(() => {
@@ -197,13 +200,25 @@ export default function ProjectForm({
             >
                 <div className="flex items-center gap-3 mb-1">
                     <PencilRuler size={25} />
-                    <h1 className="text-xl font-bold"> Create a new project</h1>
+                    <h1 className="text-xl font-semibold">
+                        {
+                            project ? <>Edit project: <span className="font-bold">{project.title}</span></> : "Create a new project"
+                        }
+                        
+                    </h1>
                 </div>
-                <span className="text-sm text-dim md:mx-10 mb-1">Projects are game development endeavors in which one or multiple people 
-                    participate in with the goal of creating a finished product that can be called
-                    a game.
+                <span className="text-sm text-dim md:mx-10 mb-1">
+                    {
+                        project 
+                        ? <span className="font-semibold">Project Settings</span>
+                        :"Projects are game development endeavors in which one or multiple people " +
+                        "participate in with the goal of creating a finished product that can be called " +
+                        "a game."
+                    }
                 </span>
-                <span className="text-sm text-dim md:mx-10 italic mb-10">Required fields are marked with an asterisk (*).</span>
+                <span className="text-sm text-dim md:mx-10 italic mb-10">
+                    Required fields are marked with an asterisk (*).
+                </span>
                 
                 <Step step={1} heading={"General"}>
                     <FieldGroup className="mt-2 mb-10">
@@ -533,20 +548,26 @@ export default function ProjectForm({
                                             <SelectGroup>
                                                 <SelectLabel>Users</SelectLabel>
                                                 <SelectItem value={`user-${user.id}`}>
-                                                    <div className="size-4 relative">
+                                                    {/* <div className="size-4 relative">
                                                         <PlaceholderPattern className="absolute border rounded-full inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
-                                                    </div>
+                                                    </div> */}
+                                                    <Avatar className="size-5">
+                                                        <AvatarImage src={user.avatar} />
+                                                        <AvatarFallback className="text-3xs">{getInitials(user.name)}</AvatarFallback>
+                                                    </Avatar>
                                                     <span className="mr-2">{user.name}</span>
                                                 </SelectItem>
                                             </SelectGroup>
                                             <SelectGroup>
                                                 <SelectLabel>Teams</SelectLabel>
                                                 {
-                                                    teams.map(({id, name}) => (
+                                                    teams.map(({id, name, avatar}) => (
                                                         <SelectItem value={`team-${id}`}>
-                                                            <div className="size-4 relative">
-                                                                <PlaceholderPattern className="absolute border rounded inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
-                                                            </div>
+                                                            <Avatar variant="square" className="size-5">
+                                                        <AvatarImage src={avatar} />
+                                                        <AvatarFallback variant="square" className="text-xxs">{getInitials(name)}</AvatarFallback>
+                                                    </Avatar>
+                                                            
                                                             <span className="mr-2">{name}</span>
                                                         </SelectItem>
                                                     ))
@@ -609,25 +630,25 @@ export default function ProjectForm({
                                     <ItemDescription>
                                     <div className="w-full flex flex-wrap mt-1 gap-6">
                                         <div className="flex gap-1.5 items-center">
-                                            <Checkbox defaultChecked={project?.platforms.includes("pc")} name="platforms[]" value="pc" /> PC
+                                            <Checkbox defaultChecked={project?.platforms?.includes("pc")} name="platforms[]" value="pc" /> PC
                                         </div>
                                         <div className="flex gap-1.5 items-center">
-                                            <Checkbox defaultChecked={project?.platforms.includes("mac")} name="platforms[]" value="mac" /> Mac
+                                            <Checkbox defaultChecked={project?.platforms?.includes("mac")} name="platforms[]" value="mac" /> Mac
                                         </div>
                                         <div className="flex gap-1.5 items-center">
-                                            <Checkbox defaultChecked={project?.platforms.includes("ps")} name="platforms[]" value="ps" /> PlayStation
+                                            <Checkbox defaultChecked={project?.platforms?.includes("ps")} name="platforms[]" value="ps" /> PlayStation
                                         </div>
                                         <div className="flex gap-1.5 items-center">
-                                            <Checkbox defaultChecked={project?.platforms.includes("xbox")} name="platforms[]" value="xbox" /> XBox
+                                            <Checkbox defaultChecked={project?.platforms?.includes("xbox")} name="platforms[]" value="xbox" /> XBox
                                         </div>
                                         <div className="flex gap-1.5 items-center">
-                                            <Checkbox defaultChecked={project?.platforms.includes("switch")} name="platforms[]" value="switch" /> Switch
+                                            <Checkbox defaultChecked={project?.platforms?.includes("switch")} name="platforms[]" value="switch" /> Switch
                                         </div>
                                         <div className="flex gap-1.5 items-center">
-                                            <Checkbox defaultChecked={project?.platforms.includes("ios")} name="platforms[]" value="ios" /> iOS
+                                            <Checkbox defaultChecked={project?.platforms?.includes("ios")} name="platforms[]" value="ios" /> iOS
                                         </div>
                                         <div className="flex gap-1.5 items-center">
-                                            <Checkbox defaultChecked={project?.platforms.includes("android")} name="platforms[]" value="android" /> Android
+                                            <Checkbox defaultChecked={project?.platforms?.includes("android")} name="platforms[]" value="android" /> Android
                                         </div>
                                     </div>
                                     </ItemDescription>

@@ -160,7 +160,7 @@ export default function CreateTeam({ apiToken } : { apiToken: string }) {
             >
                 <div className="flex items-center gap-3 mb-1">
                     <Handshake size={25} />
-                    <h1 className="text-xl font-bold">Create a new team</h1>
+                    <h1 className="text-xl font-semibold">Create a new team</h1>
                 </div>
                 <span className="text-sm text-dim md:mx-10 mb-1">
                     Teams are groups of people with skills that work together on

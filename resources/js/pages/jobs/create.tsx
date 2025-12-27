@@ -199,9 +199,9 @@ export default function CreateJobPosting({ projects, teams } : { projects: Proje
             >
                 <div className="flex items-center gap-3 mb-1">
                     <BriefcaseBusiness size={25} />
-                    <h1 className="text-xl font-bold">Create a new job listing</h1>
+                    <h1 className="text-xl font-semibold">Create a new opportunity</h1>
                 </div>
-                <span className="text-sm text-dim md:mx-10 mb-1 font-medium">Add a job posting that people can use to contact you to join your team. Job postings can be compensated or voluntary</span>
+                <span className="text-sm text-dim md:mx-10 mb-1 font-medium">Add a posting that people can use to contact you to join your team. Job postings can be compensated or voluntary</span>
                 <span className="text-sm text-dim md:mx-10 italic mb-10 font-medium">Required fields are marked with an asterisk (*).</span>
                 
                 <Step step={1} heading={"General Information"}>

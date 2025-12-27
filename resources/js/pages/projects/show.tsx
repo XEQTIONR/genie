@@ -48,6 +48,7 @@ import { store, destroy } from '@/routes/api/likes'
 import { Badge } from "@/components/ui/badge";
 import { platform } from "os";
 import { Toggle } from "@/components/ui/toggle";
+import { edit } from "@/routes/projects";
 
 export default function ShowProject({ project, h } : { 
     project: Project 
@@ -378,14 +379,11 @@ export default function ShowProject({ project, h } : {
                             "flex items-center px-5 border-b-4",
                             currentTab == 'settings' ? 'border-foreground font-semibold' : 'border-transparent'
                         )}>
-                            <a 
-                                href="#settings"
-                                onClick={() => {
-                                    setCurrentTab('settings')
-                                }}
+                            <Link 
+                                href={edit(project)}
                             >
                                 Settings
-                            </a>
+                            </Link>
                         </li>
                     </ul>
                     <SheetContent side="left">
