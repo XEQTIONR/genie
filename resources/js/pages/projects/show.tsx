@@ -43,10 +43,8 @@ import { Separator } from "@/components/ui/separator";
 import { TEAMMODEL } from "@/types/values";
 import axios from 'axios'
 import { usePage } from '@inertiajs/react'
-import { store as storeView } from '@/routes/api/views'
 import { store, destroy } from '@/routes/api/likes'
 import { Badge } from "@/components/ui/badge";
-import { platform } from "os";
 import { Toggle } from "@/components/ui/toggle";
 import { edit } from "@/routes/projects";
 
@@ -66,12 +64,6 @@ export default function ShowProject({ project, h } : {
         },
     ]
 
-    const collaborators = [
-        { name: "John Doe", initials: "JD" },
-        { name: "Anonymous", initials: "A" },
-        { name: "Jim Schooner", initials: "JS" },
-    ]
-
     const [currentTab, setCurrentTab] = useState("kontent")
     const [sidebarOpen, setSidebarOpen] = useState(false)
     const sectionNav = useRef(null)
@@ -82,16 +74,8 @@ export default function ShowProject({ project, h } : {
 
     const { apiToken, auth } = usePage<SharedData>().props
     useEffect(() => {
-        axios.post(storeView().url, {
-            viewable_type: 'project',
-            viewable_id: project.id
-        }, {
-            headers: {
-                Authorization: 'Bearer ' + apiToken
-            }
-        })
-            .then(res => console.log('storeView response:', res))
-            .catch(e => console.log('error:', e))
+        document.documentElement.style.scrollBehavior = "smooth"
+        return () => { document.documentElement.style.scrollBehavior = "auto" }
     }, [])
 
     const PlatformBadge = ({platform} : {platform: string}) => {
@@ -143,7 +127,7 @@ export default function ShowProject({ project, h } : {
     }
 
     return (
-        <AppLayout maxBodyWidth="w-full" breadcrumbs={breadcrumbs}>
+        <AppLayout maxBodyWidth="w-full scroll-smooth" breadcrumbs={breadcrumbs}>
             <Head title="Show Project" />
             <div className="w-full md:min-h-[50vh] bg-secondary dark:bg-neutral-900">
                 <h1 className="w-full md:w-1/3 text-center mx-auto text-2xl font-semibold mt-5 md:mt-10">{project.title}</h1>
@@ -434,11 +418,11 @@ export default function ShowProject({ project, h } : {
                                 {
                                     h.map(({hash, tag, text}) => (
                                         <li 
-                                        onClick={() => setTimeout(() => {
-                                            if (sectionNav.current) {
-                                                window.scrollBy(0, -100)
-                                            }
-                                        }, 1000)} 
+                                        // onClick={() => setTimeout(() => {
+                                        //     if (sectionNav.current) {
+                                        //         window.scrollBy(0, -100)
+                                        //     }
+                                        // }, 1000)} 
                                         className="mb-3">
                                             <div className="flex">
                                                 { tag == 'h2' && <div className="mr-1 mt-0.5 inline rotate-180">&not;</div>}
@@ -518,9 +502,9 @@ export default function ShowProject({ project, h } : {
                             </div>
                         </div>
                         <div className="w-full md:w-2/5 xl:w-1/4">
-                            <h2 className="text-lg mt-4 md:mt-10 mb-4 font-semibold">Collaborators</h2>
+                            <h2 className="text-lg mt-4 md:mt-10 mb-4 font-semibold">Other Projects</h2>
                             <div className="w-full flex gap-2.5 flex-col mb-4">
-                                {
+                                {/* {
                                     collaborators.map(({name, initials}) => (
                                         <Item variant="muted">
                                             <ItemMedia>
@@ -535,7 +519,7 @@ export default function ShowProject({ project, h } : {
                                             </ItemContent>
                                         </Item>
                                     ))
-                                }
+                                } */}
                                 
                             </div>
                             
