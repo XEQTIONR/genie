@@ -61,6 +61,7 @@ import {
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
+  type CarouselApi,
 } from "@/components/ui/carousel"
 import axios from 'axios'
 import FileDragArea from '@/components/file-drag-area'
@@ -119,6 +120,7 @@ export default function ProjectForm({
     const imageInput = useRef<HTMLInputElement>(null)
     const [image, setImage] = useState<Blob|null>(null)
     const [slides, setSlides] = useState<{url: string, mime: string}[]>(project?.cover_media ?? [])
+    const [carouselApi, setCarouselApi] = useState<CarouselApi>()
 
     const getInitials = useInitials()
     
@@ -185,7 +187,13 @@ export default function ProjectForm({
 
     }, [apiToken])
 
+    const deleteSlide = ((index: number) => {
+        const x = [...slides.filter((_, i) => i !== index)]
+        console.log(index, 'filtered slides:', x)
+        setSlides([])
+        setTimeout(() => setSlides(x), 100)
     
+    })
 
 
     return <Form
@@ -230,6 +238,56 @@ export default function ProjectForm({
                             <FieldLabel>Excerpt</FieldLabel>
                             <Input defaultValue={project?.excerpt ?? ""} name="excerpt" />
                             <FieldDescription>A short description about the project</FieldDescription>
+                        </Field>
+                        
+                        <Field>
+                            <FieldLabel>
+                                <div className="flex items-center justify-between w-full">
+                                    <span>Cover Images</span>
+                                </div>
+                            </FieldLabel>
+                            <div className="flex justify-end">
+                                
+                            </div>
+                            <Carousel setApi={setCarouselApi} onChange={(e) => console.log('change:', e)} defaultPlay={false} showAutoplay={false} className="max-w-4xl mx-auto">
+                                <CarouselContent>
+                                    {
+                                        Array.from({length: slides.length}).map((_, idx: number) => (
+                                        // slides.map(({ url, mime }, idx) => (
+                                            <CarouselItem>
+                                                        <div className='w-full relative'>
+                                                    {
+                                                        slides[idx].mime.split("/")[0] === 'image' && (
+                                                            <img className="w-full object-cover aspect-grid rounded-lg" src={slides[idx].url} />
+                                                        )
+                                                    }
+                                                    {
+                                                        slides[idx].mime.split("/")[0] === 'video' && (
+                                                            <div className='rounded-lg border overflow-clip'>
+                                                                <video preload="false" className="w-full">
+                                                                    <source src={slides[idx].url} type={slides[idx].mime} />
+                                                                </video>
+                                                            </div>
+                                                            
+                                                        )
+                                                    }
+                                                        <Button type="button" onClick={() => { 
+                                                            deleteSlide(idx)
+                                                            console.log('l:', carouselApi)
+                                                            console.log(carouselApi?.slideNodes())
+                                                        }} variant="destructive" className='absolute top-1 right-1' size="icon-sm"><Trash /></Button>
+                                                    </div>
+                                               
+                                            </CarouselItem>
+                                        ))
+                                    }
+                                    <CarouselItem>
+                                            <FileDragArea className='h-full' onSelect={handleSelect}  />
+                                    </CarouselItem>
+                                </CarouselContent>
+                                <CarouselPrevious />
+                                <CarouselNext />
+                            </Carousel>
                         </Field>
                         <Field className="gap-3">
                             <FieldLabel>Description</FieldLabel>
@@ -471,58 +529,7 @@ export default function ProjectForm({
                 </Step>
                 <Step step={2} heading={"Configuration"}>
                     <FieldGroup className="mt-2">
-                        <Field>
-                            <FieldLabel>
-                                <div className="flex items-center justify-between w-full">
-                                    <span>Cover Images</span>
-                                    <div className="flex">
-                                        <Button variant="ghost" size="icon-sm"><Trash /></Button>
-                                    </div>
-                                </div>
-                            </FieldLabel>
-                            <div className="flex justify-end">
-                                
-                            </div>
-                            <Carousel defaultPlay={false} showAutoplay={false} className="max-w-4xl mx-auto">
-                                <CarouselContent>
-                                    {
-                                        slides.map(({ url, mime }) => (
-                                            <CarouselItem>
-                                                
-                                                    {
-                                                        mime.split("/")[0] === 'image' && (
-                                                            <img className="w-full object-cover aspect-grid rounded-lg" src={url} />
-                                                        )
-                                                    }
-                                                    {
-                                                        mime.split("/")[0] === 'video' && (
-                                                            <div className='rounded-lg border overflow-clip'>
-                                                                <video className="w-full">
-                                                                <source src={url} type={mime} />
-                                                            </video>
-                                                            </div>
-                                                            
-                                                        )
-                                                    }
-                                               
-                                            </CarouselItem>
-                                        ))
-                                    }
-                                    <CarouselItem>
-                                        
-                                        {/* <Card> */}
-                                            <FileDragArea className='h-full' onSelect={handleSelect}  />
-                                            {/* <CardContent className="flex aspect-video items-center justify-center p-6">
-                                            <span className="text-4xl font-semibold">{index + 1}</span>
-                                            </CardContent> */}
-                                        {/* </Card> */}
-                                        
-                                    </CarouselItem>
-                                </CarouselContent>
-                                <CarouselPrevious />
-                                <CarouselNext />
-                            </Carousel>
-                        </Field>
+                        
 
                         <input name="owner_type" type="hidden" value={ownerType ?? ""} />
                         <input name="owner_id" type="hidden" value={ownerId ?? ""} />
