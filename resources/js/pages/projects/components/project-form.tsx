@@ -119,7 +119,10 @@ export default function ProjectForm({
     const videoInput = useRef<HTMLInputElement>(null)
     const imageInput = useRef<HTMLInputElement>(null)
     const [image, setImage] = useState<Blob|null>(null)
-    const [slides, setSlides] = useState<{url: string, mime: string}[]>(project?.cover_media ?? [])
+    const [slides, setSlides] = useState<{url: string, mime: string, id: number}[]>(project?.cover_media.map((v, i) => ({
+        ...v,
+        id: Date.now() + i
+    })) ?? [])
     const [carouselApi, setCarouselApi] = useState<CarouselApi>()
 
     const getInitials = useInitials()
@@ -180,7 +183,7 @@ export default function ProjectForm({
             }
         }).then((res) => {
             console.log('success:', res.data.upload)
-            setSlides((s) => [...s, { url: res.data.upload, mime: f.type }]) 
+            setSlides((s) => [...s, { url: res.data.upload, mime: f.type, id: Date.now() }]) 
         }).catch((e) => {
             console.log('error:', e)
         })
@@ -188,22 +191,18 @@ export default function ProjectForm({
     }, [apiToken])
 
     const deleteSlide = ((index: number) => {
-        const x = [...slides.filter((_, i) => i !== index)]
-        console.log(index, 'filtered slides:', x)
-        setSlides([])
-        setTimeout(() => setSlides(x), 100)
-    
+        setSlides([...slides.filter((_, i) => i !== index)])
     })
 
 
     return <Form
                 id={id} 
-                action={action == 'store' ? store() : update(project?.id)} 
+                action={action == 'store' ? store() : update(project?.id ?? 0)} 
                 className="w-full max-w-4xl mx-auto flex flex-col pt-8 px-4"
                 transform={(data) => ({
                     ...data,
                     description: editor.current?.root.innerHTML,
-                    cover_media: slides
+                    cover_media: slides.map(({url, mime}) => ({url, mime}))
                 })}
             >
                 <div className="flex items-center gap-3 mb-1">
@@ -252,20 +251,20 @@ export default function ProjectForm({
                             <Carousel setApi={setCarouselApi} onChange={(e) => console.log('change:', e)} defaultPlay={false} showAutoplay={false} className="max-w-4xl mx-auto">
                                 <CarouselContent>
                                     {
-                                        Array.from({length: slides.length}).map((_, idx: number) => (
-                                        // slides.map(({ url, mime }, idx) => (
-                                            <CarouselItem>
+                                        // Array.from({length: slides.length}).map((_, idx: number) => (
+                                        slides.map(({ url, mime, id }, idx) => (
+                                            <CarouselItem key={id}>
                                                         <div className='w-full relative'>
                                                     {
-                                                        slides[idx].mime.split("/")[0] === 'image' && (
-                                                            <img className="w-full object-cover aspect-grid rounded-lg" src={slides[idx].url} />
+                                                        mime.split("/")[0] === 'image' && (
+                                                            <img className="w-full object-cover aspect-grid rounded-lg" src={url} />
                                                         )
                                                     }
                                                     {
-                                                        slides[idx].mime.split("/")[0] === 'video' && (
+                                                        mime.split("/")[0] === 'video' && (
                                                             <div className='rounded-lg border overflow-clip'>
                                                                 <video preload="false" className="w-full">
-                                                                    <source src={slides[idx].url} type={slides[idx].mime} />
+                                                                    <source src={url} type={mime} />
                                                                 </video>
                                                             </div>
                                                             
