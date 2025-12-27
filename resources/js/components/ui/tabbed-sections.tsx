@@ -62,13 +62,13 @@ function TabbedSectionHeaders({
                 ref={div} 
                 id="tabbedSectionHeaderContent" 
                 className={cn(
-                    "scroll-smooth flex items-stretch gap-3 overflow-x-scroll scrollbar-hide h-16 md:h-20",
+                    "scroll-smooth flex items-stretch gap-3 overflow-x-scroll scrollbar-hide h-18",
                     scrollLength > 0 ? "justify-start" : "justify-center"
                 )}
             >
             {
                 headers.map(({title, key, href, icon, className}) => (
-                    <li className={cn("text-sm flex items-center font-medium border-b-2",
+                    <li className={cn("text-sm flex items-center font-medium border-b-4",
                         current == key ? "border-foreground" : "border-transparent",
                         
                     )} key={key}>

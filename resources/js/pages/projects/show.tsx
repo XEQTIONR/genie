@@ -391,7 +391,7 @@ export default function ShowProject({ project, h } : {
                             currentTab == 'kontent' && (
                                 <>
                                     <SheetHeader>
-                            <SheetTitle>Contentsk</SheetTitle>
+                            <SheetTitle>Contents</SheetTitle>
                         </SheetHeader>
                         <ul className="px-4">
                         {

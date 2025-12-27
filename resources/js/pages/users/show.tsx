@@ -754,7 +754,7 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
                 onOpenChange={setShowBannerDialog}
                 close={() => setShowBannerDialog(false)}
             />
-            <div className="flex h-full flex-col overflow-x-auto">
+            <div className="flex h-full flex-col">
                 <div
                     style={user.banner ? { backgroundImage: `url("${user.banner}")` } : {
                         backgroundImage: `url("/pattern_10.jpg")`,
@@ -796,7 +796,7 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
                     }
                     </div>
                 </div>
-                <div className="relative -top-68 -mb-44 flex flex-col items-center gap-3 w-full">
+                <div className="relative -top-68 -mb-56 flex flex-col items-center gap-3 w-full">
                     <Avatar className="size-24 ring-background">
                         {
                             auth.user && auth.user.id === user.id &&
@@ -832,62 +832,9 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
                     </div>
                     <Button variant="secondary" >Follow</Button>
                 </div>
-                <div className="w-full flex flex-col mx-auto gap-0 items-center">
-                    {/* <div className="flex flex-col md:flex-row md:gap-4 relative -top-11 -mb-11 w-full md:max-w-10xl px-4 md:mx-0">
-                        
-                        <div className="relative md:top-12 md:mb-12 flex flex-col md:flex-row gap-4 grow items-start justify-between mt-4">
-                            <div className="flex flex-col gap-2">
-                                <div className="text-4xl font-semibold flex items-center gap-4">
-                                    {user.name}
-                                    {isPro && <span className="text-xs bg-primary text-background px-2 py-0.5 rounded">PRO</span>}
-                                </div>
-                                <span>{user.status}</span>
-                            </div>
-                            <div className="flex flex-row-reverse md:flex-row gap-2 items-center shrink-0">
-                                <span className="hidden lg:inline mr-3 text-sm">Let's build something together</span>
-                                <Button className="cursor-pointer">Get in touch</Button>
-                                <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
-                                        <Button className="cursor-pointer" variant="outline" size="icon"><EllipsisVertical /></Button>
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent sideOffset={10} className="dark:bg-neutral-900" align={windowWidth >= 768 ? "end" : "start"}>
-                                        <DropdownMenuLabel>Options</DropdownMenuLabel>
-                                        <DropdownMenuSeparator />
-                                        <DropdownMenuItem className="cursor-pointer">Contact</DropdownMenuItem>
-                                        <DropdownMenuItem className="cursor-pointer">Add to team</DropdownMenuItem>
-                                        <DropdownMenuItem className="cursor-pointer">Block</DropdownMenuItem>
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
-                            </div>
-                        </div>
-                    </div> */}
-                    
-                    {/* <div className="md:ml-8">
-                        <div className="w-full flex justify-between items-center mb-2">
-                            
-                            
-                        </div>
-                        <div className="flex flex-col md:flex-row gap-2 md:gap-5 text-xs md:text-base">
-                            {
-                                user.location &&
-                                <div className="flex items-center gap-2 text-neutral-400 font-medium"><MapPin size={16} /> {renderLocation(user.location)}</div>
-                            }
-                            {
-                                user.status &&
-                                <div className="flex text-neutral-400 font-medium"><span className="font-bold text-nowrap mr-1">Status :</span> {user.status}</div>
-                            }
-                        </div>
-                        <div className="flex flex-wrap gap-4 mt-4">
-                        {
-                            user.meta?.skills?.map((title) => (
-                                <span className="bg-neutral-100 dark:bg-neutral-900 text-neutral-500 px-4 py-2 rounded-full font-semibold">{title}</span>
-                            ))
-                        }
-                        </div>
-                    </div> */}
-                    
+                <div className="w-full flex flex-col mx-auto gap-0 items-center z-50 sticky top-0 bg-foreground dark:bg-background border-b shadow-lg dark:shadow-neutral-900/80">
                     <TabbedSectionHeaders
-                        className="w-full px-1 bg-foreground/5 dark:bg-foreground/2"
+                        className="w-full px-1"
                         current={tab}
                         headers={tabs}
                         onTabChange={() => {
