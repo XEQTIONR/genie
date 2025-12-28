@@ -177,7 +177,7 @@ export default function ShowProject({ project, h } : {
                             <div className="flex justify-between">
                                 <h2 className="mb-3">{project.excerpt}</h2>
                             </div>
-                            <div className="flex gap-2 items-center mt-1">
+                            <div className="flex gap-3 items-center mt-1">
                                 <Facebook className="size-4.5" />
                                 <Twitter className="size-4.5" />
                                 <Youtube className="size-4.5" />

@@ -662,12 +662,7 @@ export default function EditPost ({ post } : { post: Post }) {
                 <div className="flex w-full justify-between">
                     <Button
                         onClick={() => {
-                            setSWidth((v) => {
-                                if (v == "20rem")
-                                    return "50rem"
-
-                                return "20rem"
-                            })
+                            history.back()
                         }} 
                         variant="outline"
                     >

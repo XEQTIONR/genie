@@ -97,8 +97,14 @@ class PostController extends Controller
      */
     public function show(Post $post)
     {
-        $post->load('owner');
-        
+        $post->loadCount(['likes', 'views'])
+            ->load(['owner', 
+                'likes' => function(MorphMany $query) {
+                    $query->where('user_id', Auth::id());
+                }
+            ])
+        ;
+
         return Inertia::render('posts/show', [
             'post' => $post
         ]);

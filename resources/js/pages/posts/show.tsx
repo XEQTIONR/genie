@@ -1,15 +1,18 @@
 import AppLayout from '@/layouts/app-layout'
 import { Post, BreadcrumbItem, SharedData } from '@/types'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { store as storeView } from '@/routes/api/views'
+import { store as storeLike, destroy } from '@/routes/api/likes'
 import axios from 'axios'
-import { usePage } from '@inertiajs/react'
+import { router, usePage } from '@inertiajs/react'
 import '/resources/css/projects.css'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { useInitials } from '@/hooks/use-initials'
 import { Separator } from '@/components/ui/separator'
 import { Button } from '@/components/ui/button'
-import { Heart } from 'lucide-react'
+import { Heart, Pencil } from 'lucide-react'
+import { cn } from '@/lib/utils'
+import { edit } from '@/routes/posts'
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -28,7 +31,12 @@ export default function ShowPost({post} : {post: Post}) {
     const variant = post.owner?.username ? 'rounded' : (post.owner?.name ? 'square' : undefined)
     const getInitials = useInitials()
 
-    const { apiToken } = usePage<SharedData>().props
+    const [numLikes, setNumLikes] = useState(post.likes_count ?? 0)
+    const [likes, setLikes] = useState(post.likes ?? [])
+    const [likeClasses, setLikeClasses] = useState("")
+    const [likeButtonDisabled, setLikeButtonDisabled] = useState(false)
+
+    const { apiToken, auth } = usePage<SharedData>().props
     useEffect(() => {
         axios.post(storeView().url, {
             viewable_type: 'post',
@@ -49,7 +57,15 @@ export default function ShowPost({post} : {post: Post}) {
                         JSON.stringify(post)
                     }
                 </p> */}
-                <h1 className='text-2xl font-semibold mt-10'>{post.title}</h1>
+                <div className="flex gap-5 items-center mt-10">
+                    <h1 className='text-2xl font-semibold'>{post.title}</h1>
+                    {
+                        post.owner_type.split("\\").pop()?.toLowerCase() === 'user' && auth.user?.id && auth.user.id === post.owner?.id && (
+                            <Button onClick={() => router.visit(edit(post))} className="rounded-full" variant="outline" size="icon-lg"><Pencil /></Button>
+                        )
+                    }
+                    
+                </div>
                 <div className="flex items-center justify-between">
                     <div className="flex gap-2.5 items-center">
                         <Avatar className='size-12'>
@@ -62,8 +78,73 @@ export default function ShowPost({post} : {post: Post}) {
                             <Button className='text-xs' variant="link">Follow</Button>
                         </div>
                     </div>
-                    <div className="flex gap-1">
-                        <Button className="rounded-full" variant="outline" size="icon-lg"><Heart /></Button>
+                    <div className="flex gap-2 items-center">
+                        <Button disabled={likeButtonDisabled} className="rounded-full cursor-pointer" variant="outline" size="icon-lg"
+                            onClick={() => {
+                                console.log('post.likes:', post.likes)
+                                if (auth.user) {
+                                    if (numLikes === 0) {
+                                        setLikeButtonDisabled(true)
+                                        axios.post(storeLike().url, {
+                                            likeable_id: post.id,
+                                            likeable_type: 'post'
+                                        }, {
+                                            headers: {
+                                                'Content-Type': 'multipart/form-data',
+                                                Authorization: 'Bearer ' + apiToken
+                                            }
+                                        }).then(res => {
+                                            setLikeButtonDisabled(false)
+                                            setNumLikes(l => l+1)
+                                            setLikes(l => {
+                                                if (l) {
+                                                    return [...l, res.data]
+                                                }
+                                                return [res.data]
+                                            })
+                                            setLikeClasses("")
+                                            setTimeout(() => {
+                                                setLikeClasses("animate-wave fill-pink-600 stroke-pink-600 ")
+                                            }, 100)
+                                        }).catch(e => {
+                                            setLikeButtonDisabled(false)
+                                            console.log('like error:', e)
+                                        })
+                                    } else {
+                                        setLikeButtonDisabled(true)
+                                        axios.delete(destroy({ like: likes[0].id }).url, {
+                                            headers: {
+                                                'Content-Type': 'multipart/form-data',
+                                                Authorization: 'Bearer ' + apiToken
+                                            }
+                                        }).then(() => {
+                                            setLikeButtonDisabled(false)
+                                            setNumLikes(l => l - 1)
+                                            setLikes([])
+                                            setLikeClasses("")
+                                            setTimeout(() => {
+                                                setLikeClasses("animate-wave")
+                                            }, 100)
+                                        }).catch((e) => {
+                                            setLikeButtonDisabled(false)
+                                            console.log('unlike error:', e)
+                                        })
+                                    }
+                                }
+                                
+                            }}
+                        >
+                            <Heart 
+                                strokeWidth={2.5} 
+                                className={cn(
+                                    "size-4 cursor-pointer",
+                                    (numLikes ?? 0 > 0) ? "fill-pink-600 stroke-pink-600 " : "hover:fill-pink-600 hover:stroke-pink-600",
+                                    likeClasses
+                                )} 
+                                    
+                            />
+                        </Button>
+                        <Button className="rounded-full py-5 px-5 font-semibold cursor-pointer">Send Inquiry</Button>
                     </div>
                 </div>
                 <Separator />
