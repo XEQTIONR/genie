@@ -97,6 +97,8 @@ class PostController extends Controller
      */
     public function show(Post $post)
     {
+        $post->load('owner');
+        
         return Inertia::render('posts/show', [
             'post' => $post
         ]);

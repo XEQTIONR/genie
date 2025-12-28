@@ -5,6 +5,11 @@ import { store as storeView } from '@/routes/api/views'
 import axios from 'axios'
 import { usePage } from '@inertiajs/react'
 import '/resources/css/projects.css'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { useInitials } from '@/hooks/use-initials'
+import { Separator } from '@/components/ui/separator'
+import { Button } from '@/components/ui/button'
+import { Heart } from 'lucide-react'
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -19,6 +24,9 @@ function replaceNbsps(str: string) {
 }
 
 export default function ShowPost({post} : {post: Post}) {
+
+    const variant = post.owner?.username ? 'rounded' : (post.owner?.name ? 'square' : undefined)
+    const getInitials = useInitials()
 
     const { apiToken } = usePage<SharedData>().props
     useEffect(() => {
@@ -35,22 +43,40 @@ export default function ShowPost({post} : {post: Post}) {
     }, [])
     return <AppLayout breadcrumbs={breadcrumbs}>
         {
-            <div className="w-full flex flex-col gap-7 mx-auto max-w-5xl">
+            <div className="w-full flex flex-col mx-auto max-w-5xl gap-6">
                 {/* <p>
                     {
                         JSON.stringify(post)
                     }
                 </p> */}
-                <h1 className='text-4xl font-bold text-center'>{post.title}</h1>
+                <h1 className='text-2xl font-semibold mt-10'>{post.title}</h1>
+                <div className="flex items-center justify-between">
+                    <div className="flex gap-2.5 items-center">
+                        <Avatar className='size-12'>
+                            <AvatarImage src={post.owner?.avatar ?? ''} />
+                            <AvatarFallback>{getInitials(post.owner?.name ?? post.owner?.title ?? "")}</AvatarFallback>
+                        </Avatar>
+                        <div>
+                            <span className="font-semibold tracking-wide text-sm">{post.owner?.name ?? post.owner?.title}</span>
+
+                            <Button className='text-xs' variant="link">Follow</Button>
+                        </div>
+                    </div>
+                    <div className="flex gap-1">
+                        <Button className="rounded-full" variant="outline" size="icon-lg"><Heart /></Button>
+                    </div>
+                </div>
+                <Separator />
+                
                 {
                     post.cover_type.split('/')[0] == 'video' &&
-                    <video autoPlay loop controls preload="true">
+                    <video className="rounded-lg" autoPlay loop controls preload="true">
                         <source src={post.cover} type={post.cover_type} />
                     </video>
                 }
                 {
                     post.cover_type.split('/')[0] == 'image' &&
-                    <img src={post.cover} className="w-full max-h-[70vh] object-contain" />
+                    <img src={post.cover} className="w-full object-contain rounded-lg" />
                 }
                 {
                     post.body.map((block) => {
@@ -72,6 +98,25 @@ export default function ShowPost({post} : {post: Post}) {
                         }
                     })
                 }
+                <div className="flex flex-col w-full gap-5 mt-30">
+                    <div className='w-full flex items-center gap-5'>
+                        <div className='w-full'>
+                            <Separator />
+                        </div>
+                        <Avatar className='size-15'>
+                            <AvatarImage src={post.owner?.avatar ?? ''} />
+                            <AvatarFallback>{getInitials(post.owner?.name ?? post.owner?.title ?? "")}</AvatarFallback>
+                        </Avatar>
+                        <div className='w-full'>
+                            <Separator />
+                        </div>
+                    </div>
+                    <h2 className="text-center text-xl font-semibold tracking-wide">{post.owner?.name ?? post.owner?.title}</h2>
+                    <div className='w-full flex justify-center'>
+                        <Button className="rounded-full py-5 px-5 mb-10 font-semibold">Send Inquiry</Button>
+                    </div>
+                </div>
+                
             </div>
             
         }
