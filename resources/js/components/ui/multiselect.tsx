@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from "react"
-import { Check, ChevronsUpDown } from "lucide-react"
+import { useRef, useState } from "react"
+import { Check, ChevronDown, ChevronsUpDown } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -16,39 +16,40 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
-import { Input } from "@/components/ui/input"
+import { Badge } from "./badge"
+import { Checkbox } from "./checkbox"
 
 export interface Option {
     label: string | React.ReactNode,
-    value: string
+    value: string|number 
 }
 
 export interface GroupedOptions {
     [key: string]: Option[]
 }
 
-export function Combobox({
-    name = "default-combobox-name",
-    defaultValue = "",
+export function Multiselect({
+    // name = "default-multiselect-name",
+    subject = "item",
+    defaultValue = [],
     items = [], 
     containerClassName = "", 
     placeholder = "Select...",
     searchLabel = "Search...",
     noResultsLabel = "No results found.",
     onQueryChange,
-    onSelectValue,
-    multiple = false
+    onSelect,
 } : {
-    name?: string
-    defaultValue?: string
+    // name?: string
+    subject?: string
+    defaultValue?: (string|number)[]
     items?: Option[]|GroupedOptions
     containerClassName?: string 
     placeholder?: string
     searchLabel?: string
     noResultsLabel?: string
     onQueryChange?: (q: string) => void
-    onSelectValue?: (val: string) => void
-    multiple?: boolean
+    onSelect?: (val: (string|number)[]) => void
 
 }) {
   const [open, setOpen] = useState(false)
@@ -57,7 +58,6 @@ export function Combobox({
 
   return (
     <>
-    <Input type="hidden" name={name} value={value} />
     <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger ref={container} className={containerClassName} asChild>
             <Button
@@ -67,13 +67,11 @@ export function Combobox({
                 className="justify-between"
             >
             {
-                value
-                    ? Array.isArray(items)
-                        ? items.find((item) => item.value === value)?.label
-                        : Object.values(items).flat().find((item) => item.value === value)?.label
+                value.length > 0
+                    ? <div className="flex gap-1"><Badge className="rounded-full" variant="secondary">{value.length}</Badge> selected</div>
                     : placeholder
             }
-                <ChevronsUpDown className="opacity-50" />
+                <ChevronDown className="opacity-50" />
             </Button>
         </PopoverTrigger>
         <PopoverContent
@@ -102,20 +100,20 @@ export function Combobox({
                                         key={item.value}
                                         value={item.value}
                                         onSelect={(currentValue) => {
-                                        setValue(currentValue === value ? "" : currentValue)
-                                        if (onSelectValue) {
-                                            onSelectValue(currentValue === value ? "" : currentValue)
+                                        //setValue(currentValue === value ? "" : currentValue)
+                                        if (!value.includes(currentValue)) {
+                                            const val = [...value, currentValue]
+                                            setValue(val)
+                                            if (onSelect) {
+                                                onSelect(val)
+                                            }
+                                        } else {
+                                            const val = value.filter(x => x !== currentValue)
+                                            setValue(val)
                                         }
-
-                                        if (!multiple)
-                                            setOpen(false)
                                     }}>
+                                        <Checkbox checked={value.includes(item.value)} />
                                         {item.label}
-                                        <Check className={cn(
-                                                "ml-auto",
-                                                value === item.value ? "opacity-100" : "opacity-0"
-                                            )}
-                                        />
                                     </CommandItem>
                                 ))
                             }
@@ -128,19 +126,21 @@ export function Combobox({
                                             key={item.value}
                                             value={item.value}
                                             onSelect={(currentValue) => {
-                                            setValue(currentValue === value ? "" : currentValue)
-                                            if (onSelectValue) {
-                                                onSelectValue(currentValue === value ? "" : currentValue)
+
+                                            
+                                            if (!value.includes(currentValue)) {
+                                                const val = [...value, currentValue]
+                                                setValue(val)
+                                                if (onSelect) {
+                                                    onSelect(val)
+                                                }
+                                            } else {
+                                                const val = value.filter(x => x !== currentValue)
+                                                setValue(val)
                                             }
-                                            if (!multiple)
-                                                setOpen(false)
                                         }}>
+                                            <Checkbox checked={value.includes(item.value)} />
                                             {item.label}
-                                            <Check className={cn(
-                                                    "ml-auto",
-                                                    value === item.value ? "opacity-100" : "opacity-0"
-                                                )}
-                                            />
                                         </CommandItem>
                                     ))
                                 }

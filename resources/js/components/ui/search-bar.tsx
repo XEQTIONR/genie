@@ -42,7 +42,7 @@ export default function SearchBar({
     const inpt = useRef(null)
 
     return (
-        <Command className="rounded-lg border shadow-md md:min-w-[450px]">
+        <Command className="rounded-lg border shadow-md">
             <CommandInput
                 ref={inpt}
                 onFocus={() => setFocus(true)}
