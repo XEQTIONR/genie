@@ -95,23 +95,48 @@ class ProjectController extends Controller
      */
     public function show(Project $project)
     {
-        if ($project->visibility === 'private') {
-            if (! Auth::user()) {
+        $user = Auth::user();
+
+        if ($project->visibility === 'private') 
+        {
+            if (! $user) 
+            {
                 session()->put('url.intended', URL::full());
                 return redirect(route('login'));
             }
             
-            if (! Gate::allows('view-project', $project)) {
+            if (! Gate::allows('view-project', $project)) 
+            {
                 abort(403);
             }
         }
 
-        $project->load(['owner', 'creator', 'members'])->withCount(['likes', 'views']);
+        $project->load([
+            'owner', 
+            'creator', 
+            'members',
+            'likes' => function(MorphMany $query) {
+                $query->where('user_id', Auth::id());
+            }
+        ])->withCount(['likes', 'views']);
 
-        $project->load(['likes' => function(MorphMany $query) {
-            $query->where('user_id', Auth::id());
-        }]);
+        $owns = false;
 
+        if ($user) 
+        {
+            if ($project->owner_id == $user->id && $project->owner_type === User::class) 
+            {
+                $owns = true;
+            } 
+            else if ($project->owner_type === Team::class) 
+            {
+                //Project->Team->User
+                $owner = $project->owner->owner;
+                if ($owner->id == $user->id) {
+                    $owns = true;
+                }
+            }
+        }
         $dom = new \DOMDocument();
         libxml_use_internal_errors(true);
         $dom->loadHTML($project->description, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
@@ -157,6 +182,7 @@ class ProjectController extends Controller
         return Inertia::render('projects/show', [
             'project' => $project,
             'h' => $h,
+            'owns' => $owns,
         ]);
     }
 

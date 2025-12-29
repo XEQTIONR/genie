@@ -26,7 +26,7 @@ function replaceNbsps(str: string) {
   return str.replace(re, " ");
 }
 
-export default function ShowPost({post} : {post: Post}) {
+export default function ShowPost({post, owns} : {post: Post, owns: boolean}) {
 
     const variant = post.owner?.username ? 'rounded' : (post.owner?.name ? 'square' : undefined)
     const getInitials = useInitials()
@@ -60,8 +60,15 @@ export default function ShowPost({post} : {post: Post}) {
                 <div className="flex gap-5 items-center mt-10">
                     <h1 className='text-2xl font-semibold'>{post.title}</h1>
                     {
-                        post.owner_type.split("\\").pop()?.toLowerCase() === 'user' && auth.user?.id && auth.user.id === post.owner?.id && (
-                            <Button onClick={() => router.visit(edit(post))} className="rounded-full" variant="outline" size="icon-lg"><Pencil /></Button>
+                        owns && (
+                            <Button 
+                                onClick={() => router.visit(edit(post))}
+                                className="rounded-full cursor-pointer"
+                                variant="outline"
+                                size="icon-lg"
+                            >
+                                <Pencil />
+                            </Button>
                         )
                     }
                     

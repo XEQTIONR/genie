@@ -102,11 +102,48 @@ class PostController extends Controller
                 'likes' => function(MorphMany $query) {
                     $query->where('user_id', Auth::id());
                 }
-            ])
-        ;
+            ]);
+
+        $user = Auth::user();
+        $owns = false;
+
+        if ($user) 
+        {
+            if ($post->owner_type === User::class && $post->owner_id == $user->id) 
+            {
+                $owns = true;
+            }
+
+            else if ($post->owner_type === Team::class) 
+            {
+                //Post->Team->User
+                $owner = $post->owner->owner;
+                if ($owner->id == $user->id) {
+                    $owns = true;
+                }
+            } 
+            
+            else if ($post->owner_type === Project::class)
+            {
+                $project = $post->owner;
+
+                if ($project->owner_type === User::class && $project->owner_id == $user->id) {
+                    $owns = true;
+                } 
+                
+                else if ($project->owner_type === Team::class)
+                {
+                    $owner = $project->owner->owner;
+                    if ($owner->id == $user->id) {
+                        $owns = true;
+                    }
+                }
+            }
+        }
 
         return Inertia::render('posts/show', [
-            'post' => $post
+            'post' => $post,
+            'owns' => $owns
         ]);
     }
 

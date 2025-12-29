@@ -1,6 +1,6 @@
 import AppLayout from "@/layouts/app-layout";
 import { BreadcrumbItem, Like, Project, ProjectMember, SharedData } from "@/types";
-import { Head, Link } from "@inertiajs/react";
+import { Head, Link, router } from "@inertiajs/react";
 import {
   Sheet,
   SheetClose,
@@ -12,7 +12,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet"
 import { Button } from "@/components/ui/button";
-import { Bookmark, ChartNoAxesColumnIncreasing, ChevronDown, Code, CodeXml, Heart, Mail, Menu, Share, Share2 } from "lucide-react";
+import { Bookmark, ChartNoAxesColumnIncreasing, ChevronDown, Code, CodeXml, Heart, Mail, Menu, Pencil, Share, Share2 } from "lucide-react";
 import { Facebook,Twitch,Twitter, Youtube } from "@/components/icons/svgs";
 import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
@@ -48,13 +48,14 @@ import { Badge } from "@/components/ui/badge";
 import { Toggle } from "@/components/ui/toggle";
 import { edit } from "@/routes/projects";
 
-export default function ShowProject({ project, h } : { 
+export default function ShowProject({ project, h, owns } : { 
     project: Project 
     h: { 
         hash: string 
         tag: string 
         text: string
     }[]
+    owns: boolean
 }) {
 
     const breadcrumbs: BreadcrumbItem[] = [
@@ -130,7 +131,25 @@ export default function ShowProject({ project, h } : {
         <AppLayout maxBodyWidth="w-full scroll-smooth" breadcrumbs={breadcrumbs}>
             <Head title="Show Project" />
             <div className="w-full md:min-h-[50vh] bg-secondary dark:bg-neutral-900">
-                <h1 className="w-full md:w-1/3 text-center mx-auto text-2xl font-semibold mt-5 md:mt-10">{project.title}</h1>
+                <div className="flex items-center gap-4 justify-center mt-5 md:mt-10">
+                    <span className={cn(
+                        "text-center text-2xl font-semibold",
+                        "ml-10"
+                    )}>{project.title}</span>
+                    {
+                        owns &&
+                        (
+                            <Button 
+                                onClick={() => router.visit(edit(project))} 
+                                className="rounded-full cursor-pointer" 
+                                variant="outline" 
+                                size="icon-lg"
+                            >
+                                <Pencil />
+                            </Button>
+                        )
+                    }
+                </div>
                 <h2 className="w-full md:w-1/3 text-center mx-auto mt-1 mb-3">{project.excerpt}</h2>
                 <div className="flex flex-col md:gap-7 md:flex-row mx-auto w-full md:max-w-7xl items-stretch">
                     <Carousel 
