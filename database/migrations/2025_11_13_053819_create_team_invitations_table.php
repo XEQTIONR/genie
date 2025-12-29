@@ -18,6 +18,7 @@ return new class extends Migration
             $table->foreignId('invitee_id')->nullable();
             $table->string('to_email')->nullable();
             $table->json('roles')->nullable();
+            $table->json('permissions')->nullable();
             $table->timestamps();
 
             $table->foreign('team_id')->references('id')->on('teams');

@@ -12,6 +12,7 @@ class TeamMembership extends Pivot
     {
         return [
             'roles' => 'array',
+            'permissions' => 'array'
         ];
     }
 }

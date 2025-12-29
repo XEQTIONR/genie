@@ -35,9 +35,13 @@ class TeamInvitationController extends Controller
     {
         $team = $invitation->team;
         $roles = $invitation->roles;
+        $permissions = $invitation->permissions;
         $user = User::where('email', $invitation->to_email)->first();
 
-        $team->users()->save($user, ['roles' => $roles]);
+        $team->users()->save($user, [
+            'roles' => $roles,
+            'permissions' => $permissions,
+        ]);
 
         return to_route('teams.show', ['team' => $team]);
     }

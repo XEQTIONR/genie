@@ -93,7 +93,10 @@ class TeamController extends Controller
         foreach ($existing_users as $invitee)
         {
             if ($userId == $invitee['id']) {
-                $team->users()->save($user, ['roles' => $invitee['roles']]);
+                $team->users()->save($user, [
+                    'roles' => $invitee['roles'],
+                    'permissions' => $invitee['permissions']
+                ]);
             } else {
                 $invitation = new TeamInvitation([
                     'team_id' => $team->id,
@@ -101,6 +104,7 @@ class TeamController extends Controller
                     'invitee_id' => $invitee['id'],
                     'to_email' => $users->first(fn($value) => $value['id'] === $invitee['id'])->email,
                     'roles' => $invitee['roles'],
+                    'permissions' => $invitee['permissions'],
                 ]);
 
                 $invitation->save();

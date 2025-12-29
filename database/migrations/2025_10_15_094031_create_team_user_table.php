@@ -15,6 +15,7 @@ return new class extends Migration
             $table->foreignId('team_id');
             $table->foreignId('user_id');
             $table->json('roles')->nullable();
+            $table->json('permissions')->nullable();
             $table->timestamps();
         });
     }

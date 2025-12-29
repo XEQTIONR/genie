@@ -43,7 +43,7 @@ class Team extends Model
     {
         return $this->belongsToMany(User::class)
             ->using(TeamMembership::class)
-            ->withPivot(['roles'])
+            ->withPivot(['roles', 'permissions'])
             ->withTimestamps();
     }
 
