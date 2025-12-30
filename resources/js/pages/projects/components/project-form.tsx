@@ -67,31 +67,7 @@ import axios from 'axios'
 import FileDragArea from '@/components/file-drag-area'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { useInitials } from '@/hooks/use-initials'
-
-function Step({step, heading, children} : {step: number, heading: string, children: React.ReactNode}) {
-    return (<>
-        <div className="w-full flex gap-3 pr-3 md:pr-0">
-            <div className="flex flex-col gap-1 items-center w-7">
-                <div className="size-7 text-sm font-medium shrink-0 rounded-2xl bg-muted text-center flex justify-center items-center">
-                    {step}
-                </div>
-            </div>
-            <div className='flex items-center flex-grow'>
-                <h2 className="font-bold">{heading}</h2>
-            </div>
-            
-        </div>
-        <div className="w-full py-1 flex gap-3 pr-3 md:pr-0">
-            <div className="flex flex-col gap-1 items-center w-7 shrink-0">
-                <Separator className="border-[1px] " orientation="vertical" />
-            </div>
-            <div className="flex-grow">
-                {children}
-            </div>
-            
-        </div>
-    </>)
-}
+import Step from '@/components/step'
 
 export default function ProjectForm({
     user,
