@@ -12,7 +12,7 @@ import { index as projectsIndex } from '@/routes/teams/projects'
 import { index as jobsIndex } from '@/routes/teams/opportunities'
 import { Opportunity, NavItem, Project, ProjectMember, Team, type BreadcrumbItem } from '@/types'
 import { Head, Link } from '@inertiajs/react'
-import { Camera, Eraser, Globe, MapPin, Pencil, PencilRuler, Instagram } from 'lucide-react'
+import { Camera, Eraser, Globe, MapPin, Pencil, PencilRuler, Instagram, Mail } from 'lucide-react'
 import { Discord, Facebook, LinkedIn, Twitter, Twitch, Youtube } from '@/components/icons/svgs'
 import {
     Dialog,
@@ -50,6 +50,7 @@ import { Separator } from '@/components/ui/separator'
 import { cn } from '@/lib/utils'
 import roles from '@/data/roles'
 import OpportunityList from '@/components/opportunity-list'
+import Step from '@/components/step'
 
 type ProfileTab = NavItem & {key: string, className?: string}
 
@@ -374,7 +375,7 @@ export default function TeamProfile({
         switch(tab) {
             case 'members':
                 return (
-                    <div className="flex w-full h-full flex-col gap-6 px-3 py-5">
+                    <div className="flex w-full h-full flex-col gap-6">
                         <h3 className="text-xl font-semibold mt-6">Members</h3>
                         <ItemGroup className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
                             {users.map((member) => (
@@ -411,7 +412,7 @@ export default function TeamProfile({
 
             case 'projects':
                 return projects.length > 0
-                    ? (<div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 w-full h-full mx-2 md:mx-8">
+                    ? (<div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 w-full h-full">
                         { projects.map((project) => (
                             <ProjectCard
                                 excerpt={project.excerpt} 
@@ -426,7 +427,7 @@ export default function TeamProfile({
                     : <NoProjects />
 
             case 'jobs':
-                return (<div className="w-full h-full mx-2 mt-4 flex flex-col gap-3">
+                return (<div className="w-full h-full mt-4 flex flex-col gap-3">
                     {/* <h2 className="text-xl font-bold">Openings</h2> */}
                     <section className="w-full h-full flex flex-col">
                         <h3 className="text-xl font-semibold mt-6">Current Openings</h3>
@@ -437,6 +438,21 @@ export default function TeamProfile({
 
                     </section>
                 </div>)
+
+            case 'activity':
+                return (
+                    <div className="flex flex-col mx-auto w-full max-w-3xl">
+                        <h3 className="text-xl font-semibold mt-6">Activity Log</h3>
+                        <Step bg="bg-blue-800" step={<Mail strokeWidth={2.5} size={14} />} heading={"Some heading"}>
+                            Something
+                        </Step>
+                        <Step step={1}>
+                            <div className='w-full h-32'>
+                                SSADSADA
+                            </div>
+                        </Step>
+                    </div>
+                )
         }
     }
 
@@ -471,14 +487,13 @@ export default function TeamProfile({
             <div className="flex h-full flex-col overflow-x-auto">
                 <div
                     style={team.banner ? { backgroundImage: `url("${team.banner}")` } : {
-                        backgroundImage: `url("/pattern_10.jpg")`,
+                        backgroundImage: `url("/pattern_10.jpg")`, //TODO: Fix hardcoded image
                         backgroundSize: '247.8px 193.8px'
                     }}
-                    // style={team.banner ? { backgroundImage: `url("${team.banner}")` } : {}}
                     className="h-88 bg-gradient-to-r from-indigo-500 from-10% via-sky-500 via-30% to-emerald-500 to-90% bg-cover bg-center flex gap-4 justify-between border-sidebar-border/70 dark:border-sidebar-border"
                 >
-                    <div className="w-full h-full  relative overflow-hidden flex justify-end items-start md:items-end px-4 py-5">
-                        <div className='absolute top-1/2 left-1/2 -translate-1/2 flex flex-col gap-3 w-full px-5 lg:px-0 max-w-3xl'>
+                    <div className="w-full h-full  relative overflow-hidden flex justify-end items-start md:items-end bg-red-950">
+                        <div className='absolute top-1/2 left-1/2 -translate-1/2 flex flex-col gap-3 w-full max-w-3xl px-4 bg-pink-700'>
                             <div className="flex gap-5">
                                 <Avatar variant="square" className="size-20">
                                 {
@@ -525,7 +540,7 @@ export default function TeamProfile({
                 </div>
                 <div className="w-full block mx-auto">
                     <TabbedSectionHeaders
-                        className="px-1 bg-foreground/5 dark:bg-foreground/2"
+                        className="px-1 bg-foreground/5 dark:bg-red-500/2"
                         current={tab}
                         headers={tabs}
                         onTabChange={() => {
@@ -534,7 +549,7 @@ export default function TeamProfile({
                     />
                 </div>
                 
-                <div className="w-full h-full md:min-h-[50vh] max-w-7xl mx-auto flex overflow-hidden">
+                <div className="w-full h-full md:min-h-[50vh] mx-auto flex overflow-hidden">
                     {
                         loading 
                             ? <Spinner className="block m-auto size-6" />
