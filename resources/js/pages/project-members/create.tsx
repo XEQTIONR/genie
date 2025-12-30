@@ -362,46 +362,26 @@ export default function AddProjectMembers({ project, defaultMembers = [], apiTok
                                                             value: 'delete-posts'
                                                         },
                                                     ],
-                                                    Team: [
-                                                        {
-                                                            label: 'Edit team info',
-                                                            value: 'edit-info'
-                                                        },
-                                                        {
-                                                            label: 'Transfer team',
-                                                            value: 'transfer'
-                                                        },
-                                                    ],
-                                                    Members: [
-                                                        {
-                                                            label: 'Add members',
-                                                            value: 'add-member'
-                                                        },
-                                                        {
-                                                            label: 'Remove members',
-                                                            value: 'delete-member'
-                                                        },
-                                                        {
-                                                            label: 'Edit role',
-                                                            value: 'edit-role'
-                                                        },
-                                                    ],
                                                     Projects: [
-                                                        {
-                                                            label: 'Create projects',
-                                                            value: 'create-project'
-                                                        },
                                                         {
                                                             label: 'Edit projects',
                                                             value: 'edit-project'
                                                         },
                                                         {
-                                                            label: 'Delete projects',
+                                                            label: 'Delete project',
                                                             value: 'delete-project'
                                                         },
                                                         {
                                                             label: 'Add members',
                                                             value: 'add-project-member'
+                                                        },
+                                                        {
+                                                            label: 'Edit members',
+                                                            value: 'edit-project-member'
+                                                        },
+                                                        {
+                                                            label: 'Remove members',
+                                                            value: 'delete-project-member'
                                                         },
                                                     ],
                                                     Opportunities: [
