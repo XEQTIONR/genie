@@ -12,7 +12,7 @@ import { index as projectsIndex } from '@/routes/teams/projects'
 import { index as jobsIndex } from '@/routes/teams/opportunities'
 import { Opportunity, NavItem, Project, ProjectMember, Team, type BreadcrumbItem } from '@/types'
 import { Head, Link } from '@inertiajs/react'
-import { Camera, Eraser, Globe, MapPin, Pencil, PencilRuler, Instagram, Mail, Send } from 'lucide-react'
+import { Camera, Eraser, Globe, MapPin, Pencil, PencilRuler, Instagram, Mail, Send, Users, Plus, Sparkles } from 'lucide-react'
 import { Discord, Facebook, LinkedIn, Twitter, Twitch, Youtube } from '@/components/icons/svgs'
 import {
     Dialog,
@@ -443,14 +443,32 @@ export default function TeamProfile({
                 return (
                     <div className="flex flex-col mx-auto w-full max-w-3xl">
                         <h3 className="text-xl font-semibold my-6">Activity Log</h3>
-                        <Step bg="bg-transparent" step={<Send size={16} />} heading={"Some heading"}>
+
+                        {
+                            team.activities?.map(({content, created_at}) => {
+
+                                switch (content.type) {
+                                    case "team-created":
+                                        return (
+                                            <Step bg="bg-transparent" step={<Sparkles strokeWidth={2} size={25} />} >
+                                                <div className='flex items-center h-6 gap-2'>
+                                                    <div>New team created - <span className="font-semibold">{team.name}</span></div>
+                                                    <Separator orientation="vertical" className='w-full h-8 bg-dim' />
+                                                    <span className="text-dim text-xs font-semibold">{(new Date(created_at)).toDateString()}</span>
+                                                </div>
+                                            </Step>
+                                        )
+                                }
+                            })
+                        }
+                        {/* <Step bg="bg-transparent" step={<Send size={16} />} heading={"Some heading"}>
                             Something
                         </Step>
                         <Step step={1}>
                             <div className='w-full h-32'>
                                 SSADSADA
                             </div>
-                        </Step>
+                        </Step> */}
                     </div>
                 )
         }
@@ -492,7 +510,7 @@ export default function TeamProfile({
                     }}
                     className="h-88 bg-gradient-to-r from-indigo-500 from-10% via-sky-500 via-30% to-emerald-500 to-90% bg-cover bg-center flex gap-4 justify-between border-sidebar-border/70 dark:border-sidebar-border"
                 >
-                    <div className="w-full h-full  relative overflow-hidden flex justify-end items-start md:items-end bg-red-950">
+                    <div className="w-full h-full  relative overflow-hidden flex justify-end items-start md:items-end"> 
                         <div className='absolute top-1/2 left-1/2 -translate-1/2 flex flex-col gap-3 w-full max-w-3xl px-4 bg-pink-700'>
                             <div className="flex gap-5">
                                 <Avatar variant="square" className="size-20">

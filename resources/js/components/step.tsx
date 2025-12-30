@@ -22,7 +22,7 @@ export default function Step({bg = 'bg-muted', step, heading, children} : {bg?: 
                         <h2 className="font-bold">{heading}</h2>
                     </div>
                 ) : (
-                    <div className="flex-grow">
+                    <div className="flex-grow mt-0.5">
                         {children}
                     </div>
                 )
@@ -30,7 +30,7 @@ export default function Step({bg = 'bg-muted', step, heading, children} : {bg?: 
         </div>
         <div className="w-full py-1 flex gap-3 pr-3 md:pr-0">
             <div className="flex flex-col gap-1 items-center w-7 shrink-0">
-                <Separator className="" orientation="vertical" />
+                <Separator className="min-h-5" orientation="vertical" />
             </div>
             {
                 heading && (

@@ -44,6 +44,7 @@ interface Location {
     country: string
 }
 
+
 type ProjectOwnerTypeUser = typeof USERMODEL
 type ProjectOwnerTypeTeam = typeof TEAMMODEL
 export type ProjectOwner = ProjectOwnerTypeUser | ProjectOwnerTypeTeam
@@ -96,6 +97,7 @@ export interface Team {
     opportunities_count?: number
     owner_id: number
     posts?: Post[]
+    activities?: Activity[]
 }
 
 export interface TeamInvitation {
@@ -205,3 +207,14 @@ export interface TextBlock {
 }
 
 export type MediaBlock = ImageBlock | VideoBlock | TextBlock
+
+export interface Activity {
+    id: string
+    subject_type: string
+    subject_id: number
+    content: {
+        type: "team-created"
+        [others: string]: unknown
+    }
+    created_at: string
+}

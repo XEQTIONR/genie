@@ -36,6 +36,8 @@ class TeamController extends Controller
 
     public function show(Team $team)
     {
+        $team->load(['activities']);
+
         return Inertia::render('teams/show', [
             'team' => $team,
             'user_count' => $team->users()->count()
