@@ -34,9 +34,14 @@ class ProjectInvitationController extends Controller
     {
         $project = $invitation->project;
         $roles = $invitation->roles;
+        $permissions = $invitation->permissions;
+
         $user = User::where('email', $invitation->to_email)->first();
 
-        $project->members()->save($user, ['roles' => $roles]);
+        $project->members()->save($user, [
+            'roles' => $roles,
+            'permissions' => $permissions
+        ]);
 
         return to_route('projects.show', ['project' => $project]);
     }

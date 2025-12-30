@@ -11,7 +11,6 @@ import { store } from '@/routes/project/members'
 // import 'quill/dist/quill.bubble.css'
 import '/resources/css/quill.bubble.css'
 import { Field, FieldDescription, FieldGroup, FieldLabel } from '@/components/ui/field'
-import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Input } from '@/components/ui/input'
 import {
     Table,
@@ -22,7 +21,7 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
-import { ChevronRight, CircleCheck, CircleX, Mail, PencilRuler, Plus, Send, Trash, UserRoundPlus, Users, UsersRound, X } from 'lucide-react'
+import { ChevronRight, CircleCheck, CircleX, Mail, Plus, Trash, Users, X } from 'lucide-react'
 import { useDebouncedCallback } from 'use-debounce'
 import axios from 'axios'
 import { type SharedData } from '@/types';
@@ -30,6 +29,7 @@ import { useInitials } from '@/hooks/use-initials'
 import { Badge } from '@/components/ui/badge'
 import SearchBar from '@/components/ui/search-bar'
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
+import { Multiselect } from '@/components/ui/multiselect'
 
 interface Member {
     id?: number
@@ -37,6 +37,7 @@ interface Member {
     email: string
     name?: string
     roles: string[]
+    permissions: string[]
     avatar?: string
 }
 
@@ -57,7 +58,8 @@ export default function AddProjectMembers({ project, defaultMembers = [], apiTok
             name, 
             email, 
             roles: id === auth.user.id ? ['Founder'] : ['Collaborator'], 
-            avatar
+            avatar,
+            permissions: [],
         }))
     })
     const getInitials = useInitials()
@@ -102,7 +104,8 @@ export default function AddProjectMembers({ project, defaultMembers = [], apiTok
                             name: data.name,
                             email: data.email,
                             avatar: data.avatar,
-                            roles: ['Collaborator']
+                            roles: ['Collaborator'],
+                            permissions: [],
                         })
                     } else { // new user not found
                         const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
@@ -170,7 +173,8 @@ export default function AddProjectMembers({ project, defaultMembers = [], apiTok
                                             setData('members', [
                                                 {
                                                     email: newEmail,
-                                                    roles: ['Collaborator']
+                                                    roles: ['Collaborator'],
+                                                    permissions: [],
                                                 },
                                                 ...data.members,
                                             ])
@@ -234,16 +238,17 @@ export default function AddProjectMembers({ project, defaultMembers = [], apiTok
                         <TableCaption>A list of users added to project.</TableCaption>
                         <TableHeader>
                             <TableRow>
-                                <TableHead className="w-6/12">User</TableHead>
-                                <TableHead className="w-5/12">Role</TableHead>
-                                <TableHead className="w-1/12">Remove</TableHead>
+                                <TableHead className="w-3/12">User</TableHead>
+                                <TableHead className="w-4/12">Role</TableHead>
+                                <TableHead className="w-3/12">Permissions</TableHead>
+                                <TableHead className="w-2/12">Remove</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
                             {
                                 data.members.map(({id, name, username, roles, email, avatar}, index) => (
                                     <TableRow className="hover:bg-transparent" key={id}>
-                                        <TableCell className="flex items-start">
+                                        <TableCell className="w-3/12 flex items-start">
                                             <div className="flex items-center gap-1.5 my-1">
                                             {
                                                 id !== undefined
@@ -280,31 +285,8 @@ export default function AddProjectMembers({ project, defaultMembers = [], apiTok
                                             }
                                             </div>
                                         </TableCell>
-                                        <TableCell>
-                                            <div className="flex flex-col">
-                                                    {
-                                                        roles.length > 0 &&
-                                                        <div className="flex flex-wrap gap-2 my-2">
-                                                        {
-                                                            roles.map(r => (
-                                                                <Badge className="cursor-pointer" onClick={() => {
-                                                                    setData('members', data.members.map((m, i) => {
-                                                                        if (i !== index) {
-                                                                            return m
-                                                                        } else {
-                                                                            const set = new Set([...m.roles])
-                                                                            set.delete(r)
-                                                                            m.roles = [...set.values()]
-                                                                            return m
-                                                                        }
-                                                                    }))
-                                                                }}>
-                                                                    {r} <X />
-                                                                </Badge>
-                                                            )) 
-                                                        }
-                                                        </div>
-                                                    }
+                                        <TableCell className="w-4/12">
+                                            <div className="w-full flex flex-col pt-1">
                                                     <SearchBar
                                                         placeholder="Add roles..."
                                                         onSelectOption={(val) => {
@@ -330,7 +312,115 @@ export default function AddProjectMembers({ project, defaultMembers = [], apiTok
                                                             }
                                                         })}
                                                     />
+                                                    {
+                                                        roles.length > 0 &&
+                                                        <div className="flex flex-wrap gap-2 my-2">
+                                                        {
+                                                            roles.map(r => (
+                                                                <Badge className="cursor-pointer" onClick={() => {
+                                                                    setData('members', data.members.map((m, i) => {
+                                                                        if (i !== index) {
+                                                                            return m
+                                                                        } else {
+                                                                            const set = new Set([...m.roles])
+                                                                            set.delete(r)
+                                                                            m.roles = [...set.values()]
+                                                                            return m
+                                                                        }
+                                                                    }))
+                                                                }}>
+                                                                    {r} <X />
+                                                                </Badge>
+                                                            )) 
+                                                        }
+                                                        </div>
+                                                    }
                                                 </div>
+                                        </TableCell>
+                                        <TableCell className='w-3/12 relative'>
+                                            <Multiselect
+                                                placeholder="Select permissions"
+                                                onSelect={(v) => setData('members', data.members.map((m, i) => {
+                                                    if (i == index) {
+                                                        m.permissions = v
+                                                    }
+                                                    return m
+                                                }))} 
+                                                subject='permissions'
+                                                items={{
+                                                    Ideas: [
+                                                        {
+                                                            label: 'Create ideas',
+                                                            value: 'create-posts'
+                                                        },
+                                                        {
+                                                            label: 'Edit ideas',
+                                                            value: 'edit-posts'
+                                                        },
+                                                        {
+                                                            label: 'Delete ideas',
+                                                            value: 'delete-posts'
+                                                        },
+                                                    ],
+                                                    Team: [
+                                                        {
+                                                            label: 'Edit team info',
+                                                            value: 'edit-info'
+                                                        },
+                                                        {
+                                                            label: 'Transfer team',
+                                                            value: 'transfer'
+                                                        },
+                                                    ],
+                                                    Members: [
+                                                        {
+                                                            label: 'Add members',
+                                                            value: 'add-member'
+                                                        },
+                                                        {
+                                                            label: 'Remove members',
+                                                            value: 'delete-member'
+                                                        },
+                                                        {
+                                                            label: 'Edit role',
+                                                            value: 'edit-role'
+                                                        },
+                                                    ],
+                                                    Projects: [
+                                                        {
+                                                            label: 'Create projects',
+                                                            value: 'create-project'
+                                                        },
+                                                        {
+                                                            label: 'Edit projects',
+                                                            value: 'edit-project'
+                                                        },
+                                                        {
+                                                            label: 'Delete projects',
+                                                            value: 'delete-project'
+                                                        },
+                                                        {
+                                                            label: 'Add members',
+                                                            value: 'add-project-member'
+                                                        },
+                                                    ],
+                                                    Opportunities: [
+                                                        {
+                                                            label: 'Create opportunities',
+                                                            value: 'create-jobs'
+                                                        },
+                                                        {
+                                                            label: 'Edit opportunities',
+                                                            value: 'edit-jobs'
+                                                        },
+                                                        {
+                                                            label: 'Delete opportunities',
+                                                            value: 'delete-jobs'
+                                                        },
+                                                    ]
+                                                }}
+                                                containerClassName='absolute top-0 w-full mt-3'
+                                            />
                                         </TableCell>
                                         <TableCell className="flex justify-center">
                                         {

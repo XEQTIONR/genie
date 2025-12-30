@@ -16,11 +16,13 @@ class ProjectInvitation extends Model
         'invitee_id',
         'to_email',
         'roles',
+        'permissions',
     ];
 
     protected function casts(): array {
         return [
-            'roles' => 'array'
+            'roles' => 'array',
+            'permissions' => 'array',
         ];
     }
 

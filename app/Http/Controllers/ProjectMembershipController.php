@@ -51,7 +51,10 @@ class ProjectMembershipController extends Controller
         foreach ($existing_users as $invitee)
         {
             if ($userId == $invitee['id']) {
-                $project->members()->save($user, ['roles' => $invitee['roles']]);
+                $project->members()->save($user, [
+                    'roles' => $invitee['roles'],
+                    'permissions' => $invitee['permissions']
+            ]);
             } else {
                 $invitation = new ProjectInvitation([
                     'project_id' => $project->id,
@@ -59,6 +62,7 @@ class ProjectMembershipController extends Controller
                     'invitee_id' => $invitee['id'],
                     'to_email' => $users->first(fn($value) => $value['id'] === $invitee['id'])->email,
                     'roles' => $invitee['roles'],
+                    'permissions' => $invitee['permissions']
                 ]);
 
                 $invitation->save();
@@ -75,6 +79,7 @@ class ProjectMembershipController extends Controller
                 'inviter_id' => $userId,
                 'to_email' => $invitee['email'],
                 'roles' => $invitee['roles'],
+                'permissions' => $invitee['permissions']
             ]);
 
             $invitation->save();

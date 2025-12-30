@@ -15,6 +15,7 @@ return new class extends Migration
             $table->foreignId('project_id');
             $table->foreignId('user_id');
             $table->json('roles');
+            $table->json('permissions');
             $table->timestamps();
 
             $table->foreign('project_id')->references('id')->on('projects');
