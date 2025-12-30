@@ -12,7 +12,7 @@ import { index as projectsIndex } from '@/routes/teams/projects'
 import { index as jobsIndex } from '@/routes/teams/opportunities'
 import { Opportunity, NavItem, Project, ProjectMember, Team, type BreadcrumbItem } from '@/types'
 import { Head, Link } from '@inertiajs/react'
-import { Camera, Eraser, Globe, MapPin, Pencil, PencilRuler, Instagram, Mail } from 'lucide-react'
+import { Camera, Eraser, Globe, MapPin, Pencil, PencilRuler, Instagram, Mail, Send } from 'lucide-react'
 import { Discord, Facebook, LinkedIn, Twitter, Twitch, Youtube } from '@/components/icons/svgs'
 import {
     Dialog,
@@ -442,8 +442,8 @@ export default function TeamProfile({
             case 'activity':
                 return (
                     <div className="flex flex-col mx-auto w-full max-w-3xl">
-                        <h3 className="text-xl font-semibold mt-6">Activity Log</h3>
-                        <Step bg="bg-blue-800" step={<Mail strokeWidth={2.5} size={14} />} heading={"Some heading"}>
+                        <h3 className="text-xl font-semibold my-6">Activity Log</h3>
+                        <Step bg="bg-transparent" step={<Send size={16} />} heading={"Some heading"}>
                             Something
                         </Step>
                         <Step step={1}>

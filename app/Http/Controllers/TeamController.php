@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Activity;
 use App\Models\Team;
 use App\Models\TeamInvitation;
 use App\Models\Upload;
@@ -83,6 +84,14 @@ class TeamController extends Controller
         ]);
 
         $team->save();
+
+        $activity = new Activity([
+            'content' => [
+                'type' => 'team-created'
+            ]
+        ]);
+
+        $team->activities()->save($activity);
 
         $existing_users = Arr::where($validated['members'], fn(array $value) => Arr::has($value, 'id'));
         $new_users = Arr::where($validated['members'], fn(array $value) => !Arr::has($value, 'id'));
