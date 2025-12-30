@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Activity;
 use App\Models\TeamInvitation;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -42,6 +43,13 @@ class TeamInvitationController extends Controller
             'roles' => $roles,
             'permissions' => $permissions,
         ]);
+
+        $activity = new Activity([
+            'type' => 'user-added',
+            'user_id' => $user->id
+        ]);
+
+        $team->activities()->save($activity);
 
         return to_route('teams.show', ['team' => $team]);
     }

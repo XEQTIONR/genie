@@ -214,5 +214,6 @@ export interface Activity {
     subject_id: number
     type: string
     created_at: string
+    user?: User
     [others: string]: unknown
 }

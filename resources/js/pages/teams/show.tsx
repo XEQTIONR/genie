@@ -10,9 +10,9 @@ import { show as showProject } from '@/routes/projects'
 import { index as membersIndex } from '@/routes/teams/users'
 import { index as projectsIndex } from '@/routes/teams/projects'
 import { index as jobsIndex } from '@/routes/teams/opportunities'
-import { Opportunity, NavItem, Project, ProjectMember, Team, type BreadcrumbItem } from '@/types'
+import { Opportunity, NavItem, Project, ProjectMember, Team, type BreadcrumbItem, Activity } from '@/types'
 import { Head, Link } from '@inertiajs/react'
-import { Camera, Eraser, Globe, MapPin, Pencil, PencilRuler, Instagram, Mail, Send, Users, Plus, Sparkles } from 'lucide-react'
+import { Camera, Eraser, Globe, MapPin, Pencil, PencilRuler, Instagram, Mail, Send, Users, Plus, Sparkles, UserPlus } from 'lucide-react'
 import { Discord, Facebook, LinkedIn, Twitter, Twitch, Youtube } from '@/components/icons/svgs'
 import {
     Dialog,
@@ -318,6 +318,7 @@ function BannerDialog({ aspect = 5, image, imageHeight, imageWidth, open, onOpen
 }
 
 export default function TeamProfile({ 
+    activities,
     team, 
     tab = 'activity', 
     user_count, 
@@ -325,7 +326,8 @@ export default function TeamProfile({
     projects = [],
     opportunities 
 
-} : { 
+} : {
+    activities: { data: Activity[] }
     team: Team 
     tab: string
     user_count: number
@@ -441,22 +443,33 @@ export default function TeamProfile({
 
             case 'activity':
                 return (
-                    <div className="flex flex-col mx-auto w-full max-w-3xl">
+                    <div className="flex flex-col mx-auto w-full max-w-3xl px-4">
                         <h3 className="text-xl font-semibold my-6">Activity Log</h3>
                         {
-                            team.activities?.map(({type, created_at}) => {
+                            activities.data.map(({type, created_at, user}) => {
 
                                 switch (type) {
                                     case "team-created":
                                         return (
-                                            <Step bg="bg-transparent" step={<Sparkles strokeWidth={2} size={25} />} >
+                                            <Step bg="bg-transparent" step={<Sparkles strokeWidth={2} size={20} />} >
                                                 <div className='flex items-center h-6 gap-2'>
-                                                    <div>New team created - <span className="font-semibold">{team.name}</span></div>
+                                                    <div className='text-sm'>New team created - <span className="font-semibold">{team.name}</span></div>
                                                     <Separator orientation="vertical" className='w-full h-8 bg-dim' />
                                                     <span className="text-dim text-xs font-semibold">{(new Date(created_at)).toDateString()}</span>
                                                 </div>
                                             </Step>
                                         )
+                                    case "user-added":
+                                        return (
+                                            <Step bg="bg-transparent" step={<UserPlus strokeWidth={2} size={20} />} >
+                                                <div className='flex items-center h-6 gap-2'>
+                                                    <div className='text-sm'>New member added - <span className="font-semibold">{user?.name}</span></div>
+                                                    <Separator orientation="vertical" className='w-full h-8 bg-dim' />
+                                                    <span className="text-dim text-xs font-semibold">{(new Date(created_at)).toDateString()}</span>
+                                                </div>
+                                            </Step>
+                                        )
+                                    
                                 }
                             })
                         }

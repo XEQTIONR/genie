@@ -65,6 +65,7 @@ class Team extends Model
 
     public function activities(): MorphMany
     {
-        return $this->morphMany(Activity::class, 'subject');
+        return $this->morphMany(Activity::class, 'subject')
+            ->orderByDesc('created_at');
     }
 }
