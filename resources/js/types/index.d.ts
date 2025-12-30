@@ -212,9 +212,7 @@ export interface Activity {
     id: string
     subject_type: string
     subject_id: number
-    content: {
-        type: "team-created"
-        [others: string]: unknown
-    }
+    type: string
     created_at: string
+    [others: string]: unknown
 }

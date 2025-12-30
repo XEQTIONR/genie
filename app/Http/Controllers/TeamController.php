@@ -88,9 +88,8 @@ class TeamController extends Controller
         $team->save();
 
         $activity = new Activity([
-            'content' => [
-                'type' => 'team-created'
-            ]
+            'type' => 'team-created',
+            'user_id' => $userId
         ]);
 
         $team->activities()->save($activity);

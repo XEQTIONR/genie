@@ -443,11 +443,10 @@ export default function TeamProfile({
                 return (
                     <div className="flex flex-col mx-auto w-full max-w-3xl">
                         <h3 className="text-xl font-semibold my-6">Activity Log</h3>
-
                         {
-                            team.activities?.map(({content, created_at}) => {
+                            team.activities?.map(({type, created_at}) => {
 
-                                switch (content.type) {
+                                switch (type) {
                                     case "team-created":
                                         return (
                                             <Step bg="bg-transparent" step={<Sparkles strokeWidth={2} size={25} />} >

@@ -15,8 +15,12 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->string('subject_type');
             $table->foreignId('subject_id');
-            $table->json('content');
+            $table->foreignId('user_id')->nullable();
+            $table->string('type');
+            $table->json('content')->nullable();
             $table->timestamps();
+
+            $table->foreign('user_id')->references('id')->on('users');
         });
     }
 
