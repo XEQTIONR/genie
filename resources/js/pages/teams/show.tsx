@@ -53,6 +53,7 @@ import roles from '@/data/roles'
 import OpportunityList from '@/components/opportunity-list'
 import Step from '@/components/step'
 import GridCard from '@/components/grid-card'
+import ProjectGridCard from '@/components/project-grid-card'
 
 type ProfileTab = NavItem & {key: string, className?: string}
 
@@ -416,18 +417,16 @@ export default function TeamProfile({
 
             case 'projects':
                 return projects.length > 0
-                    ? (<div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 w-full h-full">
-                        { projects.map((project) => (
-                            <ProjectCard
-                                excerpt={project.excerpt} 
-                                href={showProject(project.slug).url} 
-                                icon={PencilRuler} 
-                                title={project.title} 
-                                platforms={project.platforms} 
-                            />
-                            )) 
-                        }
-                    </div>)
+                    ? (
+                        <div className="flex flex-col mx-auto max-w-8xl">
+                            <h3 className="text-xl font-semibold my-6">Projects</h3>
+                            <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 w-full h-full">
+                            { 
+                                projects.map((project) => <ProjectGridCard project={project} />) 
+                            }
+                            </div>
+                        </div>
+                    )
                     : <NoProjects />
 
             case 'jobs':
@@ -474,7 +473,7 @@ export default function TeamProfile({
                                     
                                     case "create-project":
                                         return (
-                                            <Step bg="bg-transparent" step={<PencilRuler className='stroke-dim dark:stroke-foreground' strokeWidth={2} size={18} />} >
+                                            <Step bg="bg-transparent" step={<PencilRuler className='stroke-dim dark:stroke-foreground' strokeWidth={2} size={18} />}>
                                                 <div className='flex items-center h-4 gap-2 mt-1'>
                                                     <div className='text-sm'>Created a new project - <Link href={showProject({ project: subject?.slug })} className="font-semibold hover:underline">{subject?.title}</Link></div>
                                                     <Separator orientation="vertical" className='border-dim w-full bg-dim' />
