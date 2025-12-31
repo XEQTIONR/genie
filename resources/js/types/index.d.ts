@@ -216,5 +216,8 @@ export interface Activity {
     created_at: string
     user?: User
     subject?: User|Team|Project|Post
+    content?: {
+        [key: string]: unknown
+    }
     [others: string]: unknown
 }

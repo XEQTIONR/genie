@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\OpportunityResource;
+use App\Models\Activity;
 use App\Models\Opportunity;
 use App\Models\Project;
 use App\Models\Team;
@@ -70,9 +71,36 @@ class OpportunityController extends Controller
         if ($validated['owner_type'] == 'project') {
             $project = Project::find($validated['owner_id']);
             $project->opportunities()->save($job);
+
+            if ($validated['publish']) {
+                $activity = new Activity([
+                    'type' => 'create-job',
+                    'user_id' => Auth::id(),
+                    'content' => [
+                        'id' => $job->id,
+                        'title' => $job->title
+                    ]
+                ]);
+
+                $project->activities()->save($activity);
+            }
+
         } else { // $validated['owner_type'] == 'team'
             $team = Team::find($validated['owner_id']);
             $team->opportunities()->save($job);
+
+            if ($validated['publish']) {
+                $activity = new Activity([
+                    'type' => 'create-job',
+                    'user_id' => Auth::id(),
+                    'content' => [
+                        'id' => $job->id,
+                        'title' => $job->title
+                    ]
+                ]);
+
+                $team->activities()->save($activity);
+            }
         }
 
         return to_route('home');

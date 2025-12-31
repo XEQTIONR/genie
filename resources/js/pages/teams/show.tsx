@@ -13,7 +13,7 @@ import { index as projectsIndex } from '@/routes/teams/projects'
 import { index as jobsIndex } from '@/routes/teams/opportunities'
 import { Opportunity, NavItem, Project, ProjectMember, Team, type BreadcrumbItem, Activity } from '@/types'
 import { Head, Link } from '@inertiajs/react'
-import { Camera, Eraser, Globe, MapPin, Pencil, PencilRuler, Instagram, Sparkles, UserPlus, Lightbulb } from 'lucide-react'
+import { Camera, Eraser, Globe, MapPin, Pencil, PencilRuler, Instagram, Sparkles, UserPlus, Lightbulb, BriefcaseBusiness } from 'lucide-react'
 import { Discord, Facebook, LinkedIn, Twitter, Twitch, Youtube } from '@/components/icons/svgs'
 import {
     Dialog,
@@ -379,7 +379,7 @@ export default function TeamProfile({
         switch(tab) {
             case 'members':
                 return (
-                    <div className="flex w-full h-full flex-col gap-6">
+                    <div className="flex w-full h-full flex-col gap-6 max-w-6xl mx-auto px-4">
                         <h3 className="text-xl font-semibold mt-6">Members</h3>
                         <ItemGroup className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
                             {users.map((member) => (
@@ -431,7 +431,7 @@ export default function TeamProfile({
                     : <NoProjects />
 
             case 'jobs':
-                return (<div className="w-full h-full mt-4 flex flex-col gap-3">
+                return (<div className="w-full h-full flex flex-col gap-3 max-w-6xl mx-auto px-4">
                     {/* <h2 className="text-xl font-bold">Openings</h2> */}
                     <section className="w-full h-full flex flex-col">
                         <h3 className="text-xl font-semibold mt-6">Current Openings</h3>
@@ -448,13 +448,13 @@ export default function TeamProfile({
                     <div className="flex flex-col mx-auto w-full max-w-3xl px-4">
                         <h3 className="text-xl font-semibold my-6">Activity Log</h3>
                         {
-                            activities.data.map(({type, created_at, user, subject}) => {
+                            activities.data.map(({type, created_at, user, subject, content}) => {
 
                                 switch (type) {
                                     case "team-created":
                                         return (
                                             <Step bg="bg-transparent" step={<Sparkles className='stroke-dim dark:stroke-foreground' strokeWidth={2} size={19} />} >
-                                                <div className='flex items-center h-4 gap-2'>
+                                                <div className='flex items-center h-4 gap-2 mt-1'>
                                                     <div className='text-sm'>New team created - <span className="font-semibold">{team.name}</span></div>
                                                     <Separator orientation="vertical" className='border-dim w-full bg-dim' />
                                                     <span className="text-dim text-xs font-semibold">{(new Date(created_at)).toDateString()}</span>
@@ -464,7 +464,7 @@ export default function TeamProfile({
                                     case "user-added":
                                         return (
                                             <Step bg="bg-transparent" step={<UserPlus className='stroke-dim dark:stroke-foreground' strokeWidth={2} size={19} />} >
-                                                <div className='flex items-center h-4 gap-2'>
+                                                <div className='flex items-center h-4 gap-2 mt-1'>
                                                     <div className='text-sm'>Added new member to team - <Link href={showUser({user: user?.username ?? ""})} className="font-semibold hover:underline">{user?.name}</Link></div>
                                                     <Separator orientation="vertical" className='border-dim w-full bg-dim' />
                                                     <span className="text-dim text-xs font-semibold">{(new Date(created_at)).toDateString()}</span>
@@ -475,7 +475,7 @@ export default function TeamProfile({
                                     case "create-project":
                                         return (
                                             <Step bg="bg-transparent" step={<PencilRuler className='stroke-dim dark:stroke-foreground' strokeWidth={2} size={18} />} >
-                                                <div className='flex items-center h-4 gap-2'>
+                                                <div className='flex items-center h-4 gap-2 mt-1'>
                                                     <div className='text-sm'>Created a new project - <Link href={showProject({ project: subject?.slug })} className="font-semibold hover:underline">{subject?.title}</Link></div>
                                                     <Separator orientation="vertical" className='border-dim w-full bg-dim' />
                                                     <span className="text-dim text-xs font-semibold">{(new Date(created_at)).toDateString()}</span>
@@ -496,6 +496,20 @@ export default function TeamProfile({
                                                 }
                                             >
                                                 <GridCard className="mb-7 mt-1" showAuthor={false} post={subject} />
+                                            </Step>
+                                        )
+
+                                    case "create-job":
+                                        return (
+                                            <Step bg="bg-transparent"   
+                                                step={<BriefcaseBusiness className='stroke-dim dark:stroke-foreground' strokeWidth={2} size={19} />} 
+                                               
+                                            >
+                                                <div className='flex items-center h-4 gap-2 mt-1'>
+                                                    <div className='text-sm font-medium'>New opportunity posted - <Link href={showJobPosting({ opportunity: content.id })} className="font-semibold hover:underline">{content.title}</Link></div>
+                                                    <Separator orientation="vertical" className='border-dim w-full bg-dim' />
+                                                    <span className="text-dim text-xs font-semibold">{(new Date(created_at)).toDateString()}</span>
+                                                </div>
                                             </Step>
                                         )
                                     
