@@ -1,18 +1,15 @@
 import AppLayout from "@/layouts/app-layout";
-import { BreadcrumbItem, Like, Project, ProjectMember, SharedData } from "@/types";
+import { BreadcrumbItem, Like, Project, SharedData } from "@/types";
 import { Head, Link, router } from "@inertiajs/react";
 import {
   Sheet,
-  SheetClose,
   SheetContent,
-  SheetDescription,
-  SheetFooter,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet"
 import { Button } from "@/components/ui/button";
-import { Bookmark, ChartNoAxesColumnIncreasing, ChevronDown, Code, CodeXml, Heart, Mail, Menu, Pencil, Share, Share2 } from "lucide-react";
+import { Bookmark, ChartNoAxesColumnIncreasing, Menu, Pencil, Share2 } from "lucide-react";
 import { Facebook,Twitch,Twitter, Youtube } from "@/components/icons/svgs";
 import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
@@ -47,6 +44,7 @@ import { store, destroy } from '@/routes/api/likes'
 import { Badge } from "@/components/ui/badge";
 import { Toggle } from "@/components/ui/toggle";
 import { edit } from "@/routes/projects";
+import { store as storeView } from '@/routes/api/views'
 
 export default function ShowProject({ project, h, owns } : { 
     project: Project 
@@ -74,6 +72,19 @@ export default function ShowProject({ project, h, owns } : {
     const [likeClasses, setLikeClasses] = useState('')
 
     const { apiToken, auth } = usePage<SharedData>().props
+    useEffect(() => {
+        axios.post(storeView().url, {
+            viewable_type: 'project',
+            viewable_id: project.id
+        }, {
+            headers: {
+                Authorization: 'Bearer ' + apiToken
+            }
+        })
+            .then(res => console.log('storeView response:', res))
+            .catch(e => console.log('error:', e))
+    }, [])
+    
     useEffect(() => {
         document.documentElement.style.scrollBehavior = "smooth"
         return () => { document.documentElement.style.scrollBehavior = "auto" }

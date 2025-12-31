@@ -420,7 +420,7 @@ export default function TeamProfile({
                     ? (
                         <div className="flex flex-col mx-auto max-w-8xl">
                             <h3 className="text-xl font-semibold my-6">Projects</h3>
-                            <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 w-full h-full">
+                            <div className="grid gap-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 w-full h-full items-start">
                             { 
                                 projects.map((project) => <ProjectGridCard project={project} />) 
                             }

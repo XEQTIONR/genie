@@ -65,7 +65,11 @@ Route::get('/teams/{team:slug}/members', function(Team $team) {
     ]);
 })->name('teams.users.index');
 Route::get('/teams/{team:slug}/projects', function(Team $team) {
-    $projects = $team->projects()->with('owner')->get();
+    $projects = $team->projects()
+    
+    ->with('owner')
+    ->withCount(['likes', 'views'])
+    ->get();
 
     return Inertia::render('teams/show', [
         'team' => $team,

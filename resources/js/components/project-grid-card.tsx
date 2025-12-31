@@ -22,7 +22,7 @@ export default function ProjectGridCard({project} : {project: Project}) {
     const video = useRef<HTMLVideoElement>(null)
 
     return (
-        <div className="flex gap-6">
+        <div className="flex gap-6 border rounded-xl">
             <div 
                 className="w-full h-full flex flex-col justify-start overflow-clip"
                 onMouseEnter={() => setHovering(true)}
@@ -34,7 +34,7 @@ export default function ProjectGridCard({project} : {project: Project}) {
                         ? (
                             <video
                                 ref={video} 
-                                className="aspect-grid object-cover rounded-xl"
+                                className="aspect-grid object-cover rounded-t-xl border-b"
                                 onMouseEnter={() => video.current?.play()}
                                 onMouseLeave={() => video.current?.pause()}
                                 muted playsInline loop 
@@ -42,31 +42,20 @@ export default function ProjectGridCard({project} : {project: Project}) {
                                 <source className="" src={project.cover_media[0].url} type={project.cover_media[0].mime} />
                             </video>
                         ) : (
-                            <img className="w-full aspect-grid object-cover rounded-xl" src={project.cover_media[0].url} />
+                            <img className="w-full aspect-grid object-cover rounded-t-xl border-b" src={project.cover_media[0].url} />
                         )
                     }
                 </Link>
-                <div onClick={() => router.visit(show({project: project.slug}))} className="w-full flex justify-between py-4 cursor-pointer">
-                    <div className="flex flex-col gap-1 min-w-0 flex-auto">
-                        <span className={cn(
-                            "w-full line-clamp-2 font-bold text-xl overflow-clip overflow-ellipsis",
-                            hovering && "opacity-50"
-                        )}>{project.title}</span>
-                        <div className='flex justify-between'>
-                            <Link
-                                onMouseEnter={() => setHovering(false)}
-                                onMouseLeave={() => setHovering(true)}
-                                onClick={(e) => e.stopPropagation()} 
-                                className='flex items-center gap-2'
-                                href={project.owner_type == 'App\\Models\\Team' ? showTeam({ slug: project.owner?.slug }).url : showUser({username: project.owner?.username}).url}
-                            >
-                                <Avatar variant={project.owner_type == 'App\\Models\\Team' ? "square" : "rounded"} className="size-6 text-xs">
-                                    <AvatarImage src={project.owner?.avatar} />
-                                    <AvatarFallback className="text-xxs" variant={project.owner_type == 'App\\Models\\Team' ? "square" : "rounded"}>{getInitials(project.owner?.name ?? "")}</AvatarFallback>
-                                </Avatar>
-                                <span className="text-sm font-medium">{project.owner?.name}</span>
-                            </Link>
-                            <div className="flex items-center gap-4">
+                <div onClick={() => router.visit(show({project: project.slug}))} className="w-full flex justify-between py-4 px-4 cursor-pointer">
+                    <div className="flex flex-col gap-1.5 min-w-0 flex-auto">
+                        <div className="flex gap-1 justify-between items-start">
+                            
+                            <span className={cn(
+                                "w-full line-clamp-2 font-bold text-lg overflow-clip overflow-ellipsis",
+                                hovering && "opacity-50"
+                            )}>{project.title}</span>
+
+                            <div className="flex items-center gap-4 mt-1">
                                 <div className='flex gap-1 items-center'>
                                     <Bookmark
                                         onMouseEnter={() => setHovering(false)}
@@ -129,11 +118,31 @@ export default function ProjectGridCard({project} : {project: Project}) {
                                 <div className='flex gap-1 items-center'><Eye className="size-4" strokeWidth={2.5} /> <span className="font-bold text-sm">{project.views_count}</span></div>
                             </div>
                         </div>
+                        <div className='flex justify-between'>
+                            <Link
+                                onMouseEnter={() => setHovering(false)}
+                                onMouseLeave={() => setHovering(true)}
+                                onClick={(e) => e.stopPropagation()} 
+                                className='flex items-center gap-2'
+                                href={project.owner_type == 'App\\Models\\Team' ? showTeam({ slug: project.owner?.slug }).url : showUser({username: project.owner?.username}).url}
+                            >
+                                <Avatar variant={project.owner_type == 'App\\Models\\Team' ? "square" : "rounded"} className="size-6 text-xs">
+                                    <AvatarImage src={project.owner?.avatar} />
+                                    <AvatarFallback className="text-xxs" variant={project.owner_type == 'App\\Models\\Team' ? "square" : "rounded"}>{getInitials(project.owner?.name ?? "")}</AvatarFallback>
+                                </Avatar>
+                                <span className="text-sm font-medium">{project.owner?.name}</span>
+                            </Link>
+                            
+                        </div>
                     </div>
                 </div>
-                <Link href={show({project: project.slug})}>
-                    <p className="pb-4 text-dim text-sm">{project.excerpt}</p>
-                </Link>
+                {
+                    project.excerpt && (
+                        <Link href={show({project: project.slug})}>
+                            <p className="pb-4 px-4 text-dim text-sm">{project.excerpt}</p>
+                        </Link>
+                    )
+                }
             </div>
         </div>
     )
