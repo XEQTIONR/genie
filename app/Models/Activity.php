@@ -11,7 +11,17 @@ class Activity extends Model
 {
     use HasUuids;
 
-    protected $fillable = ['type', 'user_id'];
+    protected $fillable = [
+        'type', 
+        'user_id',
+        'content',
+    ];
+
+    protected function casts() {
+        return [
+            'content' => 'array'
+        ];
+    }
 
     public function subject(): MorphTo
     {

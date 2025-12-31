@@ -8,6 +8,7 @@ use App\Models\TeamInvitation;
 use App\Models\Upload;
 use App\Models\User;
 use App\Notifications\TeamInvitationNotification;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
@@ -26,19 +27,22 @@ class TeamController extends Controller
         return Inertia::render('teams/index', [
             'teams' => Team::with(['posts' => function($query) {
                 $query->latest()->limit(5);
-            }])
-                ->withCount(['projects', 'opportunities', 'users'])
-                ->get(),
-            //'user_count' => $team->users()->count()
+            }])->withCount(['projects', 'opportunities', 'users'])
+            ->get(),
         ]);
     }
 
 
     public function show(Team $team)
     {
-        $activities = $team->activities()
-            ->with('user')
-            ->paginate(5);
+        $activities = Activity::where('subject_type', Team::class)
+            ->where('subject_id', $team->id)
+            ->orWhere(function($query) use ($team) {
+            $query->where('content->owner_id', $team->id)
+                ->where('content->owner_type', 'team');
+        })->with(['user', 'subject'])
+        ->orderByDesc('created_at')
+        ->paginate(5);
 
         return Inertia::render('teams/show', [
             'team' => $team,

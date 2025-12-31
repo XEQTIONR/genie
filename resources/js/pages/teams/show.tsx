@@ -446,12 +446,12 @@ export default function TeamProfile({
                     <div className="flex flex-col mx-auto w-full max-w-3xl px-4">
                         <h3 className="text-xl font-semibold my-6">Activity Log</h3>
                         {
-                            activities.data.map(({type, created_at, user}) => {
+                            activities.data.map(({type, created_at, user, subject}) => {
 
                                 switch (type) {
                                     case "team-created":
                                         return (
-                                            <Step bg="bg-transparent" step={<Sparkles strokeWidth={2} size={20} />} >
+                                            <Step bg="bg-transparent" step={<Sparkles className='stroke-dim dark:stroke-foreground' strokeWidth={2} size={19} />} >
                                                 <div className='flex items-center h-6 gap-2'>
                                                     <div className='text-sm'>New team created - <span className="font-semibold">{team.name}</span></div>
                                                     <Separator orientation="vertical" className='w-full h-8 bg-dim' />
@@ -461,9 +461,20 @@ export default function TeamProfile({
                                         )
                                     case "user-added":
                                         return (
-                                            <Step bg="bg-transparent" step={<UserPlus strokeWidth={2} size={20} />} >
+                                            <Step bg="bg-transparent" step={<UserPlus className='stroke-dim dark:stroke-foreground' strokeWidth={2} size={19} />} >
                                                 <div className='flex items-center h-6 gap-2'>
-                                                    <div className='text-sm'>New member added - <span className="font-semibold">{user?.name}</span></div>
+                                                    <div className='text-sm'>Added new member to team - <span className="font-semibold">{user?.name}</span></div>
+                                                    <Separator orientation="vertical" className='w-full h-8 bg-dim' />
+                                                    <span className="text-dim text-xs font-semibold">{(new Date(created_at)).toDateString()}</span>
+                                                </div>
+                                            </Step>
+                                        )
+                                    
+                                    case "create-project":
+                                        return (
+                                            <Step bg="bg-transparent" step={<PencilRuler className='stroke-dim dark:stroke-foreground' strokeWidth={2} size={18} />} >
+                                                <div className='flex items-center h-6 gap-2'>
+                                                    <div className='text-sm'>Created a new project - <span className="font-semibold">{subject?.title}</span></div>
                                                     <Separator orientation="vertical" className='w-full h-8 bg-dim' />
                                                     <span className="text-dim text-xs font-semibold">{(new Date(created_at)).toDateString()}</span>
                                                 </div>
@@ -523,7 +534,7 @@ export default function TeamProfile({
                     className="h-88 bg-gradient-to-r from-indigo-500 from-10% via-sky-500 via-30% to-emerald-500 to-90% bg-cover bg-center flex gap-4 justify-between border-sidebar-border/70 dark:border-sidebar-border"
                 >
                     <div className="w-full h-full  relative overflow-hidden flex justify-end items-start md:items-end"> 
-                        <div className='absolute top-1/2 left-1/2 -translate-1/2 flex flex-col gap-3 w-full max-w-3xl px-4 bg-pink-700'>
+                        <div className='absolute top-1/2 left-1/2 -translate-1/2 flex flex-col gap-3 w-full max-w-3xl px-4'>
                             <div className="flex gap-5">
                                 <Avatar variant="square" className="size-20">
                                 {

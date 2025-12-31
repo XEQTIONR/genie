@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Activity;
 use App\Models\Project;
 use App\Models\Team;
 use App\Models\User;
@@ -86,6 +87,28 @@ class ProjectController extends Controller
         ]);
 
         $project->save();
+
+        $content = [];
+
+        if ($validated['owner_type'] == Team::class) {
+            $content = [
+                'owner_type' => 'team',
+                'owner_id' => intval($validated['owner_id']),
+            ];
+        } else {
+            $content = [
+                'owner_type' => 'user',
+                'owner_id' => intval($validated['owner_id']),
+            ];
+        }
+
+        $activity = new Activity([
+            'type' => 'create-project',
+            'user_id' => Auth::id(),
+            'content' => $content
+        ]);
+
+        $project->activities()->save($activity);
 
         return to_route('projects.members.create', ['project' => $project]);
 }

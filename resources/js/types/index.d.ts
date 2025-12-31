@@ -215,5 +215,6 @@ export interface Activity {
     type: string
     created_at: string
     user?: User
+    subject?: User|Team|Project
     [others: string]: unknown
 }

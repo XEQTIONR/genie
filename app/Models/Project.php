@@ -71,4 +71,9 @@ class Project extends Model
     {
         return $this->morphMany(View::class, 'viewable');
     }
+
+    public function activities(): MorphMany
+    {
+        return $this->morphMany(Activity::class, 'subject');
+    }
 }
