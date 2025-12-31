@@ -7,6 +7,7 @@ import { show } from '@/routes/teams'
 import { show as showJobPosting } from "@/routes/opportunities"
 import { show as showUser } from '@/routes/users'
 import { show as showProject } from '@/routes/projects'
+import { show as showPost } from '@/routes/posts'
 import { index as membersIndex } from '@/routes/teams/users'
 import { index as projectsIndex } from '@/routes/teams/projects'
 import { index as jobsIndex } from '@/routes/teams/opportunities'
@@ -453,9 +454,9 @@ export default function TeamProfile({
                                     case "team-created":
                                         return (
                                             <Step bg="bg-transparent" step={<Sparkles className='stroke-dim dark:stroke-foreground' strokeWidth={2} size={19} />} >
-                                                <div className='flex items-center h-6 gap-2'>
+                                                <div className='flex items-center h-4 gap-2'>
                                                     <div className='text-sm'>New team created - <span className="font-semibold">{team.name}</span></div>
-                                                    <Separator orientation="vertical" className='w-full h-8 bg-dim' />
+                                                    <Separator orientation="vertical" className='border-dim w-full bg-dim' />
                                                     <span className="text-dim text-xs font-semibold">{(new Date(created_at)).toDateString()}</span>
                                                 </div>
                                             </Step>
@@ -463,9 +464,9 @@ export default function TeamProfile({
                                     case "user-added":
                                         return (
                                             <Step bg="bg-transparent" step={<UserPlus className='stroke-dim dark:stroke-foreground' strokeWidth={2} size={19} />} >
-                                                <div className='flex items-center h-6 gap-2'>
-                                                    <div className='text-sm'>Added new member to team - <span className="font-semibold">{user?.name}</span></div>
-                                                    <Separator orientation="vertical" className='w-full h-8 bg-dim' />
+                                                <div className='flex items-center h-4 gap-2'>
+                                                    <div className='text-sm'>Added new member to team - <Link href={showUser({user: user?.username ?? ""})} className="font-semibold hover:underline">{user?.name}</Link></div>
+                                                    <Separator orientation="vertical" className='border-dim w-full bg-dim' />
                                                     <span className="text-dim text-xs font-semibold">{(new Date(created_at)).toDateString()}</span>
                                                 </div>
                                             </Step>
@@ -474,9 +475,9 @@ export default function TeamProfile({
                                     case "create-project":
                                         return (
                                             <Step bg="bg-transparent" step={<PencilRuler className='stroke-dim dark:stroke-foreground' strokeWidth={2} size={18} />} >
-                                                <div className='flex items-center h-6 gap-2'>
-                                                    <div className='text-sm'>Created a new project - <span className="font-semibold">{subject?.title}</span></div>
-                                                    <Separator orientation="vertical" className='w-full h-8 bg-dim' />
+                                                <div className='flex items-center h-4 gap-2'>
+                                                    <div className='text-sm'>Created a new project - <Link href={showProject({ project: subject?.slug })} className="font-semibold hover:underline">{subject?.title}</Link></div>
+                                                    <Separator orientation="vertical" className='border-dim w-full bg-dim' />
                                                     <span className="text-dim text-xs font-semibold">{(new Date(created_at)).toDateString()}</span>
                                                 </div>
                                             </Step>
@@ -485,11 +486,11 @@ export default function TeamProfile({
                                     case "create-post":
                                         return (
                                             <Step bg="bg-transparent"   
-                                                step={<Lightbulb className='stroke-dim dark:stroke-foreground' strokeWidth={2} size={20} />} 
+                                                step={<Lightbulb className='stroke-dim dark:stroke-foreground' strokeWidth={2} size={19} />} 
                                                 heading={
-                                                    <div className='flex items-center h-6 gap-2'>
-                                                        <div className='text-sm'>New idea posted - <span className="font-semibold">{subject?.title}</span></div>
-                                                        <Separator orientation="vertical" className='w-full h-8 bg-dim' />
+                                                    <div className='flex items-center h-4 gap-2'>
+                                                        <div className='text-sm font-medium'>New idea posted - <Link href={showPost({ post: subject?.id ?? 0})} className="font-semibold hover:underline">{subject?.title}</Link></div>
+                                                        <Separator orientation="vertical" className='border-dim w-full bg-dim' />
                                                         <span className="text-dim text-xs font-semibold">{(new Date(created_at)).toDateString()}</span>
                                                     </div>
                                                 }
