@@ -12,7 +12,7 @@ import { index as projectsIndex } from '@/routes/teams/projects'
 import { index as jobsIndex } from '@/routes/teams/opportunities'
 import { Opportunity, NavItem, Project, ProjectMember, Team, type BreadcrumbItem, Activity } from '@/types'
 import { Head, Link } from '@inertiajs/react'
-import { Camera, Eraser, Globe, MapPin, Pencil, PencilRuler, Instagram, Mail, Send, Users, Plus, Sparkles, UserPlus } from 'lucide-react'
+import { Camera, Eraser, Globe, MapPin, Pencil, PencilRuler, Instagram, Sparkles, UserPlus, Lightbulb } from 'lucide-react'
 import { Discord, Facebook, LinkedIn, Twitter, Twitch, Youtube } from '@/components/icons/svgs'
 import {
     Dialog,
@@ -51,6 +51,7 @@ import { cn } from '@/lib/utils'
 import roles from '@/data/roles'
 import OpportunityList from '@/components/opportunity-list'
 import Step from '@/components/step'
+import GridCard from '@/components/grid-card'
 
 type ProfileTab = NavItem & {key: string, className?: string}
 
@@ -478,6 +479,22 @@ export default function TeamProfile({
                                                     <Separator orientation="vertical" className='w-full h-8 bg-dim' />
                                                     <span className="text-dim text-xs font-semibold">{(new Date(created_at)).toDateString()}</span>
                                                 </div>
+                                            </Step>
+                                        )
+
+                                    case "create-post":
+                                        return (
+                                            <Step bg="bg-transparent"   
+                                                step={<Lightbulb className='stroke-dim dark:stroke-foreground' strokeWidth={2} size={20} />} 
+                                                heading={
+                                                    <div className='flex items-center h-6 gap-2'>
+                                                        <div className='text-sm'>New idea posted - <span className="font-semibold">{subject?.title}</span></div>
+                                                        <Separator orientation="vertical" className='w-full h-8 bg-dim' />
+                                                        <span className="text-dim text-xs font-semibold">{(new Date(created_at)).toDateString()}</span>
+                                                    </div>
+                                                }
+                                            >
+                                                <GridCard className="mb-7 mt-1" showAuthor={false} post={subject} />
                                             </Step>
                                         )
                                     

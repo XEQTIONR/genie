@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Activity;
 use App\Models\Post;
 use App\Models\Project;
 use App\Models\Team;
@@ -48,7 +49,6 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
-        Log::info($request);
         $validated = $request->validate([
             'title' => 'required|string',
             'cover' => 'required|string',
@@ -86,8 +86,16 @@ class PostController extends Controller
         ]);
         $user->posts()->save($post);
 
-        Log::info('new Post id ', );
-        Log::info($post->id );
+        $activity = new Activity([
+            'type' => 'create-post',
+            'user_id' => $user->id,
+            'content' => [
+                'owner_id' => $author->id,
+                'owner_type' => $validated['author_type']
+            ]
+        ]);
+
+        $post->activities()->save($activity);
         
         return to_route('posts.show', ['post' => $post]);
     }

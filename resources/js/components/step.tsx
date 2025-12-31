@@ -2,7 +2,7 @@ import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import { ReactNode } from "react";
 
-export default function Step({bg = 'bg-muted', step, heading, children} : {bg?: string, step: number|string|ReactNode, heading?: string, children: ReactNode}) {
+export default function Step({bg = 'bg-muted', step, heading, children} : {bg?: string, step: number|string|ReactNode, heading?: string|ReactNode, children: ReactNode}) {
     return (<>
         <div className="w-full flex gap-3 pr-3 md:pr-0">
             <div className="flex flex-col gap-1 items-center w-7">
