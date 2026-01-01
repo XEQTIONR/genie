@@ -45,7 +45,7 @@ function AvatarFallback({
       data-slot="avatar-fallback"
       className={cn(
         "bg-muted flex size-full items-center justify-center",
-        variant == 'rounded' ? 'rounded-full' : 'rounded-lg',
+        variant == 'rounded' ? 'rounded-full' : 'rounded',
         className
       )}
       {...props}

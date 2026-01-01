@@ -65,20 +65,19 @@ export default function GridCard({
                     )
                 }
                 <div
-                    onClick={(e) => e.stopPropagation()} 
                     className={
-                        cn("w-full h-1/4 flex gap-2 justify-between items-center px-5 absolute bottom-0 bg-neutral-900/30 transition-opacity duration-300",
+                        cn("w-full h-14 flex gap-2 justify-between items-center px-5 absolute bottom-0 bg-neutral-900/50 transition-opacity duration-300",
                         hovered ? "opacity-100" : "opacity-0")
                     }
                 >
                     <div className="text-lg font-semibold text-ellipsis text-nowrap grow-0 overflow-hidden text-white">
                         { post.title }
                     </div>
-                    <div className="flex shrink-0 justify-end">
-                        <div className="bg-neutral-50 dark:bg-neutral-950 p-4 rounded-full cursor-pointer">
-                            <Heart size={20} className="stroke-neutral-600 dark:stroke-neutral-50" />
+                    {/* <div className="flex shrink-0 justify-end">
+                        <div className="bg-neutral-50 dark:bg-neutral-950 p-3 rounded-full cursor-pointer">
+                            <Heart size={18} className="stroke-neutral-600 dark:stroke-neutral-50" />
                         </div>
-                    </div>
+                    </div> */}
                 </div>
             </div>
             {
@@ -86,12 +85,12 @@ export default function GridCard({
                 <div className="flex items-center gap-1.5">
                     {
                         variant ? (
-                            <Avatar variant={variant}>
+                            <Avatar className='size-7' variant={variant}>
                                 <AvatarImage src={post.owner?.avatar} />
-                                <AvatarFallback variant={variant} className="text-xs">{getInitials(post.owner?.name ?? "")}</AvatarFallback>
+                                <AvatarFallback variant={variant} className="text-xxs">{getInitials(post.owner?.name ?? "")}</AvatarFallback>
                             </Avatar>
                         ) : (
-                            <PencilRuler className='size-6' />
+                            <PencilRuler className='size-7' />
                         )
                     }
                     
@@ -154,11 +153,11 @@ export default function GridCard({
                                         
                                     }}
                                 />
-                                <span className="text-sm font-semibold min-w-5">{numLikes}</span>
+                                <span className="text-sm font-semibold">{numLikes}</span>
                             </div>
                             <div className="flex items-center gap-1.5">
                                 <Eye strokeWidth={2.5} className="size-4" />
-                                <span className="text-sm font-semibold min-w-5">{post.views_count}</span>
+                                <span className="text-sm font-semibold">{post.views_count}</span>
                             </div>
                         </div>
                     </div>

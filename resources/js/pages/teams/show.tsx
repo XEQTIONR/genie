@@ -2,8 +2,7 @@ import { Button } from '@/components/ui/button'
 import AppLayout from '@/layouts/app-layout'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import axios from 'axios'
-import { Badge } from '@/components/ui/badge'
-import { show } from '@/routes/teams'
+import { edit, show } from '@/routes/teams'
 import { show as showJobPosting } from "@/routes/opportunities"
 import { show as showUser } from '@/routes/users'
 import { show as showProject } from '@/routes/projects'
@@ -12,9 +11,9 @@ import { index as membersIndex } from '@/routes/teams/users'
 import { index as projectsIndex } from '@/routes/teams/projects'
 import { index as jobsIndex } from '@/routes/teams/opportunities'
 import { Opportunity, NavItem, Project, ProjectMember, Team, type BreadcrumbItem, Activity } from '@/types'
-import { Head, Link } from '@inertiajs/react'
-import { Camera, Eraser, Globe, MapPin, Pencil, PencilRuler, Instagram, Sparkles, UserPlus, Lightbulb, BriefcaseBusiness } from 'lucide-react'
-import { Discord, Facebook, LinkedIn, Twitter, Twitch, Youtube } from '@/components/icons/svgs'
+import { Head, Link, router } from '@inertiajs/react'
+import { Camera, Eraser, Globe, MapPin, Pencil, PencilRuler, Instagram, Sparkles, UserPlus, Lightbulb, BriefcaseBusiness, Settings, Image } from 'lucide-react'
+import { Facebook, Twitter, Twitch, Youtube } from '@/components/icons/svgs'
 import {
     Dialog,
     DialogClose,
@@ -37,7 +36,6 @@ import {
   ItemMedia,
   ItemTitle,
 } from "@/components/ui/item"
-import ProjectCard from '@/components/project-card'
 import NoProjects from '@/components/no-projects'
 import { getCroppedImage } from '@/hooks/use-crop'
 import { store as storeImage } from '@/routes/api/uploads'
@@ -49,11 +47,11 @@ import { update } from '@/routes/teams'
 import { useDebouncedCallback } from 'use-debounce'
 import { Separator } from '@/components/ui/separator'
 import { cn } from '@/lib/utils'
-import roles from '@/data/roles'
 import OpportunityList from '@/components/opportunity-list'
 import Step from '@/components/step'
 import GridCard from '@/components/grid-card'
 import ProjectGridCard from '@/components/project-grid-card'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 
 type ProfileTab = NavItem & {key: string, className?: string}
 
@@ -380,7 +378,7 @@ export default function TeamProfile({
         switch(tab) {
             case 'members':
                 return (
-                    <div className="flex w-full h-full flex-col gap-6 max-w-6xl mx-auto px-4">
+                    <div className="flex w-full h-full flex-col gap-6 max-w-8xl mx-auto px-4">
                         <h3 className="text-xl font-semibold mt-6">Members</h3>
                         <ItemGroup className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
                             {users.map((member) => (
@@ -418,7 +416,7 @@ export default function TeamProfile({
             case 'projects':
                 return projects.length > 0
                     ? (
-                        <div className="flex flex-col mx-auto max-w-8xl">
+                        <div className="flex flex-col mx-auto max-w-8xl px-4">
                             <h3 className="text-xl font-semibold my-6">Projects</h3>
                             <div className="grid gap-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 w-full h-full items-start">
                             { 
@@ -430,7 +428,7 @@ export default function TeamProfile({
                     : <NoProjects />
 
             case 'jobs':
-                return (<div className="w-full h-full flex flex-col gap-3 max-w-6xl mx-auto px-4">
+                return (<div className="w-full h-full flex flex-col gap-3 max-w-8xl mx-auto px-4">
                     {/* <h2 className="text-xl font-bold">Openings</h2> */}
                     <section className="w-full h-full flex flex-col">
                         <h3 className="text-xl font-semibold mt-6">Current Openings</h3>
@@ -579,7 +577,8 @@ export default function TeamProfile({
                                 </Avatar>
                                 <div className="flex flex-col justify-center">
                                     <div className="flex items-center gap-2">
-                                        <h1 className="text-2xl font-bold text-white">{team.name}</h1> <span className="px-1 py-0.5 text-xs font-bold rounded bg-foreground text-background">STUDIO</span>
+                                        <h1 className="text-2xl font-bold text-white">{team.name}</h1> 
+                                        <span className="px-1 py-0.5 text-xs font-bold rounded bg-foreground text-background">STUDIO</span>
                                     </div>
                                     <div className="flex gap-1 items-center text-sm text-white"><MapPin size={16} /> Toronto, ON</div>
                                 </div>
@@ -596,17 +595,23 @@ export default function TeamProfile({
                         </div>
                     {
                         team.owner_id === auth.user?.id &&
-                        <Button
-                            variant="outline"
-                            type="button" 
-                            className="cursor-pointer" 
-                            size="icon-lg"
-                            onClick={() => {
-                                setShowBannerDialog(true)
-                            }}
-                        >
-                            <Pencil />
-                        </Button>
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button
+                                    variant="outline"
+                                    type="button" 
+                                    className="cursor-pointer" 
+                                    size="icon-lg"
+                                >
+                                    <Settings />
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent>
+                                <DropdownMenuItem onSelect={() => setShowBannerDialog(true)}><Image /> Edit banner image</DropdownMenuItem>
+                                <DropdownMenuItem onSelect={() => router.visit(edit(team))}><Settings /> Team settings</DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                        
                     }
                     </div>
                 </div>

@@ -47,15 +47,15 @@ export default function ProjectGridCard({project} : {project: Project}) {
                     }
                 </Link>
                 <div onClick={() => router.visit(show({project: project.slug}))} className="w-full flex justify-between py-4 px-4 cursor-pointer">
-                    <div className="flex flex-col gap-1.5 min-w-0 flex-auto">
+                    <div className="flex flex-col gap-2 min-w-0 flex-auto">
                         <div className="flex gap-1 justify-between items-start">
                             
                             <span className={cn(
-                                "w-full line-clamp-2 font-bold text-lg overflow-clip overflow-ellipsis",
+                                "w-full line-clamp-2 font-bold text-lg/5.5 overflow-clip overflow-ellipsis",
                                 hovering && "opacity-50"
                             )}>{project.title}</span>
 
-                            <div className="flex items-center gap-4 mt-1">
+                            <div className="flex items-center gap-3">
                                 <div className='flex gap-1 items-center'>
                                     <Bookmark
                                         onMouseEnter={() => setHovering(false)}
@@ -126,7 +126,7 @@ export default function ProjectGridCard({project} : {project: Project}) {
                                 className='flex items-center gap-2'
                                 href={project.owner_type == 'App\\Models\\Team' ? showTeam({ slug: project.owner?.slug }).url : showUser({username: project.owner?.username}).url}
                             >
-                                <Avatar variant={project.owner_type == 'App\\Models\\Team' ? "square" : "rounded"} className="size-6 text-xs">
+                                <Avatar variant={project.owner_type == 'App\\Models\\Team' ? "square" : "rounded"} className="size-5 text-xs">
                                     <AvatarImage src={project.owner?.avatar} />
                                     <AvatarFallback className="text-xxs" variant={project.owner_type == 'App\\Models\\Team' ? "square" : "rounded"}>{getInitials(project.owner?.name ?? "")}</AvatarFallback>
                                 </Avatar>

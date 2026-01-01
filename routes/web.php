@@ -8,6 +8,7 @@ use App\Http\Controllers\ProjectInvitationController;
 use App\Http\Controllers\ProjectMembershipController;
 use App\Http\Controllers\TeamController;
 use App\Http\Controllers\TeamInvitationController;
+use App\Http\Controllers\TeamSettingsController;
 use App\Http\Controllers\UserProfileController;
 use App\Http\Resources\OpportunityResource;
 use App\Models\Post;
@@ -36,6 +37,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::patch('/profile/{user}', [UserProfileController::class, 'update'])->name('users.update');
 
     Route::patch('/teams/{team}', [TeamController::class, 'update'])->name('teams.update');
+    Route::get('/teams/{team:slug}/settings', [TeamSettingsController::class, 'edit'])->name('teams.edit');
 
     Route::get('/posts/create', [PostController::class, 'create'])->name('posts.create');
     
