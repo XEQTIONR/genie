@@ -8,10 +8,14 @@ use Inertia\Inertia;
 
 class TeamSettingsController extends Controller
 {
-    public function edit(Team $team)
+
+    public function editMembers(Team $team)
     {
+        $team->load('users');
+
         return Inertia::render('teams/settings', [
-            'team' => $team
+            'team' => $team,
+            'tab' => 'members'
         ]);
     }
 }

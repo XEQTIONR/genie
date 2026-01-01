@@ -149,6 +149,14 @@ class TeamController extends Controller
         return to_route('teams.show', ['team' => $team]);
     }
 
+    public function edit(Team $team)
+    {
+        return Inertia::render('teams/settings', [
+            'team' => $team,
+            'tab' => 'general'
+        ]);
+    }
+
     /**
      * Update the specified resource in storage.
      */

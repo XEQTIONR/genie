@@ -98,6 +98,12 @@ export interface Team {
     owner_id: number
     posts?: Post[]
     activities?: Activity[]
+    users?: (User & {
+        pivot: {
+            permissions: string[]
+            roles: string[]
+        }
+    })[]
 }
 
 export interface TeamInvitation {

@@ -37,7 +37,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::patch('/profile/{user}', [UserProfileController::class, 'update'])->name('users.update');
 
     Route::patch('/teams/{team}', [TeamController::class, 'update'])->name('teams.update');
-    Route::get('/teams/{team:slug}/settings', [TeamSettingsController::class, 'edit'])->name('teams.edit');
+    Route::get('/teams/{team:slug}/settings', [TeamController::class, 'edit'])->name('teams.edit');
+    Route::get('/teams/{team:slug}/settings/members', [TeamSettingsController::class, 'editMembers'])->name('teams.edit.members');
 
     Route::get('/posts/create', [PostController::class, 'create'])->name('posts.create');
     
