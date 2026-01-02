@@ -138,6 +138,7 @@ class TeamController extends Controller
                 'inviter_id' => $userId,
                 'to_email' => $invitee['email'],
                 'roles' => $invitee['roles'],
+                'permissions' => $invitee['permissions'],
             ]);
 
             $invitation->save();
@@ -163,7 +164,7 @@ class TeamController extends Controller
     public function update(Request $request, Team $team)
     {
         $validated = $request->validate([
-            'field' => 'required|string|in:avatar,banner'
+            'field' => 'required|string|in:avatar,banner,general'
         ]);
 
         switch ($validated['field']) {
@@ -171,6 +172,8 @@ class TeamController extends Controller
                 return $this->updateAvatar($request, $team);
             case 'banner':
                 return $this->updateBanner($request, $team);
+            case 'general':
+                return $this->updateGeneral($request, $team);
         }
     }
 
@@ -224,6 +227,27 @@ class TeamController extends Controller
         ])->with('notification', [
             'type' => 'info',
             'message' => "Banner updated.",
+            'button' => null
+        ]);
+    }
+
+    protected function updateGeneral(Request $request, Team $team)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|min:2',
+            'description' => 'nullable|string',
+        ]);
+
+        $team->name = $validated['name'];
+        $team->description = $validated['description'];
+
+        $team->save();
+
+        return to_route('teams.show', [
+            'team' => $team
+        ])->with('notification', [
+            'type' => 'info',
+            'message' => "Team information updated.",
             'button' => null
         ]);
     }

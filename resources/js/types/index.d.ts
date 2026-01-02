@@ -104,6 +104,9 @@ export interface Team {
             roles: string[]
         }
     })[]
+
+    invitations?: TeamInvitation[]
+    opportunities?: Opportunity[]
 }
 
 export interface TeamInvitation {
@@ -116,6 +119,7 @@ export interface TeamInvitation {
     inviter_id: number
     invitee_id: number
     roles: string[]
+    permissions: string[]|null
 }
 
 export interface User {
@@ -179,6 +183,7 @@ export interface Opportunity {
     owner?: Team | Project
     owner_type: 'Team' | 'Project'
     created_at: string
+    publish: boolean
 }
 
 export interface Like {

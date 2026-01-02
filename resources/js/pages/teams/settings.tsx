@@ -2,19 +2,19 @@ import { Button } from '@/components/ui/button'
 import AppLayout from '@/layouts/app-layout'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import axios from 'axios'
-import { show } from '@/routes/teams'
-import { index as projectsIndex } from '@/routes/teams/projects'
+import { update as updateTeam } from '@/routes/teams'
+import {  show as jobsShow } from '@/routes/opportunities'
 import { edit as editTeam } from '@/routes/teams'
-import { members as editMembers } from '@/routes/teams/edit'
+import { members as editMembers, opportunities as editJobs } from '@/routes/teams/edit'
 import { index as jobsIndex } from '@/routes/teams/opportunities'
 import { Opportunity, NavItem, Project, ProjectMember, Team, type BreadcrumbItem, Activity } from '@/types'
-import { Head, Link } from '@inertiajs/react'
-import { Camera, Eraser, Globe, MapPin, Pencil, PencilRuler, Instagram, Sparkles, UserPlus, Lightbulb, BriefcaseBusiness, Settings, Image, ChevronRight, BadgeCheck, Users, LinkIcon, Trash, X, Trash2, EllipsisVertical } from 'lucide-react'
+import { Form, Head, Link } from '@inertiajs/react'
+import { Camera, Eraser, Globe, MapPin, Pencil, PencilRuler, Instagram, Sparkles, UserPlus, Lightbulb, BriefcaseBusiness, Settings, Image, ChevronRight, BadgeCheck, Users, LinkIcon, Trash, X, Trash2, EllipsisVertical, Mail, Plus } from 'lucide-react'
 import { Facebook, Twitter, Twitch, Youtube } from '@/components/icons/svgs'
 
 import { useInitials } from '@/hooks/use-initials';
 import { Spinner } from '@/components/ui/spinner'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import { Input } from "@/components/ui/input"
 
@@ -41,6 +41,7 @@ import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table'
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card'
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 
 type ProfileTab = NavItem & {key: string, className?: string}
 
@@ -65,10 +66,37 @@ export default function TeamSettings({
         // { title: "Showcase", href: show({ user: user.username }), key: "showcase"},
         { title: "General", href: editTeam(team), key: "general"},
         { title: "Members", href: editMembers(team), key: "members" },
-        { title: "Opportunities", href: projectsIndex({ team: team.slug }), key: "jobs" },
+        { title: "Opportunities", href: editJobs(team), key: "jobs" },
     ]
 
     const [currentTab, setCurrentTab] = useState(tab)
+    const [locations, setLocations] = useState<{city?: string, country:string}[]>([])
+    const [locationType, setLocationType] = useState('global')
+
+    const [countryOptions, setCountryOptions] = useState<GroupedOptions>({})
+        
+    const [inputCity, setInputCity] = useState<string>("")
+    const [inputCountry, setInputCountry] = useState<string>("")
+
+    useEffect(() => {
+        axios.get('https://restcountries.com/v3.1/all?fields=name,flag,region')
+            .then(({data}) => {
+                const opts = data.map(({name, flag, region} : { name: { common: string }, flag: string, region: string}) => {
+                    return { name: name.common, flag, region }
+                }).sort((a: {name: string}, b: {name: string}) => a.name.localeCompare(b.name))
+                .filter(({name} : {name: string}) => name !== 'Israel')
+                .map(({ name, flag, region } : { name: string, flag: string, region: string }) => {
+                    return { label: flag + ' ' + name, value: name, region }
+                })
+
+                const grouped = Object.groupBy(opts, (opt : {region: string}) => opt.region)
+
+                setCountryOptions({
+                    None: [{label: "Not selected", value: ""}],
+                    ...grouped
+                })
+            })
+    }, [])
     
     return (
         <AppLayout maxWidth='md:max-w-11xl' maxHeaderWidth='md:max-w-10xl' breadcrumbs={breadcrumbs}>
@@ -104,21 +132,26 @@ export default function TeamSettings({
                     </aside>
                     {
                         currentTab === 'general' && (
-                            <div className='w-full px-4 flex flex-col gap-5 items-start'>
+                            <Form 
+                                action={updateTeam(team)} 
+                                className='w-full px-4 flex flex-col gap-5 items-start'
+                                transform={d => d}
+                            >
+                                <input type="hidden" name="field" value="general" />
                                 <FieldGroup className="max-w-lg">
                                     <FieldGroup>
                                         <Field className="gap-2">
-                                            <FieldLabel>Team Name *</FieldLabel>
-                                            <Input onChange={({target}) => {
+                                            <FieldLabel>Team Name</FieldLabel>
+                                            <Input defaultValue={team.name} onChange={({target}) => {
                                                 // setData('name', target.value)
-                                            }} name="title" />
+                                            }} name="name" />
                                             <FieldDescription className="text-red-600 dark:text-red-400">
                                                 {/* { errors?.name } */}
                                             </FieldDescription>
                                         </Field>
                                         <Field className="gap-2">
                                             <FieldLabel>Description</FieldLabel>
-                                            <Textarea onChange={({target}) => {
+                                            <Textarea defaultValue={team.description} onChange={({target}) => {
                                                 // setData('description', target.value)
                                             }} name="description" className="h-28" />
                                             <FieldDescription className="text-red-600 dark:text-red-400">
@@ -128,26 +161,97 @@ export default function TeamSettings({
                                         
                                         <FieldSet>
                                             <FieldLegend variant="label">Location</FieldLegend>
-                                            <FieldGroup>
+                                            <RadioGroup 
+                                                onValueChange={(value) => {
+                                                    // setData('location_type', value)
+                                                    // if (data.location_type === 'global') {
+                                                    //     setData('locations', [])
+                                                    // }
+                                                    setLocationType(value)
+                                                    if (value === 'global') {
+                                                        setLocations([])
+                                                    }
+                                                }} 
+                                                value={locationType}
+                                            >
+                                                <Field orientation="horizontal">
+                                                    <RadioGroupItem value="global" />
+                                                    <FieldLabel className="font-normal">
+                                                        Worldwide
+                                                    </FieldLabel>
+                                                </Field>
+                                                <Field orientation="horizontal">
+                                                    <RadioGroupItem value="specific" />
+                                                    <FieldLabel className="font-normal">
+                                                        Sepecific locations
+                                                    </FieldLabel>
+                                                </Field>
+                                            </RadioGroup>
+                                        </FieldSet>
+                                        {
+                                            locationType === 'specific' &&
+                                            <FieldSet className="w-full mt-4 gap-4">
+                                                {
+                                                    locations.length > 0 &&
+                                                    <div className='w-full flex flex-wrap gap-2'>
+                                                    { 
+                                                        locations.map((l, idx) => {
+                                                            return (
+                                                                <Badge
+                                                                    className="cursor-pointer" 
+                                                                    key={idx}
+                                                                    onClick={() => setLocations(locations.filter((_, i) => i !== idx))}
+                                                                >
+                                                                    {
+                                                                        l.city ? (l.city + ', ' + l.country) : l.country
+                                                                    } 
+                                                                    <X />
+                                                                </Badge>
+                                                            )
+                                                        })
+                                                    }
+                                                    </div>
+                                                }
+                                                <FieldDescription>Add Locations</FieldDescription>
                                                 <div className="flex flex-col md:flex-row gap-4">
-                                                    <Field className='w-full'>
+                                                    <Field className='w-full md:w-56'>
                                                         <FieldLabel>City</FieldLabel>
                                                         <Input 
-                                                            // value={inputCity} 
-                                                            // onChange={(e) => setInputCity(e.target.value)}
+                                                            value={inputCity} 
+                                                            onChange={(e) => setInputCity(e.target.value)}
                                                         />
                                                     </Field>
-                                                    <Field className='w-full'>
+                                                    <Field className='w-full md:w-56'>
                                                         <FieldLabel>Country</FieldLabel>
                                                         <Combobox
-                                                            // defaultValue={inputCountry} 
-                                                            // onSelectValue={(value) => setInputCountry(value)} 
-                                                            items={[]} 
+                                                            defaultValue={inputCountry} 
+                                                            onSelectValue={(value) => setInputCountry(value)} 
+                                                            items={countryOptions} 
                                                         />
                                                     </Field>
                                                 </div>
-                                            </FieldGroup>
-                                        </FieldSet>
+                                                <Button
+                                                    onClick={() => {
+                                                        const regex = / +/g
+                                                        const city = inputCity === "" ? undefined : inputCity.trim().replaceAll(regex, " ")
+                                                        const idx = locations.findIndex((location) => location.city == city && location.country == inputCountry)
+
+                                                        if (idx === -1 && inputCountry.length > 0) {
+                                                            setLocations([...locations, { city: city, country: inputCountry }])
+                                                        }
+
+                                                        setInputCity("")
+                                                    }} 
+                                                    variant="secondary"
+                                                    size="sm"
+                                                    className="w-32 cursor-pointer"
+                                                    type="button"
+                                                >
+                                                    <Plus />
+                                                    Add location
+                                                </Button>
+                                            </FieldSet>
+                                        }
                                         
                                     </FieldGroup>
                                     {/* <Button>Save</Button> */}
@@ -159,7 +263,7 @@ export default function TeamSettings({
                                             <InputGroup>
                                                 <InputGroupInput onChange={({target}) => {
                                                     // setData('name', target.value)
-                                                }} name="title" />
+                                                }} />
 
                                                 <InputGroupAddon>
                                                     <Facebook />
@@ -171,7 +275,7 @@ export default function TeamSettings({
                                             <InputGroup>
                                                 <InputGroupInput onChange={({target}) => {
                                                     // setData('name', target.value)
-                                                }} name="title" />
+                                                }} />
 
                                                 <InputGroupAddon>
                                                     <Twitter />
@@ -183,7 +287,7 @@ export default function TeamSettings({
                                             <InputGroup>
                                                 <InputGroupInput onChange={({target}) => {
                                                     // setData('name', target.value)
-                                                }} name="title" />
+                                                }} />
 
                                                 <InputGroupAddon>
                                                     <Twitch />
@@ -195,7 +299,7 @@ export default function TeamSettings({
                                             <InputGroup>
                                                 <InputGroupInput onChange={({target}) => {
                                                     // setData('name', target.value)
-                                                }} name="title" />
+                                                }} />
 
                                                 <InputGroupAddon>
                                                     <Youtube />
@@ -207,7 +311,7 @@ export default function TeamSettings({
                                             <InputGroup>
                                                 <InputGroupInput onChange={({target}) => {
                                                     // setData('name', target.value)
-                                                }} name="title" />
+                                                }} />
 
                                                 <InputGroupAddon>
                                                     <LinkIcon />
@@ -219,8 +323,8 @@ export default function TeamSettings({
                                         </Field>
                                     </FieldGroup>
                                 </FieldGroup>
-                                <Button size="sm">Save</Button>
-                            </div>
+                                <Button type="submit" size="sm">Save</Button>
+                            </Form>
                         )
                     }
                     {
@@ -305,6 +409,188 @@ export default function TeamSettings({
                                             </div>
                                         </Field>
                                     </FieldGroup>
+                                    <FieldGroup>
+                                        <Field className="gap-2">
+                                            <FieldLabel>Invitations Sent</FieldLabel>
+                                            <Table>
+                                                <TableBody>
+                                                {
+                                                    team.invitations?.map(invitation => (
+                                                        <TableRow className='hover:bg-transparent'>
+                                                            <TableCell className='w-6'>
+                                                                {
+                                                                    invitation.invitee
+                                                                        ? <Avatar className='size-6'>
+                                                                            <AvatarImage src={invitation.invitee?.avatar} />
+                                                                            <AvatarFallback>{ getInitials(invitation.invitee?.name ?? "") }</AvatarFallback>
+                                                                        </Avatar> : <div className='bg-muted flex justify-center items-center size-7 rounded-full'>
+                                                                            <Mail size={15} />
+                                                                        </div>
+                                                                        
+                                                                }
+                                                                
+                                                            </TableCell>
+                                                            <TableCell>{invitation.invitee?.name ?? invitation.to_email}</TableCell>
+                                                            <TableCell>{invitation.roles.join(", ")}</TableCell>
+                                                            <TableCell className="text-xs">{invitation.permissions && invitation.permissions.map(p => <Badge variant="outline">{p}</Badge>)}</TableCell>
+                                                            <TableCell className='w-6'>
+                                                                <Button type='button' variant="ghost" size="icon">
+                                                                    <EllipsisVertical />
+                                                                </Button>
+                                                            </TableCell>
+                                                        </TableRow>
+                                                    ))
+                                                }
+                                                </TableBody>
+                                            </Table>
+                                            {/* <div className='flex w-full gap-4'>
+                                                {
+                                                    team.users?.map(user => (
+                                                        <HoverCard>
+                                                            <HoverCardTrigger>
+                                                                <Avatar className='size-10 cursor-pointer'>
+                                                                    <AvatarImage src={user.avatar} />
+                                                                    <AvatarFallback>{ getInitials(user.name) }</AvatarFallback>
+                                                                </Avatar>
+                                                            </HoverCardTrigger>
+                                                            <HoverCardContent className='min-w-sm'>
+                                                                <div className='flex flex-col'>
+                                                                    <div className='flex justify-between items-start'>
+                                                                        <div className='flex gap-2'>
+                                                                            <Avatar className='size-8'>
+                                                                                <AvatarImage src={user.avatar} />
+                                                                                <AvatarFallback>{ getInitials(user.name) }</AvatarFallback>
+                                                                            </Avatar>
+                                                                            <div className='flex flex-col'>
+
+                                                                            <h4 className="font-bold">{user.name}</h4>
+                                                                            <span className="relative -top-1 text-sm">{user.username}</span>
+                                                                            </div>
+                                                                        </div>
+                                                                        <Button type='button' variant="ghost" size="icon-sm">
+                                                                            <EllipsisVertical />
+                                                                        </Button>
+                                                                    </div>
+                                                                    
+                                                                    <h5 className='text-xs font-semibold mt-3'>Roles</h5>
+                                                                    <div className='flex flex-wrap text-xs my-3'>
+                                                                        {
+                                                                            user.pivot.roles.map((r) => <Badge variant="secondary">{r}</Badge>)
+                                                                        }
+                                                                    </div>
+
+                                                                    <h5 className='text-xs font-semibold mt-3'>Permissions</h5>
+                                                                    <div className='flex flex-wrap text-xs mt-3 gap-1.5'>
+                                                                        {
+                                                                            user.pivot.permissions.map((r) => <Badge variant="outline">{r}</Badge>)
+                                                                        }
+                                                                    </div>
+                                                                    
+                                                                </div>
+                                                            </HoverCardContent>
+                                                        </HoverCard>
+                                                        
+                                                    ))
+                                                }
+                                                
+                                            </div> */}
+                                        </Field>
+                                    </FieldGroup>
+                                </FieldGroup>
+                                <Button size="sm">Save</Button>
+                            </div>
+                        )
+                    }
+                    {
+                        currentTab === 'jobs' && (
+                            <div className='w-full px-4 flex flex-col gap-5 items-start'>
+                                <FieldGroup className="max-w-lg">
+                                    <FieldGroup>
+                                        <Field className="gap-2">
+                                            <FieldLabel>Current Opportunites</FieldLabel>
+                                            <Table>
+                                                <TableBody>
+                                                {
+                                                    team.opportunities?.map(job => (
+                                                        <TableRow className='hover:bg-transparent'>
+                                                            {/* <TableCell className='w-6'>
+                                                                {
+                                                                    jobs.invitee
+                                                                        ? <Avatar className='size-6'>
+                                                                            <AvatarImage src={invitation.invitee?.avatar} />
+                                                                            <AvatarFallback>{ getInitials(invitation.invitee?.name ?? "") }</AvatarFallback>
+                                                                        </Avatar> : <div className='bg-muted flex justify-center items-center size-7 rounded-full'>
+                                                                            <Mail size={15} />
+                                                                        </div>
+                                                                        
+                                                                }
+                                                                
+                                                            </TableCell> */}
+                                                            <TableCell><Link href={jobsShow(job)}>{job.title}</Link></TableCell>
+                                                            <TableCell><Badge variant="outline">{job.publish  ? "Published" : "Archived"}</Badge></TableCell>
+                                                            <TableCell className='w-6'>
+                                                                <Button type='button' variant="ghost" size="icon">
+                                                                    <EllipsisVertical />
+                                                                </Button>
+                                                            </TableCell>
+                                                        </TableRow>
+                                                    ))
+                                                }
+                                                </TableBody>
+                                            </Table>
+                                            {/* <div className='flex w-full gap-4'>
+                                                {
+                                                    team.users?.map(user => (
+                                                        <HoverCard>
+                                                            <HoverCardTrigger>
+                                                                <Avatar className='size-10 cursor-pointer'>
+                                                                    <AvatarImage src={user.avatar} />
+                                                                    <AvatarFallback>{ getInitials(user.name) }</AvatarFallback>
+                                                                </Avatar>
+                                                            </HoverCardTrigger>
+                                                            <HoverCardContent className='min-w-sm'>
+                                                                <div className='flex flex-col'>
+                                                                    <div className='flex justify-between items-start'>
+                                                                        <div className='flex gap-2'>
+                                                                            <Avatar className='size-8'>
+                                                                                <AvatarImage src={user.avatar} />
+                                                                                <AvatarFallback>{ getInitials(user.name) }</AvatarFallback>
+                                                                            </Avatar>
+                                                                            <div className='flex flex-col'>
+
+                                                                            <h4 className="font-bold">{user.name}</h4>
+                                                                            <span className="relative -top-1 text-sm">{user.username}</span>
+                                                                            </div>
+                                                                        </div>
+                                                                        <Button type='button' variant="ghost" size="icon-sm">
+                                                                            <EllipsisVertical />
+                                                                        </Button>
+                                                                    </div>
+                                                                    
+                                                                    <h5 className='text-xs font-semibold mt-3'>Roles</h5>
+                                                                    <div className='flex flex-wrap text-xs my-3'>
+                                                                        {
+                                                                            user.pivot.roles.map((r) => <Badge variant="secondary">{r}</Badge>)
+                                                                        }
+                                                                    </div>
+
+                                                                    <h5 className='text-xs font-semibold mt-3'>Permissions</h5>
+                                                                    <div className='flex flex-wrap text-xs mt-3 gap-1.5'>
+                                                                        {
+                                                                            user.pivot.permissions.map((r) => <Badge variant="outline">{r}</Badge>)
+                                                                        }
+                                                                    </div>
+                                                                    
+                                                                </div>
+                                                            </HoverCardContent>
+                                                        </HoverCard>
+                                                        
+                                                    ))
+                                                }
+                                                
+                                            </div> */}
+                                        </Field>
+                                    </FieldGroup>
                                 </FieldGroup>
                                 <Button size="sm">Save</Button>
                             </div>
@@ -312,44 +598,7 @@ export default function TeamSettings({
                     }
                     
                 </div>
-                
-                {/* <div className='flex flex-col w-full'>
-                    <div className='w-full flex gap-10 mt-8 font-semibold text-sm'>
-                        <div className=' border-b-2 border-foreground'>
-                            <div className='size-full rounded py-3 hover:bg-dim'>General</div>
-                        </div>
-                        <div className=''>
-                            <div className='size-full rounded py-3 hover:bg-dim'>Members</div>
-                        </div>
-                        <div className=''>
-                            <div className='size-full rounded py-3 hover:bg-dim'>Integrations</div>
-                        </div>
-                    </div>
-                    <Separator />
-                </div>
-
-                <div className="w-full">
-                    <FieldGroup className="mb-10 max-w-lg">
-                        <Field className="gap-2">
-                            <FieldLabel>Team Name *</FieldLabel>
-                            <Input onChange={({target}) => {
-                                // setData('name', target.value)
-                            }} name="title" />
-                            <FieldDescription className="text-red-600 dark:text-red-400">
-                                
-                            </FieldDescription>
-                        </Field>
-                        <Field className="gap-2">
-                            <FieldLabel>Description</FieldLabel>
-                            <Textarea onChange={({target}) => {
-                                // setData('description', target.value)
-                            }} name="description" className="h-28" />
-                            <FieldDescription className="text-red-600 dark:text-red-400">
-                                
-                            </FieldDescription>
-                        </Field>
-                    </FieldGroup>
-                </div> */}
+            
             </div>
         </AppLayout>
     );

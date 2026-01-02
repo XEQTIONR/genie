@@ -17,14 +17,12 @@ import {
 import { index } from '@/routes/api/users'
 import { Input } from '@/components/ui/input'
 import SearchBar from '@/components/ui/search-bar'
-import { Separator } from '@/components/ui/separator'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Textarea } from '@/components/ui/textarea'
 import { useDebouncedCallback } from 'use-debounce'
 import { useInitials } from '@/hooks/use-initials'
 import { User } from '@/types'
 import { useRef, useState } from 'react'
-import { Combobox } from '@/components/ui/combobox'
 import { Multiselect } from '@/components/ui/multiselect'
 import Step from '@/components/step'
 
@@ -74,9 +72,7 @@ export default function CreateTeam({ apiToken } : { apiToken: string }) {
                 
             } else {
                 axios.get(index({
-                    query: {
-                        q: str
-                    }
+                    query: { q: str}
                 }).url, {
                     headers: {
                         Authorization: 'Bearer ' + apiToken,
@@ -103,9 +99,8 @@ export default function CreateTeam({ apiToken } : { apiToken: string }) {
                             setMissingUsername(str)
                         }
                     }
-                }).catch((e) => {
+                }).catch(() => {
                     setSearching(false)
-                    console.log('e:', e)
                 })
             }
         } else {
@@ -130,7 +125,7 @@ export default function CreateTeam({ apiToken } : { apiToken: string }) {
     })
 
     return (
-        <AppLayout maxWidth="md:max-w-7xl" breadcrumbs={breadcrumbs}>
+        <AppLayout maxHeaderWidth='md:max-w-10xl' maxWidth="md:max-w-7xl" breadcrumbs={breadcrumbs}>
             <Head title="Create new team" />
             <form 
                 className="w-full max-w-4xl mx-auto flex flex-col pt-8 px-4"

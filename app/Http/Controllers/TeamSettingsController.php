@@ -11,11 +11,21 @@ class TeamSettingsController extends Controller
 
     public function editMembers(Team $team)
     {
-        $team->load('users');
+        $team->load(['users', 'invitations.invitee']);
 
         return Inertia::render('teams/settings', [
             'team' => $team,
             'tab' => 'members'
+        ]);
+    }
+
+    public function editOpportunities(Team $team)
+    {
+        $team->load(['users', 'opportunities.creator']);
+
+        return Inertia::render('teams/settings', [
+            'team' => $team,
+            'tab' => 'jobs'
         ]);
     }
 }
