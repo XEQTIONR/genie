@@ -12,6 +12,7 @@ use App\Notifications\TeamInvitationNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -35,19 +36,10 @@ class TeamController extends Controller
 
     public function show(Team $team)
     {
-        $activities = Activity::where('subject_type', Team::class)
-            ->where('subject_id', $team->id)
-            ->orWhere(function($query) use ($team) {
-            $query->where('content->owner_id', $team->id)
-                ->where('content->owner_type', 'team');
-        })->with(['user', 'subject'])
-        ->orderByDesc('created_at')
-        ->paginate(5);
-
         return Inertia::render('teams/show', [
             'team' => $team,
             'user_count' => $team->users()->count(),
-            'activities' => $activities,
+            'posts' => $team->posts()->latest()->get()
         ]);
     }
 
@@ -177,6 +169,25 @@ class TeamController extends Controller
         }
     }
 
+    public function showActivity(Team $team)
+    {
+        $activities = Activity::where('subject_type', Team::class)
+            ->where('subject_id', $team->id)
+            ->orWhere(function($query) use ($team) {
+            $query->where('content->owner_id', $team->id)
+                ->where('content->owner_type', 'team');
+        })->with(['user', 'subject'])
+        ->orderByDesc('created_at')
+        ->paginate(5);
+
+        return Inertia::render('teams/show', [
+            'team' => $team,
+            'tab' => 'activity',
+            'user_count' => $team->users()->count(),
+            'activities' => $activities,
+        ]);
+    }
+
     protected function updateAvatar(Request $request, Team $team)
     {
         $validated = $request->validate([
@@ -206,6 +217,7 @@ class TeamController extends Controller
 
     protected function updateBanner(Request $request, Team $team)
     {
+        Log::info('updateBanner');
         $validated = $request->validate([
             'banner' => 'nullable|string'
         ]);
@@ -233,6 +245,8 @@ class TeamController extends Controller
 
     protected function updateGeneral(Request $request, Team $team)
     {
+        Log::info('updateGeneral');
+        Log::info($request);
         $validated = $request->validate([
             'name' => 'required|string|min:2',
             'description' => 'nullable|string',
@@ -253,7 +267,14 @@ class TeamController extends Controller
 
         if (array_key_exists('links', $validated)) {
             $meta = $team->meta;
-            $meta['links'] = $validated['links'];
+            $links = $validated['links'];
+
+            for($i=0; $i<count($links); $i++) {
+                if (!Str::startsWith($links[$i], 'https://')) {
+                    $links[$i] = 'https://' . $links[$i];
+                };
+            }
+            $meta['links'] = $links;
             $team->meta = $meta;
         } else {
             if ($team->meta) {

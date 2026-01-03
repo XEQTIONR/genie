@@ -2,7 +2,7 @@ import { Button } from '@/components/ui/button'
 import AppLayout from '@/layouts/app-layout'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import axios from 'axios'
-import { edit, show } from '@/routes/teams'
+import { edit, show, activities as teamActivities } from '@/routes/teams'
 import { show as showJobPosting } from "@/routes/opportunities"
 import { show as showUser } from '@/routes/users'
 import { show as showProject } from '@/routes/projects'
@@ -10,7 +10,7 @@ import { show as showPost } from '@/routes/posts'
 import { index as membersIndex } from '@/routes/teams/users'
 import { index as projectsIndex } from '@/routes/teams/projects'
 import { index as jobsIndex } from '@/routes/teams/opportunities'
-import { Opportunity, NavItem, Project, ProjectMember, Team, type BreadcrumbItem, Activity } from '@/types'
+import { Opportunity, NavItem, Project, ProjectMember, Team, type BreadcrumbItem, Activity, Post } from '@/types'
 import { Head, Link, router } from '@inertiajs/react'
 import { Camera, Eraser, Globe, MapPin, Pencil, PencilRuler, Instagram, Sparkles, UserPlus, Lightbulb, BriefcaseBusiness, Settings, Image, LinkIcon } from 'lucide-react'
 import { Facebook, Twitter, Twitch, Youtube } from '@/components/icons/svgs'
@@ -322,11 +322,12 @@ function BannerDialog({ aspect = 5, image, imageHeight, imageWidth, open, onOpen
 export default function TeamProfile({ 
     activities,
     team, 
-    tab = 'activity', 
+    tab = 'showcase', 
     user_count, 
     users = [],
     projects = [],
-    opportunities 
+    opportunities,
+    posts,
 
 } : {
     activities: { data: Activity[] }
@@ -337,7 +338,8 @@ export default function TeamProfile({
     projects?: Project[]
     opportunities?: {
         data: Opportunity[]
-    }
+    },
+    posts: Post[]
 }) {
 
     const [showAvatarDialog, setShowAvatarDialog] = useState(false)
@@ -367,8 +369,8 @@ export default function TeamProfile({
     const initialize = useInitials();
 
     const tabs: ProfileTab[] = [
-        // { title: "Showcase", href: show({ user: user.username }), key: "showcase"},
-        { title: "Activity", href: show({ team: team.slug }), key: "activity"},
+        { title: "Showcase", href: show({ team: team.slug }), key: "showcase"},
+        { title: "Activity", href: teamActivities(team), key: "activity"},
         { title: "Projects", href: projectsIndex({ team: team.slug }), key: "projects" },
         { title: "Releases", href: "/", key: "releases" },
         { title: "Members", href: membersIndex({ team: team.slug }), key: "members" },
@@ -377,6 +379,18 @@ export default function TeamProfile({
 
     function showTab(tab: string) {
         switch(tab) {
+            case 'showcase':
+                return (
+                    <div className="grid auto-rows-min gap-5 md:grid-cols-3 max-w-9xl mx-auto pt-5 px-4">
+                        {
+                            posts.map((post) => (
+                                <div className="relative overflow-hidden">
+                                    <GridCard showAuthor={false} className="cursor-pointer" onClick={() => router.visit(showPost({post: post.id}))} post={post} />
+                                </div>
+                            ))
+                        }
+                    </div>
+                )
             case 'members':
                 return (
                     <div className="flex w-full h-full flex-col gap-6 max-w-8xl mx-auto px-4">

@@ -110,6 +110,9 @@ export function Multiselect({
                                         } else {
                                             const val = value.filter(x => x !== currentValue)
                                             setValue(val)
+                                            if (onSelect) {
+                                                onSelect(val)
+                                            }
                                         }
                                     }}>
                                         <Checkbox checked={value.includes(item.value)} />
@@ -137,6 +140,9 @@ export function Multiselect({
                                             } else {
                                                 const val = value.filter(x => x !== currentValue)
                                                 setValue(val)
+                                                if (onSelect) {
+                                                    onSelect(val)
+                                                }
                                             }
                                         }}>
                                             <Checkbox checked={value.includes(item.value)} />

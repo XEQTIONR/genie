@@ -83,6 +83,8 @@ Route::get('/teams/{team:slug}/projects', function(Team $team) {
     ]);
 })->name('teams.projects.index');
 
+Route::get('/teams/{team:slug}/activities', [TeamController::class, 'showActivity'])->name('teams.activities');
+
 Route::get('/users', [UserProfileController::class, 'index'])->name('users.index');
 
 

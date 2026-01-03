@@ -1,3 +1,4 @@
+import allRoles from '@/data/roles'
 import { Button } from '@/components/ui/button'
 import AppLayout from '@/layouts/app-layout'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
@@ -7,9 +8,9 @@ import {  show as jobsShow } from '@/routes/opportunities'
 import { edit as editTeam } from '@/routes/teams'
 import { members as editMembers, opportunities as editJobs } from '@/routes/teams/edit'
 import { index as jobsIndex } from '@/routes/teams/opportunities'
-import { Opportunity, NavItem, Project, ProjectMember, Team, type BreadcrumbItem, Activity, Location } from '@/types'
+import { Opportunity, NavItem, Project, ProjectMember, Team, type BreadcrumbItem, Activity, Location, User } from '@/types'
 import { Form, Head, Link, router } from '@inertiajs/react'
-import { Camera, Eraser, Globe, MapPin, Pencil, PencilRuler, Instagram, Sparkles, UserPlus, Lightbulb, BriefcaseBusiness, Settings, Image, ChevronRight, BadgeCheck, Users, LinkIcon, Trash, X, Trash2, EllipsisVertical, Mail, Plus } from 'lucide-react'
+import { Camera, Eraser, Globe, MapPin, Pencil, PencilRuler, Instagram, Sparkles, UserPlus, Lightbulb, BriefcaseBusiness, Settings, Image, ChevronRight, BadgeCheck, Users, LinkIcon, Trash, X, Trash2, EllipsisVertical, Mail, Plus, ArrowLeft, ShieldAlert } from 'lucide-react'
 import { Facebook, Twitter, Twitch, Youtube } from '@/components/icons/svgs'
 
 import { useInitials } from '@/hooks/use-initials';
@@ -37,11 +38,25 @@ import {
   InputGroupTextarea,
 } from "@/components/ui/input-group"
 import { Combobox, GroupedOptions } from '@/components/ui/combobox'
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
 import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table'
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card'
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
+import { Label } from '@/components/ui/label'
+import SearchBar from '@/components/ui/search-bar'
+import { Multiselect } from '@/components/ui/multiselect'
+import { Item, ItemActions, ItemContent, ItemDescription, ItemMedia, ItemTitle } from '@/components/ui/item'
 
 type ProfileTab = NavItem & {key: string, className?: string}
 
@@ -106,6 +121,21 @@ export default function TeamSettings({
             return <LinkIcon />
         })
     })
+    const [selectedMember, setSelectedMember] = useState<User|undefined>(undefined)
+    const [currentRoles, setCurrentRoles] = useState<string[]>([])
+    const [currentPermissions, setCurrentPermissions] = useState<string[]>([])
+    const [editRoles, setEditRoles] = useState(false)
+    const [editPermissions, setEditPermissions] = useState(false)
+
+    useEffect(() => {
+        if (selectedMember) {
+            setCurrentRoles(team.users?.find(t => t.id === selectedMember.id)?.pivot.roles ?? [])
+            setCurrentPermissions(team.users?.find(t => t.id === selectedMember.id)?.pivot.permissions ?? [])
+        } else {
+            setCurrentRoles([])
+            setCurrentPermissions([])
+        }
+    }, [selectedMember, team])
 
     useEffect(() => {
         setLinkIcons(() => {
@@ -306,7 +336,7 @@ export default function TeamSettings({
                                                         let idx = -1
                                                         
                                                         if (locations) {
-                                                            const idx = locations.findIndex((location) => location.city == city && location.country == inputCountry)
+                                                            idx = locations.findIndex((location) => location.city == city && location.country == inputCountry)
                                                         }
 
                                                         if (idx === -1 && inputCountry.length > 0) {
@@ -431,172 +461,356 @@ export default function TeamSettings({
                             <div className='w-full px-4 flex flex-col gap-5 items-start'>
                                 <FieldGroup className="">
                                     <FieldGroup>
-                                        <Field className="gap-2">
-                                            <FieldLabel>Contributors</FieldLabel>
-                                            {/* <Table>
-                                                <TableBody>
-                                                {
-                                                    team.users?.map(user => (
-                                                        <TableRow className='hover:bg-transparent'>
-                                                            <TableCell className='w-6'>
-                                                                <Avatar className='size-6'>
-                                                                    <AvatarImage src={user.avatar} />
-                                                                    <AvatarFallback>{ getInitials(user.name) }</AvatarFallback>
-                                                                </Avatar>
-                                                            </TableCell>
-                                                            <TableCell>{user.name}</TableCell>
-                                                            <TableCell className='w-6'>
-                                                                <Button type='button' variant="ghost" size="icon">
-                                                                    <EllipsisVertical />
+                                    {
+                                            selectedMember
+                                                ? <Field className="gap-2">
+                                                    <div className='flex flex-col gap-3'>
+                                                        <div className='flex'>
+                                                            <Button
+                                                                className='cursor-pointer'
+                                                                onClick={() => setSelectedMember(undefined)} 
+                                                                type="button" 
+                                                                size="sm" 
+                                                                variant="secondary"
+                                                            >
+                                                                <ArrowLeft /> Back to all team members
+                                                            </Button>
+                                                        </div>
+                                                        <div className="flex items-center gap-1">
+                                                            <Avatar className="size-10">
+                                                                <AvatarImage src={selectedMember.avatar} />
+                                                                <AvatarFallback className="">{getInitials(selectedMember.name)}</AvatarFallback>
+                                                            </Avatar>
+                                                            {selectedMember.name}
+                                                        </div>
+                                                    </div>
+                                                    <div className='text-xs font-semibold mt-3 flex gap-2 items-center'>
+                                                        <span>Roles</span>
+                                                    {
+                                                        !editRoles && (
+                                                            <div onClick={() => setEditRoles(true)} className='rounded-full border p-1.5 hover:bg-muted cursor-pointer'>
+                                                                <Pencil size={12} />
+                                                            </div>
+                                                        )
+                                                    }
+                                                    {
+                                                        editRoles && (
+                                                            <>
+                                                                <Button className="text-xxs cursor-pointer" size="sm" variant="outline" type="button">
+                                                                    Save
                                                                 </Button>
-                                                            </TableCell>
-                                                        </TableRow>
-                                                    ))
-                                                }
-                                                </TableBody>
-                                            </Table> */}
-                                            <div className='flex w-full gap-4'>
-                                                {
-                                                    team.users?.map(user => (
-                                                        <HoverCard>
-                                                            <HoverCardTrigger>
-                                                                <Avatar className='size-10 cursor-pointer'>
-                                                                    <AvatarImage src={user.avatar} />
-                                                                    <AvatarFallback>{ getInitials(user.name) }</AvatarFallback>
-                                                                </Avatar>
-                                                            </HoverCardTrigger>
-                                                            <HoverCardContent className='min-w-sm'>
-                                                                <div className='flex flex-col'>
-                                                                    <div className='flex justify-between items-start'>
-                                                                        <div className='flex gap-2'>
-                                                                            <Avatar className='size-8'>
-                                                                                <AvatarImage src={user.avatar} />
-                                                                                <AvatarFallback>{ getInitials(user.name) }</AvatarFallback>
-                                                                            </Avatar>
-                                                                            <div className='flex flex-col'>
+                                                                <Button onClick={() => {
+                                                                    if (selectedMember) {
+                                                                        setCurrentRoles(team.users?.find(t => t.id === selectedMember.id)?.pivot.roles ?? [])
+                                                                    }
+                                                                    setEditRoles(false)
+                                                                }} className="text-xxs cursor-pointer" size="sm" variant="destructive" type="button">
+                                                                    Cancel
+                                                                </Button>
+                                                            </>
+                                                        )
+                                                    }
+                                                    </div>
 
-                                                                            <h4 className="font-bold">{user.name}</h4>
-                                                                            <span className="relative -top-1 text-sm">{user.username}</span>
-                                                                            </div>
-                                                                        </div>
-                                                                        <Button type='button' variant="ghost" size="icon-sm">
-                                                                            <EllipsisVertical />
-                                                                        </Button>
-                                                                    </div>
-                                                                    
-                                                                    <h5 className='text-xs font-semibold mt-3'>Roles</h5>
-                                                                    <div className='flex flex-wrap text-xs my-3'>
-                                                                        {
-                                                                            user.pivot.roles.map((r) => <Badge variant="secondary">{r}</Badge>)
-                                                                        }
-                                                                    </div>
+                                                    <div className='flex flex-wrap text-xs my-3 gap-1.5'>
+                                                    {
+                                                        currentRoles.map(r => (
+                                                            <Badge
+                                                                onClick={() => {
+                                                                    if (editRoles) {
+                                                                        setCurrentRoles(role => role.filter(rr => rr!== r))
+                                                                    }
+                                                                }} 
+                                                                variant="secondary"
+                                                            >
+                                                                { r } { editRoles && <X /> }
+                                                            </Badge>
+                                                        ))
+                                                    }
+                                                    </div>
+                                                    {
+                                                        editRoles && (
+                                                            <SearchBar
+                                                                onSelectOption={o => setCurrentRoles((c) => {
+                                                                    if (c.findIndex(x => x === o) == -1) {
+                                                                        return [...c, o]
+                                                                    }
+                                                                    return c
+                                                                })} 
+                                                                placeholder="Select roles"
+                                                                searchOptions={allRoles.map(({name, items}) => {
+                                                                    return {
+                                                                        heading: name,
+                                                                        options: items.map((item) => {
+                                                                            return {
+                                                                                label: item,
+                                                                                value: item
+                                                                            }
+                                                                        })
+                                                                    }
+                                                                })}
+                                                            />
+                                                        )
+                                                    }
+                                                    
 
-                                                                    <h5 className='text-xs font-semibold mt-3'>Permissions</h5>
-                                                                    <div className='flex flex-wrap text-xs mt-3 gap-1.5'>
-                                                                        {
-                                                                            user.pivot.permissions.map((r) => <Badge variant="outline">{r}</Badge>)
-                                                                        }
-                                                                    </div>
-                                                                    
+                                                    
+
+                                                    <div className='text-xs font-semibold mt-3 flex gap-2 items-center'>
+                                                        <span>Permissions</span>
+                                                        {
+                                                            !editPermissions && (
+                                                                <div onClick={() => setEditPermissions(true)} className='rounded-full border p-1.5 hover:bg-muted cursor-pointer'>
+                                                                    <Pencil size={12} />
                                                                 </div>
-                                                            </HoverCardContent>
-                                                        </HoverCard>
-                                                        
-                                                    ))
-                                                }
-                                                
-                                            </div>
-                                        </Field>
-                                    </FieldGroup>
-                                    <FieldGroup>
-                                        <Field className="gap-2">
-                                            <FieldLabel>Invitations Sent</FieldLabel>
-                                            <Table>
-                                                <TableBody>
-                                                {
-                                                    team.invitations?.map(invitation => (
-                                                        <TableRow className='hover:bg-transparent'>
-                                                            <TableCell className='w-6'>
+                                                            )
+                                                        }
+                                                        {
+                                                            editPermissions && (
+                                                                <>
+                                                                    <Button className="text-xxs cursor-pointer" size="sm" variant="outline" type="button">
+                                                                        Save
+                                                                    </Button>
+                                                                    <Button onClick={() => {
+                                                                        if (selectedMember) {
+                                                                            setCurrentPermissions(team.users?.find(t => t.id === selectedMember.id)?.pivot.permissions ?? [])
+                                                                        }
+                                                                        setEditPermissions(false)
+                                                                    }} className="text-xxs cursor-pointer" size="sm" variant="destructive" type="button">
+                                                                        Cancel
+                                                                    </Button>
+                                                                </>
+                                                            )
+                                                        }
+                                                    </div>
+                                                    <div className='flex flex-wrap text-xs mt-3 gap-1.5'>
+                                                        {
+                                                            currentPermissions.map((r) => <Badge variant="outline">{r}</Badge>)
+                                                        }
+                                                    </div>
+                                                    {
+                                                        editPermissions && <Multiselect onSelect={(v) => setCurrentPermissions(v)} defaultValue={currentPermissions} items={{
+                                                            Ideas: [
                                                                 {
-                                                                    invitation.invitee
-                                                                        ? <Avatar className='size-6'>
-                                                                            <AvatarImage src={invitation.invitee?.avatar} />
-                                                                            <AvatarFallback>{ getInitials(invitation.invitee?.name ?? "") }</AvatarFallback>
-                                                                        </Avatar> : <div className='bg-muted flex justify-center items-center size-7 rounded-full'>
-                                                                            <Mail size={15} />
-                                                                        </div>
-                                                                        
-                                                                }
-                                                                
-                                                            </TableCell>
-                                                            <TableCell>{invitation.invitee?.name ?? invitation.to_email}</TableCell>
-                                                            <TableCell>{invitation.roles.join(", ")}</TableCell>
-                                                            <TableCell className="text-xs">{invitation.permissions && invitation.permissions.map(p => <Badge variant="outline">{p}</Badge>)}</TableCell>
-                                                            <TableCell className='w-6'>
-                                                                <Button type='button' variant="ghost" size="icon">
-                                                                    <EllipsisVertical />
-                                                                </Button>
-                                                            </TableCell>
-                                                        </TableRow>
-                                                    ))
-                                                }
-                                                </TableBody>
-                                            </Table>
-                                            {/* <div className='flex w-full gap-4'>
-                                                {
-                                                    team.users?.map(user => (
-                                                        <HoverCard>
-                                                            <HoverCardTrigger>
-                                                                <Avatar className='size-10 cursor-pointer'>
-                                                                    <AvatarImage src={user.avatar} />
-                                                                    <AvatarFallback>{ getInitials(user.name) }</AvatarFallback>
-                                                                </Avatar>
-                                                            </HoverCardTrigger>
-                                                            <HoverCardContent className='min-w-sm'>
-                                                                <div className='flex flex-col'>
-                                                                    <div className='flex justify-between items-start'>
-                                                                        <div className='flex gap-2'>
-                                                                            <Avatar className='size-8'>
-                                                                                <AvatarImage src={user.avatar} />
-                                                                                <AvatarFallback>{ getInitials(user.name) }</AvatarFallback>
-                                                                            </Avatar>
-                                                                            <div className='flex flex-col'>
+                                                                    label: 'Create ideas',
+                                                                    value: 'create-posts'
+                                                                },
+                                                                {
+                                                                    label: 'Edit ideas',
+                                                                    value: 'edit-posts'
+                                                                },
+                                                                {
+                                                                    label: 'Delete ideas',
+                                                                    value: 'delete-posts'
+                                                                },
+                                                            ],
+                                                            Team: [
+                                                                {
+                                                                    label: 'Edit team info',
+                                                                    value: 'edit-info'
+                                                                },
+                                                                {
+                                                                    label: 'Transfer team',
+                                                                    value: 'transfer'
+                                                                },
+                                                            ],
+                                                            Members: [
+                                                                {
+                                                                    label: 'Add members',
+                                                                    value: 'add-member'
+                                                                },
+                                                                {
+                                                                    label: 'Remove members',
+                                                                    value: 'delete-member'
+                                                                },
+                                                                {
+                                                                    label: 'Edit role',
+                                                                    value: 'edit-role'
+                                                                },
+                                                            ],
+                                                            Projects: [
+                                                                {
+                                                                    label: 'Create projects',
+                                                                    value: 'create-project'
+                                                                },
+                                                                {
+                                                                    label: 'Edit projects',
+                                                                    value: 'edit-project'
+                                                                },
+                                                                {
+                                                                    label: 'Delete projects',
+                                                                    value: 'delete-project'
+                                                                },
+                                                                {
+                                                                    label: 'Add members',
+                                                                    value: 'add-project-member'
+                                                                },
+                                                            ],
+                                                            Opportunities: [
+                                                                {
+                                                                    label: 'Create opportunities',
+                                                                    value: 'create-jobs'
+                                                                },
+                                                                {
+                                                                    label: 'Edit opportunities',
+                                                                    value: 'edit-jobs'
+                                                                },
+                                                                {
+                                                                    label: 'Delete opportunities',
+                                                                    value: 'delete-jobs'
+                                                                },
+                                                            ]
+                                                        }} />
+                                                    }
+                                                </Field> :
+                                                <Field className="gap-2">
+                                                    <FieldLabel>Contributors</FieldLabel>
+                                                    <div className='flex w-full gap-4'>
+                                                        {
+                                                            team.users?.map(user => (
+                                                                <HoverCard>
+                                                                    <HoverCardTrigger>
+                                                                        <Avatar onClick={() => setSelectedMember(user)} className='size-10 cursor-pointer'>
+                                                                            <AvatarImage src={user.avatar} />
+                                                                            <AvatarFallback>{ getInitials(user.name) }</AvatarFallback>
+                                                                        </Avatar>
+                                                                    </HoverCardTrigger>
+                                                                    <HoverCardContent className='min-w-sm'>
+                                                                        <div className='flex flex-col'>
+                                                                            <div className='flex justify-between items-start'>
+                                                                                <div className='flex gap-2'>
+                                                                                    <Avatar className='size-8'>
+                                                                                        <AvatarImage src={user.avatar} />
+                                                                                        <AvatarFallback>{ getInitials(user.name) }</AvatarFallback>
+                                                                                    </Avatar>
+                                                                                    <div className='flex flex-col'>
 
-                                                                            <h4 className="font-bold">{user.name}</h4>
-                                                                            <span className="relative -top-1 text-sm">{user.username}</span>
+                                                                                    <h4 className="font-bold">{user.name}</h4>
+                                                                                    <span className="relative -top-1 text-sm">{user.username}</span>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <Button type='button' variant="ghost" size="icon-sm">
+                                                                                    <EllipsisVertical />
+                                                                                </Button>
                                                                             </div>
+                                                                            
+                                                                            <h5 className='text-xs font-semibold mt-3'>Roles</h5>
+                                                                            <div className='flex flex-wrap text-xs my-3 gap-1.5'>
+                                                                                {
+                                                                                    user.pivot.roles.map((r) => <Badge variant="secondary">{r}</Badge>)
+                                                                                }
+                                                                            </div>
+
+                                                                            <h5 className='text-xs font-semibold mt-3'>Permissions</h5>
+                                                                            <div className='flex flex-wrap text-xs mt-3 gap-1.5'>
+                                                                                {
+                                                                                    user.pivot.permissions.map((r) => <Badge variant="outline">{r}</Badge>)
+                                                                                }
+                                                                            </div>
+                                                                            
                                                                         </div>
-                                                                        <Button type='button' variant="ghost" size="icon-sm">
+                                                                    </HoverCardContent>
+                                                                </HoverCard>
+                                                                
+                                                            ))
+                                                        }
+                                                        
+                                                    </div>
+                                                </Field>
+                                    }  
+                                    </FieldGroup>
+                                    {
+                                        !selectedMember && (
+                                            <FieldGroup>
+                                                <Field className="gap-2">
+                                                    <FieldLabel>Invitations Sent</FieldLabel>
+                                                    <Table>
+                                                        <TableBody>
+                                                        {
+                                                            team.invitations?.map(invitation => (
+                                                                <TableRow className='hover:bg-transparent'>
+                                                                    <TableCell className='w-6'>
+                                                                        {
+                                                                            invitation.invitee
+                                                                                ? <Avatar className='size-6'>
+                                                                                    <AvatarImage src={invitation.invitee?.avatar} />
+                                                                                    <AvatarFallback>{ getInitials(invitation.invitee?.name ?? "") }</AvatarFallback>
+                                                                                </Avatar> : <div className='bg-muted flex justify-center items-center size-7 rounded-full'>
+                                                                                    <Mail size={15} />
+                                                                                </div>
+                                                                                
+                                                                        }
+                                                                        
+                                                                    </TableCell>
+                                                                    <TableCell>{invitation.invitee?.name ?? invitation.to_email}</TableCell>
+                                                                    <TableCell>{invitation.roles.join(", ")}</TableCell>
+                                                                    <TableCell className="text-xs">{invitation.permissions && invitation.permissions.map(p => <Badge variant="outline">{p}</Badge>)}</TableCell>
+                                                                    <TableCell className='w-6'>
+                                                                        <Button type='button' variant="ghost" size="icon">
                                                                             <EllipsisVertical />
                                                                         </Button>
-                                                                    </div>
-                                                                    
-                                                                    <h5 className='text-xs font-semibold mt-3'>Roles</h5>
-                                                                    <div className='flex flex-wrap text-xs my-3'>
-                                                                        {
-                                                                            user.pivot.roles.map((r) => <Badge variant="secondary">{r}</Badge>)
-                                                                        }
-                                                                    </div>
+                                                                    </TableCell>
+                                                                </TableRow>
+                                                            ))
+                                                        }
+                                                        </TableBody>
+                                                    </Table>
+                                                    {/* <div className='flex w-full gap-4'>
+                                                        {
+                                                            team.users?.map(user => (
+                                                                <HoverCard>
+                                                                    <HoverCardTrigger>
+                                                                        <Avatar className='size-10 cursor-pointer'>
+                                                                            <AvatarImage src={user.avatar} />
+                                                                            <AvatarFallback>{ getInitials(user.name) }</AvatarFallback>
+                                                                        </Avatar>
+                                                                    </HoverCardTrigger>
+                                                                    <HoverCardContent className='min-w-sm'>
+                                                                        <div className='flex flex-col'>
+                                                                            <div className='flex justify-between items-start'>
+                                                                                <div className='flex gap-2'>
+                                                                                    <Avatar className='size-8'>
+                                                                                        <AvatarImage src={user.avatar} />
+                                                                                        <AvatarFallback>{ getInitials(user.name) }</AvatarFallback>
+                                                                                    </Avatar>
+                                                                                    <div className='flex flex-col'>
 
-                                                                    <h5 className='text-xs font-semibold mt-3'>Permissions</h5>
-                                                                    <div className='flex flex-wrap text-xs mt-3 gap-1.5'>
-                                                                        {
-                                                                            user.pivot.permissions.map((r) => <Badge variant="outline">{r}</Badge>)
-                                                                        }
-                                                                    </div>
-                                                                    
-                                                                </div>
-                                                            </HoverCardContent>
-                                                        </HoverCard>
+                                                                                    <h4 className="font-bold">{user.name}</h4>
+                                                                                    <span className="relative -top-1 text-sm">{user.username}</span>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <Button type='button' variant="ghost" size="icon-sm">
+                                                                                    <EllipsisVertical />
+                                                                                </Button>
+                                                                            </div>
+                                                                            
+                                                                            <h5 className='text-xs font-semibold mt-3'>Roles</h5>
+                                                                            <div className='flex flex-wrap text-xs my-3'>
+                                                                                {
+                                                                                    user.pivot.roles.map((r) => <Badge variant="secondary">{r}</Badge>)
+                                                                                }
+                                                                            </div>
+
+                                                                            <h5 className='text-xs font-semibold mt-3'>Permissions</h5>
+                                                                            <div className='flex flex-wrap text-xs mt-3 gap-1.5'>
+                                                                                {
+                                                                                    user.pivot.permissions.map((r) => <Badge variant="outline">{r}</Badge>)
+                                                                                }
+                                                                            </div>
+                                                                            
+                                                                        </div>
+                                                                    </HoverCardContent>
+                                                                </HoverCard>
+                                                                
+                                                            ))
+                                                        }
                                                         
-                                                    ))
-                                                }
-                                                
-                                            </div> */}
-                                        </Field>
-                                    </FieldGroup>
+                                                    </div> */}
+                                                </Field>
+                                            </FieldGroup>
+                                        )
+                                    }
                                 </FieldGroup>
-                                <Button size="sm">Save</Button>
                             </div>
                         )
                     }
