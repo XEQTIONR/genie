@@ -80,6 +80,61 @@ export default function TeamSettings({
     const [inputCity, setInputCity] = useState<string>("")
     const [inputCountry, setInputCountry] = useState<string>("")
     const [links, setLinks] = useState<string[]>(team.meta?.links ?? [])
+    const [linkIcons, setLinkIcons] = useState(() => {
+        return team.meta?.links?.map((l) => {
+            
+            if (l.toLowerCase().includes('facebook.com')) {
+                return <Facebook />
+            }
+
+            if (l.toLowerCase().includes('twitter.com') || l.toLowerCase().includes('x.com')) {
+                return <Twitter />
+            }
+
+            if (l.toLowerCase().includes('twitch.tv')) {
+                return <Twitter />
+            }
+
+            if (l.toLowerCase().includes('youtube.com')) {
+                return <Youtube />
+            }
+
+            if (l.toLowerCase().includes('instagram.com')) {
+                return <Instagram />
+            }
+            
+            return <LinkIcon />
+        })
+    })
+
+    useEffect(() => {
+        setLinkIcons(() => {
+            return links?.map((l) => {
+                if (l.toLowerCase().includes('facebook.com')) {
+                    return <Facebook />
+                }
+
+                if (l.toLowerCase().includes('twitter.com') || l.toLowerCase().includes('x.com')) {
+                    return <Twitter />
+                }
+
+                if (l.toLowerCase().includes('twitch.tv')) {
+                    return <Twitch />
+                }
+
+                if (l.toLowerCase().includes('youtube.com')) {
+                    return <Youtube />
+                }
+
+                if (l.toLowerCase().includes('instagram.com')) {
+                    return <Instagram />
+                }
+                
+                return <LinkIcon />
+            }) ?? []
+        })
+        
+    }, [links])
 
     useEffect(() => {
         axios.get('https://restcountries.com/v3.1/all?fields=name,flag,region')
@@ -282,7 +337,7 @@ export default function TeamSettings({
                                         </div>
                                         <Field className="gap-2">
                                             {
-                                                links.map((link, idx) => (
+                                                links.map((link, idx: number) => (
                                                     <InputGroup>
                                                         <InputGroupInput name="links[]" value={link} onChange={({target}) => {
                                                             // setData('name', target.value)
@@ -296,7 +351,7 @@ export default function TeamSettings({
                                                         }} />
 
                                                         <InputGroupAddon>
-                                                            <LinkIcon />
+                                                            { linkIcons[idx] }
                                                         </InputGroupAddon>
                                                         <InputGroupAddon align="inline-end">
                                                             <Trash2 onClick={() => setLinks(l => l.filter((_, i) => i !== idx))} className='hover:stroke-foreground cursor-pointer' />

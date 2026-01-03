@@ -12,7 +12,7 @@ import { index as projectsIndex } from '@/routes/teams/projects'
 import { index as jobsIndex } from '@/routes/teams/opportunities'
 import { Opportunity, NavItem, Project, ProjectMember, Team, type BreadcrumbItem, Activity } from '@/types'
 import { Head, Link, router } from '@inertiajs/react'
-import { Camera, Eraser, Globe, MapPin, Pencil, PencilRuler, Instagram, Sparkles, UserPlus, Lightbulb, BriefcaseBusiness, Settings, Image } from 'lucide-react'
+import { Camera, Eraser, Globe, MapPin, Pencil, PencilRuler, Instagram, Sparkles, UserPlus, Lightbulb, BriefcaseBusiness, Settings, Image, LinkIcon } from 'lucide-react'
 import { Facebook, Twitter, Twitch, Youtube } from '@/components/icons/svgs'
 import {
     Dialog,
@@ -609,11 +609,36 @@ export default function TeamProfile({
                             </div>
                             <p className="text-sm text-white">{team.description}</p>
                             <div className='flex items-center gap-3.5 text-white'>
-                                <Facebook className="size-4.5" />
+                                {
+                                    team.meta?.links?.map(l => {
+                                        if (l.toLowerCase().includes('facebook.com')) {
+                                            return <a href={l}><Facebook className="size-4.5" /></a>
+                                        }
+
+                                        if (l.toLowerCase().includes('twitter.com') || l.toLowerCase().includes('x.com')) {
+                                            return <a href={l}><Twitter className="size-4.5" /></a>
+                                        }
+
+                                        if (l.toLowerCase().includes('twitch.tv')) {
+                                            return <a href={l}><Twitch className="size-4.5" /></a>
+                                        }
+
+                                        if (l.toLowerCase().includes('youtube.com')) {
+                                            return <a href={l}><Youtube className="size-4.5" /></a>
+                                        }
+
+                                        if (l.toLowerCase().includes('instagram.com')) {
+                                            return <a href={l}><Instagram className="size-4.5" /></a>
+                                        }
+                                        
+                                        return <a href={l}><LinkIcon className="size-4.5" /></a>
+                                    })
+                                }
+                                {/* <Facebook className="size-4.5" />
                                 <Twitter className="size-4.5" />
                                 <Instagram size={16} />
                                 <Youtube className="size-4.5" />
-                                <Twitch className="size-4.5" />
+                                <Twitch className="size-4.5" /> */}
                                 <Globe className="size-4.5" />
                             </div>
                         </div>
