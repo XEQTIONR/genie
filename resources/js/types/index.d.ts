@@ -107,6 +107,11 @@ export interface Team {
 
     invitations?: TeamInvitation[]
     opportunities?: Opportunity[]
+    locations?: Location[]
+    meta: null | {
+        links?: string[]
+        [key: string]: unknown
+    }
 }
 
 export interface TeamInvitation {

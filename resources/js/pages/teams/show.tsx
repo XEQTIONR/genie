@@ -52,6 +52,7 @@ import Step from '@/components/step'
 import GridCard from '@/components/grid-card'
 import ProjectGridCard from '@/components/project-grid-card'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
+import { Badge } from '@/components/ui/badge'
 
 type ProfileTab = NavItem & {key: string, className?: string}
 
@@ -575,12 +576,35 @@ export default function TeamProfile({
                                     <AvatarImage src={team.avatar} />
                                     <AvatarFallback variant="square" className="text-3xl">{team.name.split(' ').map(word => word.charAt(0)).join("")}</AvatarFallback>
                                 </Avatar>
-                                <div className="flex flex-col justify-center">
+                                <div className="flex flex-col gap-1 justify-center">
                                     <div className="flex items-center gap-2">
                                         <h1 className="text-2xl font-bold text-white">{team.name}</h1> 
                                         <span className="px-1 py-0.5 text-xs font-bold rounded bg-foreground text-background">STUDIO</span>
                                     </div>
-                                    <div className="flex gap-1 items-center text-sm text-white"><MapPin size={16} /> Toronto, ON</div>
+
+                                       
+                                    <div className="flex gap-1 items-center text-sm text-white">
+                                        <MapPin size={16} />
+                                        {
+                                            team.locations && team.locations.length > 0
+                                            ?
+                                            <div className='flex gap-2 items-center'>
+                                                <span>{team.locations[0].city ? team.locations[0].city + ", " + team.locations[0].country : team.locations[0].country}</span>
+                                                {/* <div className="flex gap-3">
+                                                    {
+                                                        team.locations.map(({city, country}) => <span>{city ? city + ", " + country : country}</span>)
+                                                    }
+                                                </div> */}
+                                                {
+                                                    team.locations.length > 1 && <Badge className='' variant="outline">+{team.locations.length-1}</Badge>
+                                                }
+                                            </div> 
+                                            
+                                            : "Worldwide"
+                                        }
+                                    </div>
+
+                                    
                                 </div>
                             </div>
                             <p className="text-sm text-white">{team.description}</p>

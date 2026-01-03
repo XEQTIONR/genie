@@ -236,10 +236,32 @@ class TeamController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|min:2',
             'description' => 'nullable|string',
+            'locations' => 'required|json',
+            'links' => 'nullable|array|min:1'
         ]);
 
         $team->name = $validated['name'];
         $team->description = $validated['description'];
+
+        $locations = json_decode($validated['locations']);
+
+        $team->locations = $locations;
+
+        if($locations === []) {
+            $team->locations = null;
+        }
+
+        if (array_key_exists('links', $validated)) {
+            $meta = $team->meta;
+            $meta['links'] = $validated['links'];
+            $team->meta = $meta;
+        } else {
+            if ($team->meta) {
+                $meta = $team->meta;
+                $meta['links'] = null;
+                $team->meta = $meta;
+            }
+        }
 
         $team->save();
 

@@ -7,8 +7,8 @@ import {  show as jobsShow } from '@/routes/opportunities'
 import { edit as editTeam } from '@/routes/teams'
 import { members as editMembers, opportunities as editJobs } from '@/routes/teams/edit'
 import { index as jobsIndex } from '@/routes/teams/opportunities'
-import { Opportunity, NavItem, Project, ProjectMember, Team, type BreadcrumbItem, Activity } from '@/types'
-import { Form, Head, Link } from '@inertiajs/react'
+import { Opportunity, NavItem, Project, ProjectMember, Team, type BreadcrumbItem, Activity, Location } from '@/types'
+import { Form, Head, Link, router } from '@inertiajs/react'
 import { Camera, Eraser, Globe, MapPin, Pencil, PencilRuler, Instagram, Sparkles, UserPlus, Lightbulb, BriefcaseBusiness, Settings, Image, ChevronRight, BadgeCheck, Users, LinkIcon, Trash, X, Trash2, EllipsisVertical, Mail, Plus } from 'lucide-react'
 import { Facebook, Twitter, Twitch, Youtube } from '@/components/icons/svgs'
 
@@ -36,7 +36,7 @@ import {
   InputGroupText,
   InputGroupTextarea,
 } from "@/components/ui/input-group"
-import { Combobox } from '@/components/ui/combobox'
+import { Combobox, GroupedOptions } from '@/components/ui/combobox'
 import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table'
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card'
 import { Badge } from '@/components/ui/badge'
@@ -44,6 +44,8 @@ import { cn } from '@/lib/utils'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 
 type ProfileTab = NavItem & {key: string, className?: string}
+
+
 
 
 export default function TeamSettings({ 
@@ -69,14 +71,15 @@ export default function TeamSettings({
         { title: "Opportunities", href: editJobs(team), key: "jobs" },
     ]
 
-    const [currentTab, setCurrentTab] = useState(tab)
-    const [locations, setLocations] = useState<{city?: string, country:string}[]>([])
-    const [locationType, setLocationType] = useState('global')
+    const [currentTab] = useState(tab)
+    const [locations, setLocations] = useState<Location[]>(team.locations ?? [])
+    const [locationType, setLocationType] = useState(team.locations ? 'specific': 'global')
 
     const [countryOptions, setCountryOptions] = useState<GroupedOptions>({})
         
     const [inputCity, setInputCity] = useState<string>("")
     const [inputCountry, setInputCountry] = useState<string>("")
+    const [links, setLinks] = useState<string[]>(team.meta?.links ?? [])
 
     useEffect(() => {
         axios.get('https://restcountries.com/v3.1/all?fields=name,flag,region')
@@ -111,16 +114,23 @@ export default function TeamSettings({
                     <Settings className="stroke-background" size={18} />
                 </div> */}
             </div>
-            <div className="w-full max-w-10xl -\h-screen px-4 mx-auto flex flex-col">
+            <div className="w-full max-w-10xl px-4 mx-auto flex flex-col">
                 <div className='w-full h-full grow flex'>
                     <aside className='w-xs border-r flex flex-col gap-3'>
                         <h1 className="font-semibold text-xl">Settings</h1>
                         <div className="flex w-full max-w-md flex-col gap-1 pr-3">
                             {
                                 tabs.map(t => (
-                                    <Button size="sm" className={cn('w-full justify-start', {
-                                        'bg-muted' : (currentTab == t.key)
-                                    })} variant="ghost">
+                                    <Button 
+                                        size="sm" className={cn('w-full justify-start cursor-pointer', {
+                                            'bg-muted' : (currentTab == t.key)
+                                        })} 
+                                        variant="ghost"
+                                        onClick={(e) => {
+                                            e.preventDefault()
+                                            router.visit(t.href)
+                                        }}
+                                    >
                                         {/* <Settings /> */}
                                         <Link href={t.href}>
                                             {t.title}
@@ -135,7 +145,10 @@ export default function TeamSettings({
                             <Form 
                                 action={updateTeam(team)} 
                                 className='w-full px-4 flex flex-col gap-5 items-start'
-                                transform={d => d}
+                                transform={d => ({
+                                    ...d,
+                                    locations: JSON.stringify(locations)
+                                })}
                             >
                                 <input type="hidden" name="field" value="general" />
                                 <FieldGroup className="max-w-lg">
@@ -192,7 +205,7 @@ export default function TeamSettings({
                                             locationType === 'specific' &&
                                             <FieldSet className="w-full mt-4 gap-4">
                                                 {
-                                                    locations.length > 0 &&
+                                                    locations && locations.length > 0 &&
                                                     <div className='w-full flex flex-wrap gap-2'>
                                                     { 
                                                         locations.map((l, idx) => {
@@ -233,8 +246,13 @@ export default function TeamSettings({
                                                 <Button
                                                     onClick={() => {
                                                         const regex = / +/g
-                                                        const city = inputCity === "" ? undefined : inputCity.trim().replaceAll(regex, " ")
-                                                        const idx = locations.findIndex((location) => location.city == city && location.country == inputCountry)
+                                                        const city = inputCity === "" ? null : inputCity.trim().replaceAll(regex, " ")
+                                                        
+                                                        let idx = -1
+                                                        
+                                                        if (locations) {
+                                                            const idx = locations.findIndex((location) => location.city == city && location.country == inputCountry)
+                                                        }
 
                                                         if (idx === -1 && inputCountry.length > 0) {
                                                             setLocations([...locations, { city: city, country: inputCountry }])
@@ -258,9 +276,35 @@ export default function TeamSettings({
                                     <FieldSeparator className='max-w-lg' />
 
                                     <FieldGroup className="max-w-lg gap-2">
-                                        <FieldLabel>Links</FieldLabel>
+                                        <div className='flex justify-between'>
+                                            <FieldLabel>Links</FieldLabel>
+                                            <Button type="button" onClick={() => setLinks(l => [...l, ""])} className="mr-1" variant="ghost" size="icon-sm"><Plus /></Button>
+                                        </div>
                                         <Field className="gap-2">
-                                            <InputGroup>
+                                            {
+                                                links.map((link, idx) => (
+                                                    <InputGroup>
+                                                        <InputGroupInput name="links[]" value={link} onChange={({target}) => {
+                                                            // setData('name', target.value)
+                                                            setLinks(l => l.map((v, i) => {
+                                                                if (i == idx) {
+                                                                    return target.value
+                                                                }
+
+                                                                return v
+                                                            }) )
+                                                        }} />
+
+                                                        <InputGroupAddon>
+                                                            <LinkIcon />
+                                                        </InputGroupAddon>
+                                                        <InputGroupAddon align="inline-end">
+                                                            <Trash2 onClick={() => setLinks(l => l.filter((_, i) => i !== idx))} className='hover:stroke-foreground cursor-pointer' />
+                                                        </InputGroupAddon>
+                                                    </InputGroup>
+                                                ))
+                                            }
+                                            {/* <InputGroup>
                                                 <InputGroupInput onChange={({target}) => {
                                                     // setData('name', target.value)
                                                 }} />
@@ -319,7 +363,7 @@ export default function TeamSettings({
                                                 <InputGroupAddon align="inline-end">
                                                     <Trash2 />
                                                 </InputGroupAddon>
-                                            </InputGroup>
+                                            </InputGroup> */}
                                         </Field>
                                     </FieldGroup>
                                 </FieldGroup>

@@ -21,13 +21,16 @@ class Team extends Model
         'slug',
         'creator_id',
         'owner_id',
-        'avatar'
+        'avatar',
+        'locations',
+        'meta',
     ];
 
     protected function casts(): array
     {
         return [
-            'meta' => 'array'
+            'meta' => 'array',
+            'locations' => 'array',
         ];
     }
 
