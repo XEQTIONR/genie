@@ -49,6 +49,11 @@ class Project extends Model
         return $this->morphTo();
     }
 
+    public function posts(): MorphMany
+    {
+        return $this->morphMany(Post::class, 'owner');
+    }
+
     public function members(): BelongsToMany
     {
         return $this->belongsToMany(User::class)

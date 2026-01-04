@@ -44,7 +44,10 @@ import { store, destroy } from '@/routes/api/likes'
 import { Badge } from "@/components/ui/badge";
 import { Toggle } from "@/components/ui/toggle";
 import { edit } from "@/routes/projects";
+import { show as showPost } from "@/routes/posts";
 import { store as storeView } from '@/routes/api/views'
+import GridCard from "@/components/grid-card";
+import NoPosts from "@/components/no-posts";
 
 export default function ShowProject({ project, h, owns } : { 
     project: Project 
@@ -355,6 +358,29 @@ export default function ShowProject({ project, h, owns } : {
                     <ul ref={sectionNav} className="flex h-full gap-4 text-sm">
                         <li className={cn(
                             "flex items-center px-5 border-b-4 gap-3",
+                            currentTab == 'posts' ? 'border-foreground font-semibold' : 'border-transparent'
+                        )}>
+                            {
+                                currentTab == 'posts' && (
+                                    <SheetTrigger className="md:hidden" asChild>
+                                    {
+                                        sidebarOpen ? <Menu size={16} /> : <ChartNoAxesColumnIncreasing onClick={(e) => e.stopPropagation()} size={16} className="rotate-90" />
+                                    }
+                                    </SheetTrigger>
+                                )
+                            }
+                            <a 
+                                href="#posts" 
+                                className="flex gap-4"
+                                onClick={() => {
+                                    setCurrentTab('posts')
+                                }}
+                            >
+                                Showcase
+                            </a>
+                        </li>
+                        <li className={cn(
+                            "flex items-center px-5 border-b-4 gap-3",
                             currentTab == 'kontent' ? 'border-foreground font-semibold' : 'border-transparent'
                         )}>
                             {
@@ -569,6 +595,25 @@ export default function ShowProject({ project, h, owns } : {
                     //     </div>
                     //     <p className="mt-5">{project.creator?.bio}</p>
                     // </ThreeColLayout>
+                )
+            }
+            {
+                currentTab == 'posts' && (
+                    <section id="posts" className="w-full flex flex-col min-h-[50vh]">
+                    {
+                        project.posts?.length ?? 0 > 0 ?    
+                        <div className="grid auto-rows-min gap-5 md:grid-cols-3 max-w-9xl mx-auto pt-5 px-4">
+                            {
+                                project.posts?.map((post) => (
+                                    <div className="relative overflow-hidden">
+                                        <GridCard showAuthor={false} className="cursor-pointer" onClick={() => router.visit(showPost(post))} post={post} />
+                                    </div>
+                                ))
+                            }
+                        </div> :
+                        <NoPosts />
+                    }
+                    </section>
                 )
             }
             

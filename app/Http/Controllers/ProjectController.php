@@ -138,6 +138,7 @@ class ProjectController extends Controller
             'owner', 
             'creator', 
             'members',
+            'posts',
             'likes' => function(MorphMany $query) {
                 $query->where('user_id', Auth::id());
             }
