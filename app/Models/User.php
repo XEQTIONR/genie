@@ -110,4 +110,10 @@ class User extends Authenticatable
     {
         return $this->morphMany(Like::class, 'likeable');
     }
+
+    public function activities(): HasMany
+    {
+        return $this->hasMany(Activity::class)
+            ->orderByDesc('created_at');
+    }
 }

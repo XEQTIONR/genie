@@ -175,6 +175,27 @@ Route::get('/profile/{user:username}/projects', function(User $user) {
     ]);
 })->name('users.projects.index');
 
+Route::get('/profile/{user:username}/activities', function(User $user) {
+    $me = false;
+    if (Auth::user()) {
+        $user->load([
+            'likes' => function($query) {
+                $query->where('user_id', Auth::id());
+            }
+        ]);
+        if (Auth::id() === $user->id) {
+            $me = true;
+        }
+    }
+    $activities = $user->activities()->with('subject')->get();
+    return Inertia::render('users/show', [
+        'user' => $user,
+        'activities' => $activities,
+        'tab' => 'activities',
+        'me' => $me,
+    ]);
+})->name('users.activites.index');
+
 Route::get('/teams/{team:slug}/opportunities', function (Team $team) {
     return Inertia::render('teams/show', [
         'team' => $team,

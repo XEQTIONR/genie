@@ -1,5 +1,5 @@
 import AppLayout from '@/layouts/app-layout'
-import { ArrowUpRightIcon, Eraser, LayoutGrid } from "lucide-react"
+import { ArrowUpRightIcon, BriefcaseBusiness, Eraser, LayoutGrid, Lightbulb, Sparkle, UserPlus } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Camera, EllipsisVertical, Pencil, PencilRuler, Rocket, Users } from 'lucide-react'
 import axios from 'axios'
@@ -44,13 +44,15 @@ import {
   ItemMedia,
   ItemTitle,
 } from "@/components/ui/item"
-import { NavItem, Project, Team, User, type BreadcrumbItem } from '@/types'
+import { Activity, NavItem, Project, Team, User, type BreadcrumbItem } from '@/types'
 import NoProjects from '@/components/no-projects'
 import { Separator } from '@/components/ui/separator'
 import { type SharedData } from '@/types'
 import { show, about } from '@/routes/users'
 import { index as indexPost, create as createPost, show as showPost } from '@/routes/posts'
 import { show as showTeam } from '@/routes/teams'
+import { show as showProject } from '@/routes/projects'
+import { index as indexActivity } from '@/routes/users/activites'
 import { Spinner } from '@/components/ui/spinner'
 import { store as storeImage } from '@/routes/api/uploads'
 import { update as updateUser } from '@/actions/App/Http/Controllers/UserProfileController'
@@ -64,6 +66,7 @@ import GridCard from '@/components/grid-card'
 import { store as storeLike, destroy as destroyLike } from '@/routes/api/likes'
 import { index as indexProject } from '@/routes/users/projects'
 import ProjectGridCard from '@/components/project-grid-card'
+import Step from '@/components/step'
 
 type ProfileTab = NavItem & {key: string, className?: string}
 
@@ -438,7 +441,18 @@ function BannerDialog({ aspect = 5, image, imageHeight, imageWidth, open, onOpen
     )
 }
 
-export default function Profile({ user, tab = 'showcase', teams, projects } : { user: User, tab: string, teams?: Team[], projects?: Project[] }) {
+export default function Profile({
+    activities,
+    user, 
+    tab = 'showcase', 
+    teams, projects 
+} : {
+    activities: Activity[]
+    user: User, 
+    tab: string, 
+    teams?: Team[], 
+    projects?: Project[] 
+}) {
 
     const [showAvatarDialog, setShowAvatarDialog] = useState(false)
 
@@ -484,7 +498,7 @@ export default function Profile({ user, tab = 'showcase', teams, projects } : { 
 
     const tabs: ProfileTab[] = [
         { title: "Showcase", href: show({ user: user.username }), key: "showcase"},
-        // { title: "Activity", href: "/", key: "activity"},
+        { title: "Activities", href: indexActivity(user), key: "activities"},
         { title: "Projects", href: indexProject(user), key: "projects"},
         { title: "About", href: about({ user: user.username }), key: "about" },
         { title: "Teams / Studios", href: showTeams({ user: user.username }).url, key: "teams"},
@@ -729,6 +743,54 @@ export default function Profile({ user, tab = 'showcase', teams, projects } : { 
                                                 </div>
                                             )
                                             : <NoProjects />
+                )
+            case 'activities':
+                return (
+                    <div className="flex flex-col mx-auto w-full max-w-3xl px-4">
+                        <h3 className="text-xl font-semibold my-6">Activity Log</h3>
+                        {
+                            activities.map(({type, created_at, user, subject, content}) => {
+
+                                switch (type) {
+                                    case "create-project":
+                                        return (
+                                            <Step bg="bg-transparent" step={<PencilRuler className='stroke-dim dark:stroke-foreground' strokeWidth={2} size={18} />}>
+                                                <div className='flex items-center h-4 gap-2 mt-1'>
+                                                    <div className='text-sm'>Created a new project - <Link href={showProject({ project: subject?.slug })} className="font-semibold hover:underline">{subject?.title}</Link></div>
+                                                    <Separator orientation="vertical" className='border-dim w-full bg-dim' />
+                                                    <span className="text-dim text-xs font-semibold">{(new Date(created_at)).toDateString()}</span>
+                                                </div>
+                                            </Step>
+                                        )
+
+                                    case "create-post":
+                                        return (
+                                            <Step bg="bg-transparent"   
+                                                step={<Lightbulb className='stroke-dim dark:stroke-foreground' strokeWidth={2} size={19} />} 
+                                                heading={
+                                                    <div className='flex items-center h-4 gap-2'>
+                                                        <div className='text-sm font-medium'>New idea posted - <Link href={showPost({ post: subject?.id ?? 0})} className="font-semibold hover:underline">{subject?.title}</Link></div>
+                                                        <Separator orientation="vertical" className='border-dim w-full bg-dim' />
+                                                        <span className="text-dim text-xs font-semibold">{(new Date(created_at)).toDateString()}</span>
+                                                    </div>
+                                                }
+                                            >
+                                                <GridCard className="mb-7 mt-1" showAuthor={false} post={subject} />
+                                            </Step>
+                                        )
+                                    
+                                }
+                            })
+                        }
+                        {/* <Step bg="bg-transparent" step={<Send size={16} />} heading={"Some heading"}>
+                            Something
+                        </Step>
+                        <Step step={1}>
+                            <div className='w-full h-32'>
+                                SSADSADA
+                            </div>
+                        </Step> */}
+                    </div>
                 )
             default: 
                 return null
