@@ -70,6 +70,7 @@ import { getCroppedImage } from '@/hooks/use-crop'
 import { Discord, Facebook, LinkedIn, Twitter, Twitch, Youtube } from '@/components/icons/svgs'
 import { PlaceholderPattern } from '@/components/ui/placeholder-pattern'
 import GridCard from '@/components/grid-card'
+import { store as storeLike, destroy as destroyLike } from '@/routes/api/likes'
 
 type ProfileTab = NavItem & {key: string, className?: string}
 
@@ -462,6 +463,18 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
 
     const rz = useDebouncedCallback(() => {setWindowWidth(window.innerWidth)}, 100)
 
+    const [likes, setLikes] = useState(user.likes ?? [])
+
+    const [likeDisabled, setLikeDisabled] = useState(false)
+
+    const [followButtonText, setFollowButtonText] = useState(() => {
+        if (likes.length == 0) {
+            return "Follow"
+        }
+
+        return "Following"
+    })
+
     useEffect(() => {
         window.addEventListener("resize", rz)
         return () => window.removeEventListener("resize", rz)
@@ -474,7 +487,7 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
         {label: 'Contact & socials', name: 'contact'},
     ]
 
-    const { auth } = usePage<SharedData>().props
+    const { auth, apiToken } = usePage<SharedData>().props
 
     const breadcrumbs: BreadcrumbItem[] = [
         {
@@ -830,7 +843,66 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
                         }
                         </span>
                     </div>
-                    <Button variant="secondary" >Follow</Button>
+                    {
+                        auth.user && auth.user.id !== user.id &&
+                        <Button
+                            disabled={likeDisabled}
+                            type="button" 
+                            variant="secondary"
+                            onClick={() => {
+                                if (likes.length == 0) {
+                                    setLikeDisabled(true)
+                                    axios.post(storeLike().url, {
+                                        likeable_id: user.id,
+                                        likeable_type: 'user'
+                                    }, {
+                                        headers: {
+                                            Authorization: 'Bearer ' + apiToken
+                                        }
+                                    }).then(res => {
+                                        setLikes(l => {
+                                            if (l) {
+                                                return [...l, res.data]
+                                            }
+                                            return [res.data]
+                                        })
+                                        setLikeDisabled(false)    
+                                    }).catch(() => {
+                                        setLikeDisabled(false)       
+                                    })
+                                } else {
+                                    setLikeDisabled(true)
+                                    axios.delete(destroyLike(likes[0]).url, {
+                                        headers: {
+                                            Authorization: 'Bearer ' + apiToken
+                                        }
+                                    }).then(() => {
+                                        setLikes([])
+                                        setLikeDisabled(false)
+                                    }).catch(() => {
+                                        setLikeDisabled(false)
+                                    })
+                                }
+                            }}
+                            onMouseEnter={() => {
+                                if (followButtonText == "Following") {
+                                    setFollowButtonText("Unfollow")
+                                }
+                            }}
+                            onMouseLeave={() => {
+                                if (likes.length == 0) {
+                                    setFollowButtonText("Follow")
+                                } else {
+                                    setFollowButtonText("Following")
+                                }
+
+                            }}
+                        >
+                            {followButtonText}
+                        </Button>
+
+                    }
+                    
                 </div>
                 <div className="w-full flex flex-col mx-auto gap-0 items-center z-50 sticky top-0 bg-foreground dark:bg-background border-b shadow-lg dark:shadow-neutral-900/80">
                     <TabbedSectionHeaders

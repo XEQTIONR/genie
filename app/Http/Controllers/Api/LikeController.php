@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Like;
 use App\Models\Post;
 use App\Models\Project;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -19,13 +20,14 @@ class LikeController extends Controller
     {
         $validated = $request->validate([
             'likeable_id' => 'required|numeric',
-            'likeable_type' => 'required|string|in:post,project'
+            'likeable_type' => 'required|string|in:post,project,user'
         ]);
 
         $id = Auth::id();
         $type = match ($validated['likeable_type']) {
             'post' => Post::class,
             'project' => Project::class,
+            'user' => User::class,
         };        
 
         $like = Like::where('likeable_id', $validated['likeable_id'])

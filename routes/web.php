@@ -96,25 +96,61 @@ Route::get('/teams/invitations/{invitation}', [TeamInvitationController::class, 
 Route::put('/teams/invitations/{invitation}', [TeamInvitationController::class, 'update'])->name('teamInvitation.update');
 
 Route::get('/profile/{user:username}', function(User $user) {
+    $me = false;
+    if (Auth::user()) {
+        $user->load([
+            'likes' => function($query) {
+                $query->where('user_id', Auth::id());
+            }
+        ]);
+        if (Auth::id() === $user->id) {
+            $me = true;
+        }
+    }
     $user->load(['posts']);
     return Inertia::render('users/show', [
         'user' => $user,
-        'tab' => 'showcase'
+        'tab' => 'showcase',
+        'me' => $me,
     ]);
 })->name('users.show');
 Route::get('/profile/{user:username}/about', function(User $user) {
+    $me = false;
+    if (Auth::user()) {
+        $user->load([
+            'likes' => function($query) {
+                $query->where('user_id', Auth::id());
+            }
+        ]);
+        if (Auth::id() === $user->id) {
+            $me = true;
+        }
+    }
     $user->load(['ownedProjects']);
     return Inertia::render('users/show', [
         'user' => $user,
-        'tab' => 'about'
+        'tab' => 'about',
+        'me' => $me,
     ]);
 })->name('users.about');
 Route::get('/profile/{user:username}/teams', function(User $user) {
+    $me = false;
+    if (Auth::user()) {
+        $user->load([
+            'likes' => function($query) {
+                $query->where('user_id', Auth::id());
+            }
+        ]);
+        if (Auth::id() === $user->id) {
+            $me = true;
+        }
+    }
     $teams = $user->teams()->withCount(['users', 'projects'])->get();
     return Inertia::render('users/show', [
         'user' => $user,
         'teams' => $teams,
-        'tab' => 'teams'
+        'tab' => 'teams',
+        'me' => $me,
     ]);
 })->name('users.teams.index');
 
@@ -122,7 +158,7 @@ Route::get('/teams/{team:slug}/opportunities', function (Team $team) {
     return Inertia::render('teams/show', [
         'team' => $team,
         'tab' => 'jobs',
-        'opportunities' => OpportunityResource::collection($team->opportunities)
+        'opportunities' => OpportunityResource::collection($team->opportunities),
     ]);
 })->name('teams.opportunities.index');
 

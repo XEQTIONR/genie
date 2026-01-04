@@ -151,6 +151,7 @@ export interface User {
     owned_posts?: Post[]
     teams_count?: number
     projects_count?: number
+    likes?: Like[]
 }
 
 export type Post = {

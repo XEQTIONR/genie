@@ -105,4 +105,9 @@ class User extends Authenticatable
     {
         return $this->morphMany(Post::class, 'owner');
     }
+
+    public function likes(): MorphMany
+    {
+        return $this->morphMany(Like::class, 'likeable');
+    }
 }
