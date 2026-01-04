@@ -53,6 +53,8 @@ import GridCard from '@/components/grid-card'
 import ProjectGridCard from '@/components/project-grid-card'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { Badge } from '@/components/ui/badge'
+import NoJobs from '@/components/no-jobs'
+import NoPosts from '@/components/no-posts'
 
 type ProfileTab = NavItem & {key: string, className?: string}
 
@@ -381,15 +383,21 @@ export default function TeamProfile({
         switch(tab) {
             case 'showcase':
                 return (
-                    <div className="grid auto-rows-min gap-5 md:grid-cols-3 max-w-9xl mx-auto pt-5 px-4">
-                        {
-                            posts.map((post) => (
-                                <div className="relative overflow-hidden">
-                                    <GridCard showAuthor={false} className="cursor-pointer" onClick={() => router.visit(showPost({post: post.id}))} post={post} />
-                                </div>
-                            ))
-                        }
-                    </div>
+                    <section className="w-full flex flex-col">
+                    {
+                        posts.length > 0 ?    
+                        <div className="grid auto-rows-min gap-5 md:grid-cols-3 max-w-9xl mx-auto pt-5 px-4">
+                            {
+                                posts.map((post) => (
+                                    <div className="relative overflow-hidden">
+                                        <GridCard showAuthor={false} className="cursor-pointer" onClick={() => router.visit(showPost({post: post.id}))} post={post} />
+                                    </div>
+                                ))
+                            }
+                        </div> :
+                        <NoPosts />
+                    }
+                    </section>
                 )
             case 'members':
                 return (
@@ -429,26 +437,36 @@ export default function TeamProfile({
                 )
 
             case 'projects':
-                return projects.length > 0
-                    ? (
-                        <div className="flex flex-col mx-auto max-w-8xl px-4">
-                            <h3 className="text-xl font-semibold my-6">Projects</h3>
-                            <div className="grid gap-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 w-full h-full items-start">
-                            { 
-                                projects.map((project) => <ProjectGridCard project={project} />) 
-                            }
+                return (
+                    <section className="w-full flex flex-col">
+                    {
+                        projects.length > 0
+                        ? (
+                            <div className="flex flex-col mx-auto max-w-8xl px-4">
+                                <h3 className="text-xl font-semibold my-6">Projects</h3>
+                                <div className="grid gap-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 w-full h-full items-start">
+                                { 
+                                    projects.map((project) => <ProjectGridCard project={project} />) 
+                                }
+                                </div>
                             </div>
-                        </div>
-                    )
-                    : <NoProjects />
+                        )
+                        : <NoProjects />
+                    }
+                </section>)
 
             case 'jobs':
-                return (<div className="w-full h-full flex flex-col gap-3 max-w-8xl mx-auto px-4">
+                return (<div className="w-full flex flex-col gap-3 max-w-8xl mx-auto px-4 grow shrink-0">
                     {/* <h2 className="text-xl font-bold">Openings</h2> */}
                     <section className="w-full h-full flex flex-col">
-                        <h3 className="text-xl font-semibold mt-6">Current Openings</h3>
+                        
                         {
-                            <OpportunityList opportunities={opportunities?.data ?? []} />
+                            opportunities?.data.length ?? 0 > 0
+                                ? <>
+                                    <h3 className="text-xl font-semibold mt-6">Current Openings</h3>f
+                                    <OpportunityList opportunities={opportunities?.data ?? []} />
+                                </>
+                                : <NoJobs />
                         }
 
 
@@ -689,7 +707,7 @@ export default function TeamProfile({
                     />
                 </div>
                 
-                <div className="w-full h-full md:min-h-[50vh] mx-auto flex overflow-hidden">
+                <div className="w-full h-full md:min-h-[50vh] mx-auto flex items-stretch overflow-hidden">
                     {
                         loading 
                             ? <Spinner className="block m-auto size-6" />

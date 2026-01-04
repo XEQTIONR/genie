@@ -723,7 +723,7 @@ export default function TeamSettings({
                                         !selectedMember && (
                                             <FieldGroup>
                                                 <Field className="gap-2">
-                                                    <FieldLabel>Invitations Sent</FieldLabel>
+                                                    <FieldLabel>Pending Invitations</FieldLabel>
                                                     <Table>
                                                         <TableBody>
                                                         {

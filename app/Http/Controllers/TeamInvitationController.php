@@ -44,6 +44,8 @@ class TeamInvitationController extends Controller
             'permissions' => $permissions,
         ]);
 
+        $invitation->delete();
+
         $activity = new Activity([
             'type' => 'user-added',
             'user_id' => $user->id

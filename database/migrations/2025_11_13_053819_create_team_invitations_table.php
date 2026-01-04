@@ -20,6 +20,7 @@ return new class extends Migration
             $table->json('roles')->nullable();
             $table->json('permissions')->nullable();
             $table->timestamps();
+            $table->softDeletes();
 
             $table->foreign('team_id')->references('id')->on('teams');
             $table->foreign('inviter_id')->references('id')->on('users');

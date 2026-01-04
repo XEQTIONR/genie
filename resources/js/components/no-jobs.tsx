@@ -6,26 +6,26 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@/components/ui/empty"
-import { ArrowUpRight, PencilRuler } from "lucide-react"
+import { ArrowUpRight, BriefcaseBusiness } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { create } from "@/routes/projects"
+import { create } from "@/routes/opportunities"
 import { router } from "@inertiajs/react"
 
-export default function NoProjects() {
+export default function NoJobs() {
     return (
         <Empty className="h-full w-full">
             <EmptyHeader>
                 <EmptyMedia variant="icon">
-                    <PencilRuler />
+                    <BriefcaseBusiness />
                 </EmptyMedia>
-                <EmptyTitle>No projects</EmptyTitle>
+                <EmptyTitle>No opportunities</EmptyTitle>
                 <EmptyDescription>
-                    You don&apos;t have any projects. You are free to create one.
+                    You don&apos;t have any current opportunities. You are free to create one.
                 </EmptyDescription>
             </EmptyHeader>
             <EmptyContent>
                 <div className="flex gap-2"> 
-                    <Button onClick={() => router.visit(create())} className="cursor-pointer">Create a new project</Button>
+                    <Button onClick={() => router.visit(create())} className="cursor-pointer">Create a new opportunity</Button>
                     {/* <Button className="cursor-pointer" variant="outline">Join existing team</Button> */}
                 </div>
             </EmptyContent>
