@@ -1,10 +1,9 @@
 import AppLayout from '@/layouts/app-layout'
-import { ArrowUpRightIcon, Eraser, Eye, Heart, Image, ImageIcon, LayoutGrid } from "lucide-react"
+import { ArrowUpRightIcon, Eraser, LayoutGrid } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { AtSign, Camera, EllipsisVertical, Gamepad2, Globe, Hammer, Lightbulb, LinkIcon, Mail, MapPin, Pencil, PencilRuler, Plus, Rocket, Trash, UserPlus, Users, X, } from 'lucide-react'
+import { Camera, EllipsisVertical, Pencil, PencilRuler, Rocket, Users } from 'lucide-react'
 import axios from 'axios'
-import { Badge } from '@/components/ui/badge'
-import { Button, buttonVariants } from '@/components/ui/button'
+import { Button } from '@/components/ui/button'
 import { Combobox, GroupedOptions, Option } from '@/components/ui/combobox'
 import { cn } from '@/lib/utils'
 import { create as createTeam } from '@/routes/teams'
@@ -33,9 +32,7 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@/components/ui/empty"
-import { FieldDescription } from "@/components/ui/field"
-import { Form, useForm, usePage } from '@inertiajs/react'
-import { Godot, Unity, Unreal } from '@/components/icons/create'
+import { useForm, usePage } from '@inertiajs/react'
 import { Head, Link, router } from '@inertiajs/react'
 import { index as showTeams } from '@/routes/users/teams'
 import { Input } from "@/components/ui/input"
@@ -47,12 +44,8 @@ import {
   ItemMedia,
   ItemTitle,
 } from "@/components/ui/item"
-import { Label } from '@/components/ui/label'
-import { NavItem, Team, User, type BreadcrumbItem } from '@/types'
+import { NavItem, Project, Team, User, type BreadcrumbItem } from '@/types'
 import NoProjects from '@/components/no-projects'
-import ProjectCard from '@/components/project-card'
-import roles from '@/data/roles'
-import SearchBar from '@/components/ui/search-bar'
 import { Separator } from '@/components/ui/separator'
 import { type SharedData } from '@/types'
 import { show, about } from '@/routes/users'
@@ -62,15 +55,15 @@ import { Spinner } from '@/components/ui/spinner'
 import { store as storeImage } from '@/routes/api/uploads'
 import { update as updateUser } from '@/actions/App/Http/Controllers/UserProfileController'
 import { TabbedSectionHeaders } from '@/components/ui/tabbed-sections'
-import { Textarea } from '@/components/ui/textarea'
 import { useEffect, useState } from 'react'
 import { useDebouncedCallback } from 'use-debounce'
 import { Slider } from '@/components/ui/slider'
 import { getCroppedImage } from '@/hooks/use-crop'
 import { Discord, Facebook, LinkedIn, Twitter, Twitch, Youtube } from '@/components/icons/svgs'
-import { PlaceholderPattern } from '@/components/ui/placeholder-pattern'
 import GridCard from '@/components/grid-card'
 import { store as storeLike, destroy as destroyLike } from '@/routes/api/likes'
+import { index as indexProject } from '@/routes/users/projects'
+import ProjectGridCard from '@/components/project-grid-card'
 
 type ProfileTab = NavItem & {key: string, className?: string}
 
@@ -445,7 +438,7 @@ function BannerDialog({ aspect = 5, image, imageHeight, imageWidth, open, onOpen
     )
 }
 
-export default function Profile({ user, tab = 'showcase', teams } : { user: User, tab: string, teams: Team[] }) {
+export default function Profile({ user, tab = 'showcase', teams, projects } : { user: User, tab: string, teams?: Team[], projects?: Project[] }) {
 
     const [showAvatarDialog, setShowAvatarDialog] = useState(false)
 
@@ -480,13 +473,6 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
         return () => window.removeEventListener("resize", rz)
     }, [rz])
 
-    const sectionLabels = [
-        {label: 'Overview', name: 'overview'},
-        {label: 'Skills & tools', name: 'skills'},
-        {label: 'Projects & releases', name: 'projects'},
-        {label: 'Contact & socials', name: 'contact'},
-    ]
-
     const { auth, apiToken } = usePage<SharedData>().props
 
     const breadcrumbs: BreadcrumbItem[] = [
@@ -499,6 +485,7 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
     const tabs: ProfileTab[] = [
         { title: "Showcase", href: show({ user: user.username }), key: "showcase"},
         // { title: "Activity", href: "/", key: "activity"},
+        { title: "Projects", href: indexProject(user), key: "projects"},
         { title: "About", href: about({ user: user.username }), key: "about" },
         { title: "Teams / Studios", href: showTeams({ user: user.username }).url, key: "teams"},
     ]
@@ -727,6 +714,21 @@ export default function Profile({ user, tab = 'showcase', teams } : { user: User
                         )
                     }
                     </div>
+                )
+            case "projects":
+                return (
+                    projects?.length ?? 0 > 0
+                                            ? (
+                                                <div className="flex flex-col mx-auto max-w-8xl px-4">
+                                                    <h3 className="text-xl font-semibold my-6">Projects</h3>
+                                                    <div className="grid gap-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 w-full h-full items-start">
+                                                    { 
+                                                        projects?.map((project) => <ProjectGridCard project={project} />) 
+                                                    }
+                                                    </div>
+                                                </div>
+                                            )
+                                            : <NoProjects />
                 )
             default: 
                 return null
