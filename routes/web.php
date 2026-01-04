@@ -83,13 +83,14 @@ Route::get('/teams/{team:slug}/projects', function(Team $team) {
     ]);
 })->name('teams.projects.index');
 
-Route::get('/teams/{team:slug}/activities', [TeamController::class, 'showActivity'])->name('teams.activities');
+Route::get('/teams/{team:slug}/activities', [TeamController::class, 'showActivity'])->name('teams.activities.index');
 
 Route::get('/users', [UserProfileController::class, 'index'])->name('users.index');
 
 
 Route::get('/projects', [ProjectController::class, 'index'])->name('projects.index');
 Route::get('/projects/{project:slug}', [ProjectController::class, 'show'])->name('projects.show');
+Route::get('/projects/{project:slug}/activities', [ProjectController::class, 'showActivity'])->name('projects.activites.index');
 Route::get('/projects/invitations/{invitation}', [ProjectInvitationController::class, 'show'])->name('projectInvitation.show');
 Route::put('/projects/invitations/{invitation}', [ProjectInvitationController::class, 'update'])->name('projectInvitation.update');
 Route::get('/teams/invitations/{invitation}', [TeamInvitationController::class, 'show'])->name('teamInvitation.show');
