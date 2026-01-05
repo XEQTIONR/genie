@@ -387,27 +387,6 @@ export default function ShowProject({ project, h, owns, tab = 'kontent', activit
                             <ul ref={sectionNav} className="flex h-full gap-4 text-sm">
                                 <li className={cn(
                                     "flex items-center px-5 border-b-4 gap-3",
-                                    currentTab == 'posts' ? 'border-foreground font-semibold' : 'border-transparent'
-                                )}>
-                                    {
-                                        currentTab == 'posts' && (
-                                            <SheetTrigger className="md:hidden" asChild>
-                                            {
-                                                sidebarOpen ? <Menu size={16} /> : <ChartNoAxesColumnIncreasing onClick={(e) => e.stopPropagation()} size={16} className="rotate-90" />
-                                            }
-                                            </SheetTrigger>
-                                        )
-                                    }
-                                    <Link
-                                        preserveScroll
-                                        href={postsIndex(project)} 
-                                        className="flex gap-4"
-                                    >
-                                        Showcase
-                                    </Link>
-                                </li>
-                                <li className={cn(
-                                    "flex items-center px-5 border-b-4 gap-3",
                                     currentTab == 'kontent' ? 'border-foreground font-semibold' : 'border-transparent'
                                 )}>
                                     {
@@ -427,6 +406,28 @@ export default function ShowProject({ project, h, owns, tab = 'kontent', activit
                                         Project
                                     </Link>
                                 </li>
+                                <li className={cn(
+                                    "flex items-center px-5 border-b-4 gap-3",
+                                    currentTab == 'posts' ? 'border-foreground font-semibold' : 'border-transparent'
+                                )}>
+                                    {
+                                        currentTab == 'posts' && (
+                                            <SheetTrigger className="md:hidden" asChild>
+                                            {
+                                                sidebarOpen ? <Menu size={16} /> : <ChartNoAxesColumnIncreasing onClick={(e) => e.stopPropagation()} size={16} className="rotate-90" />
+                                            }
+                                            </SheetTrigger>
+                                        )
+                                    }
+                                    <Link
+                                        preserveScroll
+                                        href={postsIndex(project)} 
+                                        className="flex gap-4"
+                                    >
+                                        Showcase
+                                    </Link>
+                                </li>
+                                
                                 <li className={cn(
                                     "flex items-center px-5 border-b-4",
                                     currentTab == 'second' ? 'border-foreground font-semibold' : 'border-transparent'
@@ -740,15 +741,18 @@ export default function ShowProject({ project, h, owns, tab = 'kontent', activit
                 </div>
                 <div className={ cn(
                     "sticky top-0",
-                    "transition-all duration-300 overflow-x-clip",
+                    "transition-all duration-300",
                     o ? "w-sm" : "w-0"
                 )}>
-                    <div className="w-sm h-full flex ">
-                        <div className="h-full w-10 border-r flex flex-col items-center ">
-                        </div>
-                        <Button onClick={() => setO(!o)} variant="outline" size="icon-sm" className="sticky top-32 -translate-x-4 scrollbar-hide rounded-full">
-                            <X />
-                        </Button>
+                    <div className="w-sm h-full flex border-l">
+                        {
+                            o && (
+                                <Button onClick={() => setO(!o)} variant="secondary" size="icon-sm" className="sticky top-32 -translate-x-4 scrollbar-hide rounded-full">
+                                    <X />
+                                </Button>
+                            )
+                        }
+                        
                         <div className="w-full grid grid-cols-1 gap-3 h-screen overflow-y-scroll sticky top-0">
                             <div className="w-full h-64 bg-amber-500">
                                 X
