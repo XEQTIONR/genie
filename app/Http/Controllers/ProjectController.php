@@ -111,7 +111,7 @@ class ProjectController extends Controller
         $project->activities()->save($activity);
 
         return to_route('projects.members.create', ['project' => $project]);
-}
+    }
 
     /**
      * Display the specified resource.
@@ -138,7 +138,6 @@ class ProjectController extends Controller
             'owner', 
             'creator', 
             'members',
-            'posts',
             'likes' => function(MorphMany $query) {
                 $query->where('user_id', Auth::id());
             }
@@ -329,13 +328,64 @@ class ProjectController extends Controller
             ->orderByDesc('created_at')
             ->paginate(5);
 
-        //return 
-
         return Inertia::render('projects/show', [
             'project' => $project,
             'owns' => $owns,
             'activities' => $activities,
             'tab' => 'activities'
+        ]);
+    }
+
+
+    public function showPosts(Project $project)
+    {
+        $user = Auth::user();
+
+        if ($project->visibility === 'private') 
+        {
+            if (! $user) 
+            {
+                session()->put('url.intended', URL::full());
+                return redirect(route('login'));
+            }
+            
+            if (! Gate::allows('view-project', $project)) 
+            {
+                abort(403);
+            }
+        }
+
+        $project->load([
+            'owner', 
+            'creator', 
+            'posts',
+            'likes' => function(MorphMany $query) {
+                $query->where('user_id', Auth::id());
+            }
+        ])->withCount(['likes', 'views']);
+
+        $owns = false;
+
+        if ($user) 
+        {
+            if ($project->owner_id == $user->id && $project->owner_type === User::class) 
+            {
+                $owns = true;
+            } 
+            else if ($project->owner_type === Team::class) 
+            {
+                //Project->Team->User
+                $owner = $project->owner->owner;
+                if ($owner->id == $user->id) {
+                    $owns = true;
+                }
+            }
+        }
+
+        return Inertia::render('projects/show', [
+            'project' => $project,
+            'owns' => $owns,
+            'tab' => 'posts'
         ]);
     }
 }

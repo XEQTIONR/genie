@@ -43,7 +43,8 @@ import { usePage } from '@inertiajs/react'
 import { store, destroy } from '@/routes/api/likes'
 import { Badge } from "@/components/ui/badge"
 import { Toggle } from "@/components/ui/toggle"
-import { edit } from "@/routes/projects"
+import { edit, show } from "@/routes/projects"
+import { index as postsIndex } from "@/routes/projects/posts"
 import { show as showPost } from "@/routes/posts"
 import { index as activitiesIndex } from "@/routes/projects/activites"
 import { store as storeView } from '@/routes/api/views'
@@ -375,15 +376,13 @@ export default function ShowProject({ project, h, owns, tab = 'kontent', activit
                                     </SheetTrigger>
                                 )
                             }
-                            <a 
-                                href="#posts" 
+                            <Link
+                                preserveScroll
+                                href={postsIndex(project)} 
                                 className="flex gap-4"
-                                onClick={() => {
-                                    setCurrentTab('posts')
-                                }}
                             >
                                 Showcase
-                            </a>
+                            </Link>
                         </li>
                         <li className={cn(
                             "flex items-center px-5 border-b-4 gap-3",
@@ -398,15 +397,13 @@ export default function ShowProject({ project, h, owns, tab = 'kontent', activit
                                     </SheetTrigger>
                                 )
                             }
-                            <a 
-                                href="#kontent" 
+                            <Link
+                                preserveScroll
+                                href={show(project)} 
                                 className="flex gap-4"
-                                onClick={() => {
-                                    setCurrentTab('kontent')
-                                }}
                             >
                                 Project
-                            </a>
+                            </Link>
                         </li>
                         <li className={cn(
                             "flex items-center px-5 border-b-4",
@@ -433,9 +430,10 @@ export default function ShowProject({ project, h, owns, tab = 'kontent', activit
                         </li>
                         <li className={cn(
                             "flex items-center px-5 border-b-4",
-                            currentTab == 'settings' ? 'border-foreground font-semibold' : 'border-transparent'
+                            currentTab == 'activities' ? 'border-foreground font-semibold' : 'border-transparent'
                         )}>
-                            <Link 
+                            <Link
+                                preserveScroll 
                                 href={activitiesIndex(project)}
                             >
                                 Activities

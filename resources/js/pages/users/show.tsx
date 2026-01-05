@@ -855,21 +855,21 @@ export default function Profile({
                             <Pencil />
                         </Button> :
                         <div className="flex flex-row gap-2 items-center shrink-0">
-                                <span className="hidden lg:inline mr-3 text-sm text-white">Let's build something together</span>
-                                <Button className="cursor-pointer">Get in touch</Button>
-                                <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
-                                        <Button className="cursor-pointer" variant="outline" size="icon"><EllipsisVertical /></Button>
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent sideOffset={10} className="dark:bg-neutral-900" align="end">
-                                        <DropdownMenuLabel>Options</DropdownMenuLabel>
-                                        <DropdownMenuSeparator />
-                                        <DropdownMenuItem className="cursor-pointer">Contact</DropdownMenuItem>
-                                        <DropdownMenuItem className="cursor-pointer">Add to team</DropdownMenuItem>
-                                        <DropdownMenuItem className="cursor-pointer">Block</DropdownMenuItem>
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
-                            </div>
+                            <span className="hidden lg:inline mr-3 text-sm text-white">Let's build something together</span>
+                            <Button className="cursor-pointer">Get in touch</Button>
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <Button className="cursor-pointer" variant="outline" size="icon"><EllipsisVertical /></Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent sideOffset={10} className="dark:bg-neutral-900" align="end">
+                                    <DropdownMenuLabel>Options</DropdownMenuLabel>
+                                    <DropdownMenuSeparator />
+                                    <DropdownMenuItem className="cursor-pointer">Contact</DropdownMenuItem>
+                                    <DropdownMenuItem className="cursor-pointer">Add to team</DropdownMenuItem>
+                                    <DropdownMenuItem className="cursor-pointer">Block</DropdownMenuItem>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+                        </div>
                     }
                     </div>
                 </div>

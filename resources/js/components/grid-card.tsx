@@ -85,12 +85,12 @@ export default function GridCard({
                 <div className="flex items-center gap-1.5">
                     {
                         variant ? (
-                            <Avatar className='size-7' variant={variant}>
-                                <AvatarImage src={post.owner?.avatar} />
+                            <Avatar className='size-6' variant={variant}>
+                                <AvatarImage className='size-6' src={post.owner?.avatar} />
                                 <AvatarFallback variant={variant} className="text-xxs">{getInitials(post.owner?.name ?? "")}</AvatarFallback>
                             </Avatar>
                         ) : (
-                            <PencilRuler className='size-7' />
+                            <PencilRuler className='size-5' />
                         )
                     }
                     

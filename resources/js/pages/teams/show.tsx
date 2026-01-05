@@ -2,7 +2,8 @@ import { Button } from '@/components/ui/button'
 import AppLayout from '@/layouts/app-layout'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import axios from 'axios'
-import { edit, show, activities as teamActivities } from '@/routes/teams'
+import { edit, show } from '@/routes/teams'
+import { index as teamActivities } from '@/routes/teams/activities'
 import { show as showJobPosting } from "@/routes/opportunities"
 import { show as showUser } from '@/routes/users'
 import { show as showProject } from '@/routes/projects'
@@ -12,7 +13,7 @@ import { index as projectsIndex } from '@/routes/teams/projects'
 import { index as jobsIndex } from '@/routes/teams/opportunities'
 import { Opportunity, NavItem, Project, ProjectMember, Team, type BreadcrumbItem, Activity, Post } from '@/types'
 import { Head, Link, router } from '@inertiajs/react'
-import { Camera, Eraser, Globe, MapPin, Pencil, PencilRuler, Instagram, Sparkles, UserPlus, Lightbulb, BriefcaseBusiness, Settings, Image, LinkIcon } from 'lucide-react'
+import { Camera, Eraser, Globe, MapPin, PencilRuler, Instagram, Sparkles, UserPlus, Lightbulb, BriefcaseBusiness, Settings, Image, LinkIcon } from 'lucide-react'
 import { Facebook, Twitter, Twitch, Youtube } from '@/components/icons/svgs'
 import {
     Dialog,
@@ -587,7 +588,7 @@ export default function TeamProfile({
                 onOpenChange={setShowBannerDialog}
                 close={() => setShowBannerDialog(false)}
             />
-            <div className="flex h-full flex-col overflow-x-auto">
+            <div className="flex h-full flex-col">
                 <div
                     style={team.banner ? { backgroundImage: `url("${team.banner}")` } : {
                         backgroundImage: `url("/pattern_10.jpg")`, //TODO: Fix hardcoded image
@@ -696,7 +697,7 @@ export default function TeamProfile({
                     }
                     </div>
                 </div>
-                <div className="w-full block mx-auto">
+                <div className="w-full flex flex-col mx-auto gap-0 items-center z-50 sticky top-0 bg-foreground dark:bg-background border-b shadow-lg dark:shadow-neutral-900/80">
                     <TabbedSectionHeaders
                         className="px-1 bg-foreground/5 dark:bg-red-500/2"
                         current={tab}
