@@ -10,9 +10,16 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { useInitials } from '@/hooks/use-initials'
 import { Separator } from '@/components/ui/separator'
 import { Button } from '@/components/ui/button'
-import { Heart, Pencil } from 'lucide-react'
+import { Heart, MessageCircle, Pencil, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { edit } from '@/routes/posts'
+import {
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+} from "@/components/ui/resizable"
+
+import { usePanelRef } from "react-resizable-panels"
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -35,8 +42,12 @@ export default function ShowPost({post, owns} : {post: Post, owns: boolean}) {
     const [likes, setLikes] = useState(post.likes ?? [])
     const [likeClasses, setLikeClasses] = useState("")
     const [likeButtonDisabled, setLikeButtonDisabled] = useState(false)
-
+    const [o, setO] = useState(false)
+    
     const { apiToken, auth } = usePage<SharedData>().props
+
+    const pref = usePanelRef();
+
     useEffect(() => {
         axios.post(storeView().url, {
             viewable_type: 'post',
@@ -49,8 +60,16 @@ export default function ShowPost({post, owns} : {post: Post, owns: boolean}) {
             .then(res => console.log('storeView response:', res))
             .catch(e => console.log('error:', e))
     }, [])
-    return <AppLayout breadcrumbs={breadcrumbs}>
+    return (
+    <AppLayout breadcrumbs={breadcrumbs}>
         {
+            !o && (
+                <div className="size-10 sticky top-1/2 left-full -translate-x-2 z-100 flex flex-col gap-1 -mt-10">
+                    <Button variant="outline" onClick={() => setO(!o)} size="icon"><MessageCircle /></Button>
+                </div>
+            )
+        }
+        <ResizablePanelGroup>
             <div className="w-full flex flex-col mx-auto max-w-5xl gap-6">
                 {/* <p>
                     {
@@ -206,7 +225,77 @@ export default function ShowPost({post, owns} : {post: Post, owns: boolean}) {
                 </div>
                 
             </div>
+            <div className={ cn(
+                "sticky top-0",
+                "transition-all duration-300 overflow-x-clip",
+                o ? "w-sm" : "w-0"
+            )}>
+                <div className="w-sm h-full flex ">
+                    <div className="h-full w-10 border-r flex flex-col items-center ">
+                    </div>
+                    <Button onClick={() => setO(!o)} variant="outline" size="icon-sm" className="sticky top-32 -translate-x-4 scrollbar-hide rounded-full">
+                        <X />
+                    </Button>
+                    <div className="w-full grid grid-cols-1 gap-3 h-screen overflow-y-scroll sticky top-0">
+                        <div className="w-full h-64 bg-amber-500">
+                            X
+                        </div>
+
+                        <div className="w-full h-96 bg-green-600">
+                            X
+                        </div>
+
+                        <div className="w-full h-80 bg-cyan-600">
+                            X
+                        </div>
+                        <div className="w-full h-80 bg-amber-500">
+                            X
+                        </div>
+                        <div className="w-full h-80 bg-blue-500">
+                            X
+                        </div>
+                        <div className="w-full h-80 bg-amber-500">
+                            X
+                        </div>
+
+                        <div className="w-full h-80 bg-cyan-600">
+                            X
+                        </div>
+                        <div className="w-full h-80 bg-amber-500">
+                            X
+                        </div>
+                        <div className="w-full h-80 bg-blue-500">
+                            X
+                        </div>
+                        <div className="w-full h-80 bg-amber-500">
+                            X
+                        </div>
+
+                        <div className="w-full h-80 bg-blue-500">
+                            X
+                        </div>
+                        <div className="w-full h-80 bg-amber-500">
+                            X
+                        </div>
+
+                        <div className="w-full h-80 bg-cyan-600">
+                            X
+                        </div>
+                        <div className="w-full h-80 bg-amber-500">
+                            X
+                        </div>
+                        <div className="w-full h-80 bg-blue-500">
+                            X
+                        </div>
+                        <div className="w-full h-80 bg-amber-500">
+                            X
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </ResizablePanelGroup>
             
-        }
-    </AppLayout>
+        
+    </AppLayout>)
 }
