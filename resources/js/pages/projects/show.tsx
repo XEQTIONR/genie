@@ -58,6 +58,8 @@ import {
 } from "@/components/ui/resizable"
 
 import { usePanelRef } from "react-resizable-panels";
+import CommentForm from "@/components/comment-form";
+import CommentItem from "@/components/comment-item";
 
 export default function ShowProject({ project, h, owns, tab = 'kontent', activities } : { 
     project: Project 
@@ -91,7 +93,7 @@ export default function ShowProject({ project, h, owns, tab = 'kontent', activit
     const { apiToken, auth } = usePage<SharedData>().props
 
     const pref = usePanelRef();
-
+    const [comments, setComments] = useState(project?.comments ?? [])
 
     useEffect(() => {
         axios.post(storeView().url, {
@@ -160,9 +162,9 @@ export default function ShowProject({ project, h, owns, tab = 'kontent', activit
     }
 
     const [o, setO] = useState(false)
-
+    
     return (
-        <AppLayout maxBodyWidth="w-full scroll-smooth relative" breadcrumbs={breadcrumbs}>
+        <AppLayout maxBodyWidth="w-full" breadcrumbs={breadcrumbs}>
             <Head title="Show Project" />
             {
                 !o && (
@@ -742,9 +744,9 @@ export default function ShowProject({ project, h, owns, tab = 'kontent', activit
                 <div className={ cn(
                     "sticky top-0",
                     "transition-all duration-300",
-                    o ? "w-sm" : "w-0"
+                    o ? "w-md" : "w-0"
                 )}>
-                    <div className="w-sm h-full flex border-l">
+                    <div className="w-md h-full flex border-l">
                         {
                             o && (
                                 <Button onClick={() => setO(!o)} variant="secondary" size="icon-sm" className="sticky top-32 -translate-x-4 scrollbar-hide rounded-full">
@@ -753,61 +755,28 @@ export default function ShowProject({ project, h, owns, tab = 'kontent', activit
                             )
                         }
                         
-                        <div className="w-full grid grid-cols-1 gap-3 h-screen overflow-y-scroll sticky top-0">
-                            <div className="w-full h-64 bg-amber-500">
-                                X
+                        <div className="w-md h-full flex">
+                            {/* <div className="h-full w-5 border-r flex flex-col items-center ">
                             </div>
-
-                            <div className="w-full h-96 bg-green-600">
-                                X
+                            <Button onClick={() => setO(!o)} variant="outline" size="icon-sm" className="sticky top-32 -translate-x-4 scrollbar-hide rounded-full">
+                                <X />
+                            </Button> */}
+                            <div className="w-full flex flex-col gap-3 h-[90vh] overflow-y-scroll sticky top-19">
+                                <h1 className='text-xl font-bold'>Comments</h1>
+                                {
+                                    auth.user && <CommentForm 
+                                        className='relative -left-4' 
+                                        commentableId={project.id}
+                                        commentableType='project'
+                                        user={auth.user}
+                                        onSuccess={(newComment) => setComments(c => [newComment, ...c,])}
+                                        onError={(e) => console.log('error:', e)}
+                                    />
+                                }
+                                {
+                                    comments.map(comment => <CommentItem className='relative -left-4' comment={comment} />)
+                                }
                             </div>
-
-                            <div className="w-full h-80 bg-cyan-600">
-                                X
-                            </div>
-                            <div className="w-full h-80 bg-amber-500">
-                                X
-                            </div>
-                            <div className="w-full h-80 bg-blue-500">
-                                X
-                            </div>
-                            <div className="w-full h-80 bg-amber-500">
-                                X
-                            </div>
-
-                            <div className="w-full h-80 bg-cyan-600">
-                                X
-                            </div>
-                            <div className="w-full h-80 bg-amber-500">
-                                X
-                            </div>
-                            <div className="w-full h-80 bg-blue-500">
-                                X
-                            </div>
-                            <div className="w-full h-80 bg-amber-500">
-                                X
-                            </div>
-
-                            <div className="w-full h-80 bg-blue-500">
-                                X
-                            </div>
-                            <div className="w-full h-80 bg-amber-500">
-                                X
-                            </div>
-
-                            <div className="w-full h-80 bg-cyan-600">
-                                X
-                            </div>
-                            <div className="w-full h-80 bg-amber-500">
-                                X
-                            </div>
-                            <div className="w-full h-80 bg-blue-500">
-                                X
-                            </div>
-                            <div className="w-full h-80 bg-amber-500">
-                                X
-                            </div>
-
                         </div>
                     </div>
                 </div>

@@ -68,6 +68,7 @@ export interface Project {
     likes_count?: number
     likes: Like[]
     posts?: Post[]
+    comments?: Comment[]
     visibility: "public" | "private"
 }
 
@@ -201,6 +202,7 @@ export interface Comment {
     user?: User
     commentable?: Post|Project
     comment: string
+    created_at: string
 }
 export interface Like {
     id: number

@@ -37,7 +37,7 @@ class CommentController extends Controller
 
         switch($validated['commentable_type']) {
             case 'project':
-                $project = Project::find($validated(['commentable_id']));
+                $project = Project::find($validated['commentable_id']);
                 $project->comments()->save($comment);
                 break;
 

@@ -31,6 +31,8 @@ import {
 import { usePanelRef } from "react-resizable-panels"
 import { Textarea } from '@/components/ui/textarea'
 import { Item, ItemContent, ItemDescription, ItemMedia, ItemTitle } from '@/components/ui/item'
+import CommentItem from '@/components/comment-item'
+import CommentForm from '@/components/comment-form'
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -75,7 +77,7 @@ export default function ShowPost({post, owns} : {post: Post, owns: boolean}) {
             .catch(e => console.log('error:', e))
     }, [])
     return (
-    <AppLayout maxBodyWidth='w-full' breadcrumbs={breadcrumbs}>
+    <AppLayout breadcrumbs={breadcrumbs}>
         {
             !o && (
                 <div className="size-10 sticky top-1/2 left-full -translate-x-2 z-100 flex flex-col gap-1 -my-10">
@@ -83,7 +85,7 @@ export default function ShowPost({post, owns} : {post: Post, owns: boolean}) {
                 </div>
             )
         }
-        <ResizablePanelGroup>
+        <ResizablePanelGroup className='w-screen'>
             <div className="w-full flex flex-col mx-auto max-w-5xl gap-6">
                 <div className="flex gap-5 items-center mt-10">
                     <h1 className='text-2xl font-semibold'>{post.title}</h1>
@@ -247,86 +249,18 @@ export default function ShowPost({post, owns} : {post: Post, owns: boolean}) {
                     <div className="w-full flex flex-col gap-3 h-[90vh] overflow-y-scroll sticky top-19">
                         <h1 className='text-xl font-bold'>Comments</h1>
                         {
-                            auth.user && (
-                                <Item  className='relative -left-4'>
-                                    <ItemMedia>
-                                        <Avatar className="size-7">
-                                            <AvatarImage src={auth.user.avatar} />
-                                            <AvatarFallback>{getInitials(auth.user.name ?? "")}</AvatarFallback>
-                                        </Avatar>
-                                    </ItemMedia>
-                                    <ItemContent>
-                                        <ItemDescription>
-                                        <InputGroup>
-                                             <InputGroupTextarea value={comment} onChange={(e) => setComment(e.target.value)} placeholder="Write your comment ..." />
-                                             <InputGroupAddon align="block-end">
-                                            
-                                             <InputGroupButton
-                                                variant="secondary"
-                                                className="rounded-full ml-auto"
-                                                size="icon-sm"
-                                                onClick={() => {
-                                                    axios.post(storeComment().url, {
-                                                        commentable_type: 'post',
-                                                        commentable_id: post.id,
-                                                        comment,
-                                                    }, {
-                                                        headers: {
-                                                            Authorization: 'Bearer ' + apiToken
-                                                        }
-                                                    })
-                                                        .then(res => {
-                                                            setComments(c => [res.data, ...c,])
-                                                            setComment("") 
-                                                        })
-                                                        .catch(e => console.log('error:', e))
-                                                    
-                                                }}
-                                            >
-                                                <Send  />
-                                                <span className="sr-only">Send</span>
-                                            </InputGroupButton>
-                                            </InputGroupAddon>
-                                        </InputGroup>
-                                        </ItemDescription>
-                                    </ItemContent>
-                                </Item>
-                            )
+                            auth.user && <CommentForm 
+                                className='relative -left-4' 
+                                commentableId={post.id}
+                                commentableType='post'
+                                user={auth.user}
+                                onSuccess={(newComment) => setComments(c => [newComment, ...c,])}
+                                onError={(e) => console.log('error:', e)}
+                            />
                         }
-
                         {
-                            comments.map(comment => (
-                                // <div className='w-full flex flex-col gap-2'>
-                                //     <div className='w-full flex items-center gap-2'>
-                                //         <Avatar className="size-7">
-                                //             <AvatarImage src={comment.user?.avatar} />
-                                //             <AvatarFallback>{getInitials(comment.user?.name ?? "")}</AvatarFallback>
-                                //         </Avatar>
-                                //         <span className='text-sm'>{ comment.user?.name }</span>
-                                //     </div>
-                                //     <div 
-                                //         dangerouslySetInnerHTML={{__html: comment.comment.replace(/(?:\r\n|\r|\n)/g, '<br>') }}
-                                //     />
-                                // </div>
-                                <Item className='relative -left-4'>
-                                    <ItemMedia>
-                                        <Avatar className="size-7">
-                                            <AvatarImage src={comment.user?.avatar} />
-                                            <AvatarFallback>{getInitials(comment.user?.name ?? "")}</AvatarFallback>
-                                        </Avatar>
-                                    </ItemMedia>
-                                    <ItemContent>
-                                        <ItemTitle>{comment.user?.name}</ItemTitle>
-                                        <ItemDescription 
-                                            className='text-foreground line-clamp-none' 
-                                            dangerouslySetInnerHTML={{__html: comment.comment.replace(/(?:\r\n|\r|\n)/g, '<br>') }} 
-                                        />
-                                    </ItemContent>
-                                </Item>
-                            ))
+                            comments.map(comment => <CommentItem className='relative -left-4' comment={comment} />)
                         }
-                        
-
                     </div>
                 </div>
             </div>

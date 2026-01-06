@@ -140,7 +140,8 @@ class ProjectController extends Controller
             'members',
             'likes' => function(MorphMany $query) {
                 $query->where('user_id', Auth::id());
-            }
+            },
+            'comments.user'
         ])->withCount(['likes', 'views']);
 
         $owns = false;
