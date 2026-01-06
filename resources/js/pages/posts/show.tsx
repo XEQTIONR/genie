@@ -3,6 +3,7 @@ import { Post, BreadcrumbItem, SharedData } from '@/types'
 import { useEffect, useState } from 'react'
 import { store as storeView } from '@/routes/api/views'
 import { store as storeLike, destroy } from '@/routes/api/likes'
+import { store as storeComment } from '@/routes/api/comments'
 import axios from 'axios'
 import { router, usePage } from '@inertiajs/react'
 import '/resources/css/projects.css'
@@ -10,9 +11,17 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { useInitials } from '@/hooks/use-initials'
 import { Separator } from '@/components/ui/separator'
 import { Button } from '@/components/ui/button'
-import { Heart, MessageCircle, Pencil, X } from 'lucide-react'
+import { ArrowUpIcon, Heart, MessageCircle, Pencil, Plus, Send, SendHorizonal, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { edit } from '@/routes/posts'
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupInput,
+  InputGroupText,
+  InputGroupTextarea,
+} from "@/components/ui/input-group"
 import {
   ResizableHandle,
   ResizablePanel,
@@ -20,6 +29,8 @@ import {
 } from "@/components/ui/resizable"
 
 import { usePanelRef } from "react-resizable-panels"
+import { Textarea } from '@/components/ui/textarea'
+import { Item, ItemContent, ItemDescription, ItemMedia, ItemTitle } from '@/components/ui/item'
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -43,6 +54,9 @@ export default function ShowPost({post, owns} : {post: Post, owns: boolean}) {
     const [likeClasses, setLikeClasses] = useState("")
     const [likeButtonDisabled, setLikeButtonDisabled] = useState(false)
     const [o, setO] = useState(false)
+
+    const [comment, setComment] = useState("")
+    const [comments, setComments] = useState(post?.comments ?? [])
     
     const { apiToken, auth } = usePage<SharedData>().props
 
@@ -61,7 +75,7 @@ export default function ShowPost({post, owns} : {post: Post, owns: boolean}) {
             .catch(e => console.log('error:', e))
     }, [])
     return (
-    <AppLayout breadcrumbs={breadcrumbs}>
+    <AppLayout maxBodyWidth='w-full' breadcrumbs={breadcrumbs}>
         {
             !o && (
                 <div className="size-10 sticky top-1/2 left-full -translate-x-2 z-100 flex flex-col gap-1 -mt-10">
@@ -70,7 +84,7 @@ export default function ShowPost({post, owns} : {post: Post, owns: boolean}) {
             )
         }
         <ResizablePanelGroup>
-            <div className="w-full flex flex-col mx-auto max-w-5xl gap-6">
+            <div className="w-full flex flex-col mx-auto max-w-5xl gap-6 bg-pink-800">
                 {/* <p>
                     {
                         JSON.stringify(post)
@@ -228,68 +242,129 @@ export default function ShowPost({post, owns} : {post: Post, owns: boolean}) {
             <div className={ cn(
                 "sticky top-0",
                 "transition-all duration-300 overflow-x-clip",
-                o ? "w-sm" : "w-0"
+                o ? "w-md" : "w-0"
             )}>
-                <div className="w-sm h-full flex ">
-                    <div className="h-full w-10 border-r flex flex-col items-center ">
+                <div className="w-md h-full flex">
+                    <div className="h-full w-5 border-r flex flex-col items-center ">
                     </div>
                     <Button onClick={() => setO(!o)} variant="outline" size="icon-sm" className="sticky top-32 -translate-x-4 scrollbar-hide rounded-full">
                         <X />
                     </Button>
-                    <div className="w-full grid grid-cols-1 gap-3 h-screen overflow-y-scroll sticky top-0">
-                        <div className="w-full h-64 bg-amber-500">
-                            X
-                        </div>
+                    <div className="w-full flex flex-col gap-3 h-screen overflow-y-scroll sticky top-0">
+                        <h1 className='text-xl font-bold'>Comments</h1>
+                        {
+                            auth.user && (
+                                // <div className="flex gap-3 mt-2">
+                                    
+                                //     <Avatar className="size-7 mt-3">
+                                //         <AvatarImage src={auth.user.avatar} />
+                                //         <AvatarFallback>{getInitials(auth.user.name)}</AvatarFallback>
+                                //     </Avatar>
+                                    
+                                    
+                                //          <InputGroup>
+                                //             <InputGroupTextarea value={comment} onChange={(e) => setComment(e.target.value)} placeholder="Write your comment ..." />
+                                //             <InputGroupAddon align="block-end">
+                                            
+                                //             <InputGroupButton
+                                //                 variant="secondary"
+                                //                 className="rounded-full ml-auto"
+                                //                 size="icon-sm"
+                                //                 onClick={() => {
+                                //                     axios.post(storeComment().url, {
+                                //                         commentable_type: 'post',
+                                //                         commentable_id: post.id,
+                                //                         comment,
+                                //                     }, {
+                                //                         headers: {
+                                //                             Authorization: 'Bearer ' + apiToken
+                                //                         }
+                                //                     })
+                                //                         .then(res => console.log('storeView response:', res))
+                                //                         .catch(e => console.log('error:', e))
+                                                    
+                                //                 }}
+                                //             >
+                                //                 <Send  />
+                                //                 <span className="sr-only">Send</span>
+                                //             </InputGroupButton>
+                                //             </InputGroupAddon>
+                                //         </InputGroup>
+                                // </div>
+                                <Item  className='relative -left-4'>
+                                    <ItemMedia>
+                                        <Avatar className="size-7">
+                                            <AvatarImage src={auth.user.avatar} />
+                                            <AvatarFallback>{getInitials(auth.user.name ?? "")}</AvatarFallback>
+                                        </Avatar>
+                                    </ItemMedia>
+                                    <ItemContent>
+                                        <ItemDescription>
+                                        <InputGroup>
+                                             <InputGroupTextarea value={comment} onChange={(e) => setComment(e.target.value)} placeholder="Write your comment ..." />
+                                             <InputGroupAddon align="block-end">
+                                            
+                                             <InputGroupButton
+                                                variant="secondary"
+                                                className="rounded-full ml-auto"
+                                                size="icon-sm"
+                                                onClick={() => {
+                                                    axios.post(storeComment().url, {
+                                                        commentable_type: 'post',
+                                                        commentable_id: post.id,
+                                                        comment,
+                                                    }, {
+                                                        headers: {
+                                                            Authorization: 'Bearer ' + apiToken
+                                                        }
+                                                    })
+                                                        .then(res => console.log('storeView response:', res))
+                                                        .catch(e => console.log('error:', e))
+                                                    
+                                                }}
+                                            >
+                                                <Send  />
+                                                <span className="sr-only">Send</span>
+                                            </InputGroupButton>
+                                            </InputGroupAddon>
+                                        </InputGroup>
+                                        </ItemDescription>
+                                    </ItemContent>
+                                </Item>
+                            )
+                        }
 
-                        <div className="w-full h-96 bg-green-600">
-                            X
-                        </div>
+                        {
+                            comments.map(comment => (
+                                // <div className='w-full flex flex-col gap-2'>
+                                //     <div className='w-full flex items-center gap-2'>
+                                //         <Avatar className="size-7">
+                                //             <AvatarImage src={comment.user?.avatar} />
+                                //             <AvatarFallback>{getInitials(comment.user?.name ?? "")}</AvatarFallback>
+                                //         </Avatar>
+                                //         <span className='text-sm'>{ comment.user?.name }</span>
+                                //     </div>
+                                //     <div 
+                                //         dangerouslySetInnerHTML={{__html: comment.comment.replace(/(?:\r\n|\r|\n)/g, '<br>') }}
+                                //     />
+                                // </div>
+                                <Item className='relative -left-4'>
+                                    <ItemMedia>
+                                        <Avatar className="size-7">
+                                            <AvatarImage src={comment.user?.avatar} />
+                                            <AvatarFallback>{getInitials(comment.user?.name ?? "")}</AvatarFallback>
+                                        </Avatar>
+                                    </ItemMedia>
+                                    <ItemContent>
+                                        <ItemTitle>{comment.user?.name}</ItemTitle>
+                                        <ItemDescription className='text-foreground' dangerouslySetInnerHTML={{__html: comment.comment.replace(/(?:\r\n|\r|\n)/g, '<br>') }}>
 
-                        <div className="w-full h-80 bg-cyan-600">
-                            X
-                        </div>
-                        <div className="w-full h-80 bg-amber-500">
-                            X
-                        </div>
-                        <div className="w-full h-80 bg-blue-500">
-                            X
-                        </div>
-                        <div className="w-full h-80 bg-amber-500">
-                            X
-                        </div>
-
-                        <div className="w-full h-80 bg-cyan-600">
-                            X
-                        </div>
-                        <div className="w-full h-80 bg-amber-500">
-                            X
-                        </div>
-                        <div className="w-full h-80 bg-blue-500">
-                            X
-                        </div>
-                        <div className="w-full h-80 bg-amber-500">
-                            X
-                        </div>
-
-                        <div className="w-full h-80 bg-blue-500">
-                            X
-                        </div>
-                        <div className="w-full h-80 bg-amber-500">
-                            X
-                        </div>
-
-                        <div className="w-full h-80 bg-cyan-600">
-                            X
-                        </div>
-                        <div className="w-full h-80 bg-amber-500">
-                            X
-                        </div>
-                        <div className="w-full h-80 bg-blue-500">
-                            X
-                        </div>
-                        <div className="w-full h-80 bg-amber-500">
-                            X
-                        </div>
+                                        </ItemDescription>
+                                    </ItemContent>
+                                </Item>
+                            ))
+                        }
+                        
 
                     </div>
                 </div>

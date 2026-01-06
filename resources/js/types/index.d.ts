@@ -166,6 +166,7 @@ export type Post = {
     views_count?: number
     likes_count?: number
     likes?: Like[]
+    comments?: Comment[]
 }
 
 export type ProjectMember = User & {
@@ -192,6 +193,15 @@ export interface Opportunity {
     publish: boolean
 }
 
+export interface Comment {
+    id: string
+    commentable_id: string
+    commentable_type: string
+    user_id: number
+    user?: User
+    commentable?: Post|Project
+    comment: string
+}
 export interface Like {
     id: number
     likeable_type: string

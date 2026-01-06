@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\CommentController;
 use App\Http\Controllers\Api\LikeController;
 use App\Http\Controllers\Api\ViewController;
 use App\Http\Controllers\UploadController;
@@ -26,6 +27,8 @@ Route::name('api.')->group(function() {
         Route::delete('/likes/{like}', [LikeController::class, 'destroy'])->name('likes.destroy');
 
         Route::post('/views', [ViewController::class, 'store'])->name('views.store');
+
+        Route::post('/comments', [CommentController::class, 'store'])->name('comments.store');
 
     });
 });

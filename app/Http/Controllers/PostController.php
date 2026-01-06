@@ -106,7 +106,12 @@ class PostController extends Controller
     public function show(Post $post)
     {
         $post->loadCount(['likes', 'views'])
-            ->load(['owner', 
+            ->load([
+                'owner',
+                'comments'  => function($query) {
+                    $query->with('user')
+                        ->orderByDesc('created_at');
+                },
                 'likes' => function(MorphMany $query) {
                     $query->where('user_id', Auth::id());
                 }

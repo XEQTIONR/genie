@@ -81,4 +81,9 @@ class Project extends Model
     {
         return $this->morphMany(Activity::class, 'subject');
     }
+
+    public function comments(): MorphMany
+    {
+        return $this->morphMany(Comment::class, 'commentable');
+    }
 }

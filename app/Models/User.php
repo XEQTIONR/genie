@@ -116,4 +116,9 @@ class User extends Authenticatable
         return $this->hasMany(Activity::class)
             ->orderByDesc('created_at');
     }
+
+    public function comments(): HasMany
+    {
+        return $this->hasMany(Comment::class);
+    }
 }
