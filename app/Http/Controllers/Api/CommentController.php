@@ -46,7 +46,7 @@ class CommentController extends Controller
                 $post = Post::find($validated['commentable_id']);
                 $post->comments()->save($comment);
         }
-
+        $comment->load('user');
         return $comment;
     }
 

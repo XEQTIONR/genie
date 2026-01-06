@@ -78,18 +78,13 @@ export default function ShowPost({post, owns} : {post: Post, owns: boolean}) {
     <AppLayout maxBodyWidth='w-full' breadcrumbs={breadcrumbs}>
         {
             !o && (
-                <div className="size-10 sticky top-1/2 left-full -translate-x-2 z-100 flex flex-col gap-1 -mt-10">
+                <div className="size-10 sticky top-1/2 left-full -translate-x-2 z-100 flex flex-col gap-1 -my-10">
                     <Button variant="outline" onClick={() => setO(!o)} size="icon"><MessageCircle /></Button>
                 </div>
             )
         }
         <ResizablePanelGroup>
-            <div className="w-full flex flex-col mx-auto max-w-5xl gap-6 bg-pink-800">
-                {/* <p>
-                    {
-                        JSON.stringify(post)
-                    }
-                </p> */}
+            <div className="w-full flex flex-col mx-auto max-w-5xl gap-6">
                 <div className="flex gap-5 items-center mt-10">
                     <h1 className='text-2xl font-semibold'>{post.title}</h1>
                     {
@@ -240,7 +235,6 @@ export default function ShowPost({post, owns} : {post: Post, owns: boolean}) {
                 
             </div>
             <div className={ cn(
-                "sticky top-0",
                 "transition-all duration-300 overflow-x-clip",
                 o ? "w-md" : "w-0"
             )}>
@@ -250,47 +244,10 @@ export default function ShowPost({post, owns} : {post: Post, owns: boolean}) {
                     <Button onClick={() => setO(!o)} variant="outline" size="icon-sm" className="sticky top-32 -translate-x-4 scrollbar-hide rounded-full">
                         <X />
                     </Button>
-                    <div className="w-full flex flex-col gap-3 h-screen overflow-y-scroll sticky top-0">
+                    <div className="w-full flex flex-col gap-3 h-[90vh] overflow-y-scroll sticky top-19">
                         <h1 className='text-xl font-bold'>Comments</h1>
                         {
                             auth.user && (
-                                // <div className="flex gap-3 mt-2">
-                                    
-                                //     <Avatar className="size-7 mt-3">
-                                //         <AvatarImage src={auth.user.avatar} />
-                                //         <AvatarFallback>{getInitials(auth.user.name)}</AvatarFallback>
-                                //     </Avatar>
-                                    
-                                    
-                                //          <InputGroup>
-                                //             <InputGroupTextarea value={comment} onChange={(e) => setComment(e.target.value)} placeholder="Write your comment ..." />
-                                //             <InputGroupAddon align="block-end">
-                                            
-                                //             <InputGroupButton
-                                //                 variant="secondary"
-                                //                 className="rounded-full ml-auto"
-                                //                 size="icon-sm"
-                                //                 onClick={() => {
-                                //                     axios.post(storeComment().url, {
-                                //                         commentable_type: 'post',
-                                //                         commentable_id: post.id,
-                                //                         comment,
-                                //                     }, {
-                                //                         headers: {
-                                //                             Authorization: 'Bearer ' + apiToken
-                                //                         }
-                                //                     })
-                                //                         .then(res => console.log('storeView response:', res))
-                                //                         .catch(e => console.log('error:', e))
-                                                    
-                                //                 }}
-                                //             >
-                                //                 <Send  />
-                                //                 <span className="sr-only">Send</span>
-                                //             </InputGroupButton>
-                                //             </InputGroupAddon>
-                                //         </InputGroup>
-                                // </div>
                                 <Item  className='relative -left-4'>
                                     <ItemMedia>
                                         <Avatar className="size-7">
@@ -318,7 +275,10 @@ export default function ShowPost({post, owns} : {post: Post, owns: boolean}) {
                                                             Authorization: 'Bearer ' + apiToken
                                                         }
                                                     })
-                                                        .then(res => console.log('storeView response:', res))
+                                                        .then(res => {
+                                                            setComments(c => [res.data, ...c,])
+                                                            setComment("") 
+                                                        })
                                                         .catch(e => console.log('error:', e))
                                                     
                                                 }}
@@ -357,9 +317,10 @@ export default function ShowPost({post, owns} : {post: Post, owns: boolean}) {
                                     </ItemMedia>
                                     <ItemContent>
                                         <ItemTitle>{comment.user?.name}</ItemTitle>
-                                        <ItemDescription className='text-foreground' dangerouslySetInnerHTML={{__html: comment.comment.replace(/(?:\r\n|\r|\n)/g, '<br>') }}>
-
-                                        </ItemDescription>
+                                        <ItemDescription 
+                                            className='text-foreground line-clamp-none' 
+                                            dangerouslySetInnerHTML={{__html: comment.comment.replace(/(?:\r\n|\r|\n)/g, '<br>') }} 
+                                        />
                                     </ItemContent>
                                 </Item>
                             ))
