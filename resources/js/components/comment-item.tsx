@@ -22,31 +22,31 @@ export default function CommentItem({comment, className = ''} : {comment: Commen
         const diff = Date.now() - date.getTime()
 
         if (diff / MILISECONDS_IN_YEAR >= 1) {
-            return Math.floor(diff / MILISECONDS_IN_YEAR) + " y ago"
+            return Math.floor(diff / MILISECONDS_IN_YEAR) + "y ago"
         }
 
         if (diff / MILISECONDS_IN_MONTH >= 1) {
-            return Math.floor(diff / MILISECONDS_IN_MONTH) + " mon ago"
+            return Math.floor(diff / MILISECONDS_IN_MONTH) + "mon ago"
         }
 
         if (diff / MILISECONDS_IN_WEEK >= 1) {
-            return Math.floor(diff / MILISECONDS_IN_WEEK) + " w ago"
+            return Math.floor(diff / MILISECONDS_IN_WEEK) + "w ago"
         }
 
         if (diff / MILISECONDS_IN_DAY >= 1) {
-            return Math.floor(diff / MILISECONDS_IN_DAY) + " days ago"
+            return Math.floor(diff / MILISECONDS_IN_DAY) + "d ago"
         }
 
         if (diff / MILISECONDS_IN_HOUR >= 1) {
-            return Math.floor(diff / MILISECONDS_IN_HOUR) + " h ago"
+            return Math.floor(diff / MILISECONDS_IN_HOUR) + "h ago"
         }
 
         if (diff / MILISECONDS_IN_MINUTE >= 1) {
-            return Math.floor(diff / MILISECONDS_IN_MINUTE) + " m ago"
+            return Math.floor(diff / MILISECONDS_IN_MINUTE) + "m ago"
         }
 
         // if (diff / MILISECONDS_IN_SE >= 1) {
-            return Math.floor(diff / MILISECONDS_IN_SECOND) + " s ago"
+            return Math.floor(diff / MILISECONDS_IN_SECOND) + "s ago"
         // }
     }
 

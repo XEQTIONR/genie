@@ -9,7 +9,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet"
 import { Button } from "@/components/ui/button";
-import { Bookmark, BriefcaseBusiness, ChartNoAxesColumnIncreasing, Lightbulb, Menu, MessageCircle, Pencil, PencilRuler, Share2, Sparkles, UserPlus, X } from "lucide-react";
+import { Bookmark, BriefcaseBusiness, ChartNoAxesColumnIncreasing, Heart, Lightbulb, Menu, MessageCircle, Pencil, PencilRuler, Share, Share2, Sparkles, UserPlus, X } from "lucide-react";
 import { Facebook,Twitch,Twitter, Youtube } from "@/components/icons/svgs";
 import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
@@ -169,7 +169,7 @@ export default function ShowProject({ project, h, owns, tab = 'kontent', activit
             {
                 !o && (
                     <div className="size-10 sticky top-1/2 left-full -translate-x-2 z-100 flex flex-col gap-1 -mt-10">
-                        <Button variant="outline" onClick={() => setO(!o)} size="icon"><MessageCircle /></Button>
+                        <Button className="rounded-full" variant="outline" onClick={() => setO(!o)} size="icon"><MessageCircle /></Button>
                     </div>
                 )
             }
@@ -325,7 +325,7 @@ export default function ShowProject({ project, h, owns, tab = 'kontent', activit
                                     </div> */}
                                     <Toggle
                                         pressed={likes.length > 0} 
-                                        className="w-full cursor-pointer data-[state=on]:bg-transparent data-[state=on]:*:[svg]:fill-blue-500 data-[state=on]:*:[svg]:stroke-blue-500"
+                                        className="w-full cursor-pointer data-[state=on]:bg-transparent data-[state=on]:*:[svg]:fill-yellow-400 data-[state=on]:*:[svg]:stroke-yellow-400"
                                         onPressedChange={() => {
                                                 if (auth.user) {
                                                     if (likes.length === 0) {
@@ -742,11 +742,12 @@ export default function ShowProject({ project, h, owns, tab = 'kontent', activit
                     }
                 </div>
                 <div className={ cn(
-                    "sticky top-0",
-                    "transition-all duration-300",
+                    "transition-all duration-300 overflow-x-clip",
                     o ? "w-md" : "w-0"
                 )}>
-                    <div className="w-md h-full flex border-l">
+                    <div className="w-md h-full flex">
+                        <div className="h-full w-5 border-r flex flex-col items-center ">
+                        </div>
                         {
                             o && (
                                 <Button onClick={() => setO(!o)} variant="secondary" size="icon-sm" className="sticky top-32 -translate-x-4 scrollbar-hide rounded-full">
@@ -762,6 +763,63 @@ export default function ShowProject({ project, h, owns, tab = 'kontent', activit
                                 <X />
                             </Button> */}
                             <div className="w-full flex flex-col gap-3 h-[90vh] overflow-y-scroll sticky top-19">
+                                <div className='flex gap-3 mt-10 w-full justify-end'>
+                            <Button
+                                onClick={() => {
+                                    if (auth.user) {
+                                        if (likes.length === 0) {
+                                            axios.post(store().url, {
+                                                likeable_id: project.id,
+                                                likeable_type: 'project'
+                                            }, {
+                                                headers: {
+                                                    'Content-Type': 'multipart/form-data',
+                                                    Authorization: 'Bearer ' + apiToken
+                                                }
+                                            }).then(res => {
+                                                setNumLikes(l => l+1)
+                                                setILike(l => {
+                                                    if (l) {
+                                                        return [...l, res.data]
+                                                    }
+                                                    return [res.data]
+                                                })
+                                                setLikeClasses("")
+                                                setTimeout(() => {
+                                                    setLikeClasses("animate-wave fill-yellow-400 stroke-yellow-400 ")
+                                                }, 100)
+                                            }).catch(e => {
+                                                console.log('like error:', e)
+                                            })
+                                        } else {
+                                            axios.delete(destroy({ like: likes[0].id }).url, {
+                                                headers: {
+                                                    'Content-Type': 'multipart/form-data',
+                                                    Authorization: 'Bearer ' + apiToken
+                                                }
+                                            }).then(() => {
+                                                setNumLikes(l => l - 1)
+                                                setILike([])
+                                                setLikeClasses("")
+                                                setTimeout(() => {
+                                                    setLikeClasses("animate-wave")
+                                                }, 100)
+                                            }).catch((e) => {
+                                                console.log('unlike error:', e)
+                                            })
+                                        }
+                                    }
+                                }} 
+                                className="cursor-pointer rounded-full mt-1.5"
+                                variant="outline" 
+                                size="icon"
+                            >
+                                <Bookmark 
+                                    className={likeClasses}
+                                />
+                            </Button>
+                            <Button className="rounded-full mt-1.5" variant="outline" size="icon"><Share /></Button>
+                        </div>
                                 <h1 className='text-xl font-bold'>Comments</h1>
                                 {
                                     auth.user && <CommentForm 
