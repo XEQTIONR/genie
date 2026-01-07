@@ -326,7 +326,6 @@ export default function TeamProfile({
     activities,
     team, 
     tab = 'showcase', 
-    user_count, 
     users = [],
     projects = [],
     opportunities,
@@ -336,7 +335,6 @@ export default function TeamProfile({
     activities: { data: Activity[] }
     team: Team 
     tab: string
-    user_count: number
     users?: ProjectMember[]
     projects?: Project[]
     opportunities?: {
@@ -560,15 +558,11 @@ export default function TeamProfile({
         }
     }
 
-    // if ( auth.user?.id === team.owner_id ) {
-    //     tabs.push({ title: "Add to team", href: "/", key: "invite", icon: UserPlus, className: "ml-2 border" })
-    // }
-
-    const isPro = true
+    const isStudio = true
     
     return (
         <AppLayout maxWidth='md:max-w-11xl' maxHeaderWidth='md:max-w-10xl' breadcrumbs={breadcrumbs}>
-            <Head title="Profile" />
+            <Head title={team.name} />
             <AvatarDialog 
                 image={team.avatar ?? ""}
                 imageHeight={480}
@@ -598,47 +592,69 @@ export default function TeamProfile({
                 >
                     <div className="w-full h-full  relative overflow-hidden flex justify-end items-start md:items-end"> 
                         <div className='absolute top-1/2 left-1/2 -translate-1/2 flex flex-col gap-3 w-full max-w-3xl px-4'>
-                            <div className="flex gap-5">
-                                <Avatar variant="square" className="size-20">
-                                {
-                                    auth.user && auth.user.id === team.owner_id &&
-                                    <div onClick={() => setShowAvatarDialog(true)} className="cursor-pointer size-full flex items-center justify-center absolute bg-neutral-950/50 z-50 opacity-0 hover:opacity-100">
-                                        <Camera className="opacity-90 stroke-white" size={25} />
-                                    </div>
-                                }
-                                    <AvatarImage src={team.avatar} />
-                                    <AvatarFallback variant="square" className="text-3xl">{team.name.split(' ').map(word => word.charAt(0)).join("")}</AvatarFallback>
-                                </Avatar>
-                                <div className="flex flex-col gap-1 justify-center">
-                                    <div className="flex items-center gap-2">
-                                        <h1 className="text-2xl font-bold text-white">{team.name}</h1> 
-                                        <span className="px-1 py-0.5 text-xs font-bold rounded bg-foreground text-background">STUDIO</span>
-                                    </div>
+                            <div className="flex justify-between">
+                                <div className='flex gap-5'>
+                                    <Avatar variant="square" className="size-20">
+                                    {
+                                        auth.user && auth.user.id === team.owner_id &&
+                                        <div onClick={() => setShowAvatarDialog(true)} className="cursor-pointer size-full flex items-center justify-center absolute bg-neutral-950/50 z-50 opacity-0 hover:opacity-100">
+                                            <Camera className="opacity-90 stroke-white" size={25} />
+                                        </div>
+                                    }
+                                        <AvatarImage src={team.avatar} />
+                                        <AvatarFallback variant="square" className="text-3xl">{team.name.split(' ').map(word => word.charAt(0)).join("")}</AvatarFallback>
+                                    </Avatar>
+                                    <div className="flex flex-col gap-1 justify-center">
+                                        <div className="flex items-center gap-2">
+                                            <h1 className="text-2xl font-bold text-white">{team.name}</h1> 
+                                            <span className="px-1 py-0.5 text-xs font-bold rounded bg-foreground text-background">STUDIO</span>
+                                        </div>
 
-                                       
-                                    <div className="flex gap-1 items-center text-sm text-white">
-                                        <MapPin size={16} />
-                                        {
-                                            team.locations && team.locations.length > 0
-                                            ?
-                                            <div className='flex gap-2 items-center'>
-                                                <span>{team.locations[0].city ? team.locations[0].city + ", " + team.locations[0].country : team.locations[0].country}</span>
-                                                {/* <div className="flex gap-3">
+                                        
+                                        <div className="flex gap-1 items-center text-sm text-white">
+                                            <MapPin size={16} />
+                                            {
+                                                team.locations && team.locations.length > 0
+                                                ?
+                                                <div className='flex gap-2 items-center'>
+                                                    <span>{team.locations[0].city ? team.locations[0].city + ", " + team.locations[0].country : team.locations[0].country}</span>
+                                                    {/* <div className="flex gap-3">
+                                                        {
+                                                            team.locations.map(({city, country}) => <span>{city ? city + ", " + country : country}</span>)
+                                                        }
+                                                    </div> */}
                                                     {
-                                                        team.locations.map(({city, country}) => <span>{city ? city + ", " + country : country}</span>)
+                                                        team.locations.length > 1 && <Badge className='' variant="outline">+{team.locations.length-1}</Badge>
                                                     }
-                                                </div> */}
-                                                {
-                                                    team.locations.length > 1 && <Badge className='' variant="outline">+{team.locations.length-1}</Badge>
-                                                }
-                                            </div> 
-                                            
-                                            : "Worldwide"
-                                        }
-                                    </div>
+                                                </div> 
+                                                
+                                                : "Worldwide"
+                                            }
+                                        </div>
 
-                                    
+                                        
+                                    </div>
                                 </div>
+                                
+                                {
+                                    team.owner_id === auth.user?.id &&
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger asChild>
+                                            <Button
+                                                variant="outline"
+                                                type="button" 
+                                                className="cursor-pointer" 
+                                                size="icon-lg"
+                                            >
+                                                <Settings />
+                                            </Button>
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent align="end">
+                                            <DropdownMenuItem onSelect={() => setShowBannerDialog(true)}><Image /> Edit banner image</DropdownMenuItem>
+                                            <DropdownMenuItem onSelect={() => router.visit(edit(team))}><Settings /> Team settings</DropdownMenuItem>
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
+                                }
                             </div>
                             <p className="text-sm text-white">{team.description}</p>
                             <div className='flex items-center gap-3.5 text-white'>
@@ -675,26 +691,6 @@ export default function TeamProfile({
                                 <Globe className="size-4.5" />
                             </div>
                         </div>
-                    {
-                        team.owner_id === auth.user?.id &&
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <Button
-                                    variant="outline"
-                                    type="button" 
-                                    className="cursor-pointer" 
-                                    size="icon-lg"
-                                >
-                                    <Settings />
-                                </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent>
-                                <DropdownMenuItem onSelect={() => setShowBannerDialog(true)}><Image /> Edit banner image</DropdownMenuItem>
-                                <DropdownMenuItem onSelect={() => router.visit(edit(team))}><Settings /> Team settings</DropdownMenuItem>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
-                        
-                    }
                     </div>
                 </div>
                 <div className="w-full flex flex-col mx-auto gap-0 items-center z-50 sticky top-0 bg-foreground dark:bg-background border-b shadow-lg dark:shadow-neutral-900/80">

@@ -41,7 +41,7 @@ export default function CommentForm({
         <ItemContent>
             <ItemDescription>
             <InputGroup>
-                    <InputGroupTextarea value={comment} onChange={(e) => setComment(e.target.value)} placeholder="Write your comment ..." />
+                    <InputGroupTextarea className="text-pretty" value={comment} onChange={(e) => setComment(e.target.value)} placeholder="Write your comment ..." />
                     <InputGroupAddon align="block-end">
                 
                     <InputGroupButton

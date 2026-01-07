@@ -69,6 +69,7 @@ export interface Project {
     likes: Like[]
     posts?: Post[]
     comments?: Comment[]
+    comments_count?: number
     visibility: "public" | "private"
 }
 
@@ -168,6 +169,7 @@ export type Post = {
     likes_count?: number
     likes?: Like[]
     comments?: Comment[]
+    comments_count?: number
 }
 
 export type ProjectMember = User & {

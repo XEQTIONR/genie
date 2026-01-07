@@ -168,8 +168,17 @@ export default function ShowProject({ project, h, owns, tab = 'kontent', activit
             <Head title="Show Project" />
             {
                 !o && (
-                    <div className="size-10 sticky top-1/2 left-full -translate-x-2 z-100 flex flex-col gap-1 -mt-10">
-                        <Button className="rounded-full" variant="outline" onClick={() => setO(!o)} size="icon"><MessageCircle /></Button>
+                    <div className="size-10 sticky top-1/2 left-full -translate-x-4 z-100 flex flex-col gap-1 -mt-10">
+                        <div className='relative'>
+                            <Button className="rounded-full cursor-pointer" variant="outline" onClick={() => setO(!o)} size="icon">
+                                <MessageCircle />
+                            </Button>
+                            {
+                                project.comments_count && project.comments_count > 0 && (
+                                    <Badge variant="destructive" className='absolute -right-1.5 -top-1 px-1 rounded-full font-semibold'>{project.comments_count}</Badge>
+                                )
+                            }
+                        </div>
                     </div>
                 )
             }
@@ -313,16 +322,6 @@ export default function ShowProject({ project, h, owns, tab = 'kontent', activit
                                 </div>
                                 
                                 <div className="flex flex-col gap-3">
-                                    {/* <div className="w-full flex gap-5 items-center">
-                                        <span className="rounded-sm">Share this</span>
-                                        <div className="flex gap-5">
-                                            <Facebook className="size-6" />
-                                            <Twitter className="size-6" />
-                                            <Mail />
-                                            <CodeXml />
-                                        </div>
-                                        
-                                    </div> */}
                                     <Toggle
                                         pressed={likes.length > 0} 
                                         className="w-full cursor-pointer data-[state=on]:bg-transparent data-[state=on]:*:[svg]:fill-yellow-400 data-[state=on]:*:[svg]:stroke-yellow-400"
@@ -442,16 +441,6 @@ export default function ShowProject({ project, h, owns, tab = 'kontent', activit
                                     >
                                         Creator
                                     </a>
-                                </li>
-                                <li className={cn(
-                                    "flex items-center px-5 border-b-4",
-                                    currentTab == 'settings' ? 'border-foreground font-semibold' : 'border-transparent'
-                                )}>
-                                    <Link 
-                                        href={edit(project)}
-                                    >
-                                        Settings
-                                    </Link>
                                 </li>
                                 <li className={cn(
                                     "flex items-center px-5 border-b-4",
@@ -756,7 +745,7 @@ export default function ShowProject({ project, h, owns, tab = 'kontent', activit
                             )
                         }
                         
-                        <div className="w-md h-full flex">
+                        <div className="w-md h-full flex pr-11">
                             {/* <div className="h-full w-5 border-r flex flex-col items-center ">
                             </div>
                             <Button onClick={() => setO(!o)} variant="outline" size="icon-sm" className="sticky top-32 -translate-x-4 scrollbar-hide rounded-full">
@@ -764,66 +753,66 @@ export default function ShowProject({ project, h, owns, tab = 'kontent', activit
                             </Button> */}
                             <div className="w-full flex flex-col gap-3 h-[90vh] overflow-y-scroll sticky top-19">
                                 <div className='flex gap-3 mt-10 w-full justify-end'>
-                            <Button
-                                onClick={() => {
-                                    if (auth.user) {
-                                        if (likes.length === 0) {
-                                            axios.post(store().url, {
-                                                likeable_id: project.id,
-                                                likeable_type: 'project'
-                                            }, {
-                                                headers: {
-                                                    'Content-Type': 'multipart/form-data',
-                                                    Authorization: 'Bearer ' + apiToken
+                                    <Button
+                                        onClick={() => {
+                                            if (auth.user) {
+                                                if (likes.length === 0) {
+                                                    axios.post(store().url, {
+                                                        likeable_id: project.id,
+                                                        likeable_type: 'project'
+                                                    }, {
+                                                        headers: {
+                                                            'Content-Type': 'multipart/form-data',
+                                                            Authorization: 'Bearer ' + apiToken
+                                                        }
+                                                    }).then(res => {
+                                                        setNumLikes(l => l+1)
+                                                        setILike(l => {
+                                                            if (l) {
+                                                                return [...l, res.data]
+                                                            }
+                                                            return [res.data]
+                                                        })
+                                                        setLikeClasses("")
+                                                        setTimeout(() => {
+                                                            setLikeClasses("animate-wave fill-yellow-400 stroke-yellow-400 ")
+                                                        }, 100)
+                                                    }).catch(e => {
+                                                        console.log('like error:', e)
+                                                    })
+                                                } else {
+                                                    axios.delete(destroy({ like: likes[0].id }).url, {
+                                                        headers: {
+                                                            'Content-Type': 'multipart/form-data',
+                                                            Authorization: 'Bearer ' + apiToken
+                                                        }
+                                                    }).then(() => {
+                                                        setNumLikes(l => l - 1)
+                                                        setILike([])
+                                                        setLikeClasses("")
+                                                        setTimeout(() => {
+                                                            setLikeClasses("animate-wave")
+                                                        }, 100)
+                                                    }).catch((e) => {
+                                                        console.log('unlike error:', e)
+                                                    })
                                                 }
-                                            }).then(res => {
-                                                setNumLikes(l => l+1)
-                                                setILike(l => {
-                                                    if (l) {
-                                                        return [...l, res.data]
-                                                    }
-                                                    return [res.data]
-                                                })
-                                                setLikeClasses("")
-                                                setTimeout(() => {
-                                                    setLikeClasses("animate-wave fill-yellow-400 stroke-yellow-400 ")
-                                                }, 100)
-                                            }).catch(e => {
-                                                console.log('like error:', e)
-                                            })
-                                        } else {
-                                            axios.delete(destroy({ like: likes[0].id }).url, {
-                                                headers: {
-                                                    'Content-Type': 'multipart/form-data',
-                                                    Authorization: 'Bearer ' + apiToken
-                                                }
-                                            }).then(() => {
-                                                setNumLikes(l => l - 1)
-                                                setILike([])
-                                                setLikeClasses("")
-                                                setTimeout(() => {
-                                                    setLikeClasses("animate-wave")
-                                                }, 100)
-                                            }).catch((e) => {
-                                                console.log('unlike error:', e)
-                                            })
-                                        }
-                                    }
-                                }} 
-                                className="cursor-pointer rounded-full mt-1.5"
-                                variant="outline" 
-                                size="icon"
-                            >
-                                <Bookmark 
-                                    className={likeClasses}
-                                />
-                            </Button>
-                            <Button className="rounded-full mt-1.5" variant="outline" size="icon"><Share /></Button>
-                        </div>
+                                            }
+                                        }} 
+                                        className="cursor-pointer rounded-full mt-1.5"
+                                        variant="outline" 
+                                        size="icon"
+                                    >
+                                        <Bookmark 
+                                            className={likeClasses}
+                                        />
+                                    </Button>
+                                    <Button className="rounded-full mt-1.5" variant="outline" size="icon"><Share /></Button>
+                                </div>
                                 <h1 className='text-xl font-bold'>Comments</h1>
                                 {
                                     auth.user && <CommentForm 
-                                        className='relative -left-4' 
+                                        className='relative -left-4 -mr-8' 
                                         commentableId={project.id}
                                         commentableType='project'
                                         user={auth.user}
@@ -832,7 +821,7 @@ export default function ShowProject({ project, h, owns, tab = 'kontent', activit
                                     />
                                 }
                                 {
-                                    comments.map(comment => <CommentItem className='relative -left-4' comment={comment} />)
+                                    comments.map(comment => <CommentItem className='relative -left-4 -mr-8' comment={comment} />)
                                 }
                             </div>
                         </div>

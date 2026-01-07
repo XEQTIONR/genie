@@ -105,7 +105,7 @@ class PostController extends Controller
      */
     public function show(Post $post)
     {
-        $post->loadCount(['likes', 'views'])
+        $post->loadCount(['likes', 'views', 'comments'])
             ->load([
                 'owner',
                 'comments'  => function($query) {

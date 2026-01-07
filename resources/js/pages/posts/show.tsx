@@ -33,6 +33,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Item, ItemContent, ItemDescription, ItemMedia, ItemTitle } from '@/components/ui/item'
 import CommentItem from '@/components/comment-item'
 import CommentForm from '@/components/comment-form'
+import { Badge } from '@/components/ui/badge'
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -135,7 +136,16 @@ export default function ShowPost({post, owns} : {post: Post, owns: boolean}) {
         {
             !o && (
                 <div className="size-10 sticky top-1/2 left-full -translate-x-2 z-100 flex flex-col gap-1 -my-10">
-                    <Button className="rounded-full" variant="outline" onClick={() => setO(!o)} size="icon"><MessageCircle /></Button>
+                    <div className='relative'>
+                        <Button className="rounded-full" variant="outline" onClick={() => setO(!o)} size="icon">
+                            <MessageCircle />
+                        </Button>
+                        {
+                            post.comments_count && post.comments_count > 0 && (
+                                <Badge variant="destructive" className='absolute -right-1.5 -top-1 px-1 rounded-full font-semibold cursor-pointer'>{post.comments_count}</Badge>
+                            )
+                        }
+                    </div>
                 </div>
             )
         }

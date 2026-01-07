@@ -4,12 +4,12 @@ import AppLayout from '@/layouts/app-layout'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import axios from 'axios'
 import { update as updateTeam } from '@/routes/teams'
-import {  show as jobsShow } from '@/routes/opportunities'
-import { edit as editTeam } from '@/routes/teams'
+import { show as jobsShow } from '@/routes/opportunities'
+import { edit as editTeam, show as showTeam } from '@/routes/teams'
 import { members as editMembers, opportunities as editJobs } from '@/routes/teams/edit'
 import { index as jobsIndex } from '@/routes/teams/opportunities'
 import { Opportunity, NavItem, Project, ProjectMember, Team, type BreadcrumbItem, Activity, Location, User } from '@/types'
-import { Form, Head, Link, router } from '@inertiajs/react'
+import { Form, Head, Link, router, useForm } from '@inertiajs/react'
 import { Camera, Eraser, Globe, MapPin, Pencil, PencilRuler, Instagram, Sparkles, UserPlus, Lightbulb, BriefcaseBusiness, Settings, Image, ChevronRight, BadgeCheck, Users, LinkIcon, Trash, X, Trash2, EllipsisVertical, Mail, Plus, ArrowLeft, ShieldAlert } from 'lucide-react'
 import { Facebook, Twitter, Twitch, Youtube } from '@/components/icons/svgs'
 
@@ -38,16 +38,6 @@ import {
   InputGroupTextarea,
 } from "@/components/ui/input-group"
 import { Combobox, GroupedOptions } from '@/components/ui/combobox'
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog"
 import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table'
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card'
 import { Badge } from '@/components/ui/badge'
@@ -56,12 +46,10 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Label } from '@/components/ui/label'
 import SearchBar from '@/components/ui/search-bar'
 import { Multiselect } from '@/components/ui/multiselect'
-import { Item, ItemActions, ItemContent, ItemDescription, ItemMedia, ItemTitle } from '@/components/ui/item'
+import { update as updateMember } from '@/routes/teams/edit/members'
+import allPermisions from '@/data/permissions'
 
 type ProfileTab = NavItem & {key: string, className?: string}
-
-
-
 
 export default function TeamSettings({ 
     team,
@@ -127,7 +115,14 @@ export default function TeamSettings({
     const [editRoles, setEditRoles] = useState(false)
     const [editPermissions, setEditPermissions] = useState(false)
 
+    const {transform, post} = useForm({
+        userId: 0,
+        roles: [],
+        permissions: []
+    })
+
     useEffect(() => {
+        console.log('permissions:', Object.values(allPermisions).flat())
         if (selectedMember) {
             setCurrentRoles(team.users?.find(t => t.id === selectedMember.id)?.pivot.roles ?? [])
             setCurrentPermissions(team.users?.find(t => t.id === selectedMember.id)?.pivot.permissions ?? [])
@@ -136,6 +131,17 @@ export default function TeamSettings({
             setCurrentPermissions([])
         }
     }, [selectedMember, team])
+
+    useEffect(() => {
+        console.log('team changed');
+        if (editRoles) {
+            setEditRoles(false)
+        }
+
+        if (editPermissions) {
+            setEditPermissions(false)
+        }
+    }, [team]) 
 
     useEffect(() => {
         setLinkIcons(() => {
@@ -189,16 +195,14 @@ export default function TeamSettings({
     return (
         <AppLayout maxWidth='md:max-w-11xl' maxHeaderWidth='md:max-w-10xl' breadcrumbs={breadcrumbs}>
             <Head title="Team Settings" />
-            <div className='flex items-center gap-1.5 my-3 w-full max-w-10xl px-4 mx-auto'>
+            <Link href={showTeam(team)} className='flex items-center gap-1.5 my-3 w-full max-w-10xl px-4 mx-auto'>
                 <Avatar variant="square" className="size-8">
                     <AvatarImage src={team.avatar} />
                     <AvatarFallback variant="square" className="text-xs">{getInitials(team.name)}</AvatarFallback>
                 </Avatar>
+                
                 <h2 className="font-medium">{team.name}</h2>
-                {/* <div className='size-7 bg-foreground flex justify-center items-center rounded-full'>
-                    <Settings className="stroke-background" size={18} />
-                </div> */}
-            </div>
+            </Link>
             <div className="w-full max-w-10xl px-4 mx-auto flex flex-col">
                 <div className='w-full h-full grow flex'>
                     <aside className='w-xs border-r flex flex-col gap-3'>
@@ -240,18 +244,14 @@ export default function TeamSettings({
                                     <FieldGroup>
                                         <Field className="gap-2">
                                             <FieldLabel>Team Name</FieldLabel>
-                                            <Input defaultValue={team.name} onChange={({target}) => {
-                                                // setData('name', target.value)
-                                            }} name="name" />
+                                            <Input defaultValue={team.name} name="name" />
                                             <FieldDescription className="text-red-600 dark:text-red-400">
                                                 {/* { errors?.name } */}
                                             </FieldDescription>
                                         </Field>
                                         <Field className="gap-2">
                                             <FieldLabel>Description</FieldLabel>
-                                            <Textarea defaultValue={team.description} onChange={({target}) => {
-                                                // setData('description', target.value)
-                                            }} name="description" className="h-28" />
+                                            <Textarea defaultValue={team.description} name="description" className="h-28" />
                                             <FieldDescription className="text-red-600 dark:text-red-400">
                                                 {/* { errors?.description } */}
                                             </FieldDescription>
@@ -261,10 +261,6 @@ export default function TeamSettings({
                                             <FieldLegend variant="label">Location</FieldLegend>
                                             <RadioGroup 
                                                 onValueChange={(value) => {
-                                                    // setData('location_type', value)
-                                                    // if (data.location_type === 'global') {
-                                                    //     setData('locations', [])
-                                                    // }
                                                     setLocationType(value)
                                                     if (value === 'global') {
                                                         setLocations([])
@@ -357,7 +353,6 @@ export default function TeamSettings({
                                         }
                                         
                                     </FieldGroup>
-                                    {/* <Button>Save</Button> */}
                                     <FieldSeparator className='max-w-lg' />
 
                                     <FieldGroup className="max-w-lg gap-2">
@@ -389,66 +384,6 @@ export default function TeamSettings({
                                                     </InputGroup>
                                                 ))
                                             }
-                                            {/* <InputGroup>
-                                                <InputGroupInput onChange={({target}) => {
-                                                    // setData('name', target.value)
-                                                }} />
-
-                                                <InputGroupAddon>
-                                                    <Facebook />
-                                                </InputGroupAddon>
-                                                <InputGroupAddon align="inline-end">
-                                                    <Trash2 className='hover:stroke-foreground cursor-pointer' />
-                                                </InputGroupAddon>
-                                            </InputGroup>
-                                            <InputGroup>
-                                                <InputGroupInput onChange={({target}) => {
-                                                    // setData('name', target.value)
-                                                }} />
-
-                                                <InputGroupAddon>
-                                                    <Twitter />
-                                                </InputGroupAddon>
-                                                <InputGroupAddon align="inline-end">
-                                                    <Trash2 />
-                                                </InputGroupAddon>
-                                            </InputGroup>
-                                            <InputGroup>
-                                                <InputGroupInput onChange={({target}) => {
-                                                    // setData('name', target.value)
-                                                }} />
-
-                                                <InputGroupAddon>
-                                                    <Twitch />
-                                                </InputGroupAddon>
-                                                <InputGroupAddon align="inline-end">
-                                                    <Trash2 />
-                                                </InputGroupAddon>
-                                            </InputGroup>
-                                            <InputGroup>
-                                                <InputGroupInput onChange={({target}) => {
-                                                    // setData('name', target.value)
-                                                }} />
-
-                                                <InputGroupAddon>
-                                                    <Youtube />
-                                                </InputGroupAddon>
-                                                <InputGroupAddon align="inline-end">
-                                                    <Trash2 />
-                                                </InputGroupAddon>
-                                            </InputGroup>
-                                            <InputGroup>
-                                                <InputGroupInput onChange={({target}) => {
-                                                    // setData('name', target.value)
-                                                }} />
-
-                                                <InputGroupAddon>
-                                                    <LinkIcon />
-                                                </InputGroupAddon>
-                                                <InputGroupAddon align="inline-end">
-                                                    <Trash2 />
-                                                </InputGroupAddon>
-                                            </InputGroup> */}
                                         </Field>
                                     </FieldGroup>
                                 </FieldGroup>
@@ -496,7 +431,18 @@ export default function TeamSettings({
                                                     {
                                                         editRoles && (
                                                             <>
-                                                                <Button className="text-xxs cursor-pointer" size="sm" variant="outline" type="button">
+                                                                <Button onClick={() => {
+                                                                    transform(() => ({
+                                                                        userId: selectedMember.id,
+                                                                        roles: currentRoles,
+                                                                        permissions: currentPermissions
+                                                                    }))
+
+                                                                    post(updateMember({
+                                                                        team: team.id,
+                                                                        user: selectedMember.id
+                                                                    }).url)
+                                                                }} className="text-xxs cursor-pointer" size="sm" variant="outline" type="button">
                                                                     Save
                                                                 </Button>
                                                                 <Button onClick={() => {
@@ -568,7 +514,20 @@ export default function TeamSettings({
                                                         {
                                                             editPermissions && (
                                                                 <>
-                                                                    <Button className="text-xxs cursor-pointer" size="sm" variant="outline" type="button">
+                                                                    <Button className="text-xxs cursor-pointer" size="sm" variant="outline" type="button"
+                                                                        onClick={() => {
+                                                                            transform(() => ({
+                                                                                userId: selectedMember.id,
+                                                                                roles: currentRoles,
+                                                                                permissions: currentPermissions
+                                                                            }))
+
+                                                                            post(updateMember({
+                                                                                team: team.id,
+                                                                                user: selectedMember.id
+                                                                            }).url)
+                                                                        }}
+                                                                    >
                                                                         Save
                                                                     </Button>
                                                                     <Button onClick={() => {
@@ -585,82 +544,13 @@ export default function TeamSettings({
                                                     </div>
                                                     <div className='flex flex-wrap text-xs mt-3 gap-1.5'>
                                                         {
-                                                            currentPermissions.map((r) => <Badge variant="outline">{r}</Badge>)
+                                                            currentPermissions
+                                                                .sort((a,b) => Object.values(allPermisions).flat().findIndex((p) => p.value == a) - Object.values(allPermisions).flat().findIndex((p) => p.value == b))
+                                                                .map((r) => <Badge variant="outline">{r}</Badge>)
                                                         }
                                                     </div>
                                                     {
-                                                        editPermissions && <Multiselect onSelect={(v) => setCurrentPermissions(v)} defaultValue={currentPermissions} items={{
-                                                            Ideas: [
-                                                                {
-                                                                    label: 'Create ideas',
-                                                                    value: 'create-posts'
-                                                                },
-                                                                {
-                                                                    label: 'Edit ideas',
-                                                                    value: 'edit-posts'
-                                                                },
-                                                                {
-                                                                    label: 'Delete ideas',
-                                                                    value: 'delete-posts'
-                                                                },
-                                                            ],
-                                                            Team: [
-                                                                {
-                                                                    label: 'Edit team info',
-                                                                    value: 'edit-info'
-                                                                },
-                                                                {
-                                                                    label: 'Transfer team',
-                                                                    value: 'transfer'
-                                                                },
-                                                            ],
-                                                            Members: [
-                                                                {
-                                                                    label: 'Add members',
-                                                                    value: 'add-member'
-                                                                },
-                                                                {
-                                                                    label: 'Remove members',
-                                                                    value: 'delete-member'
-                                                                },
-                                                                {
-                                                                    label: 'Edit role',
-                                                                    value: 'edit-role'
-                                                                },
-                                                            ],
-                                                            Projects: [
-                                                                {
-                                                                    label: 'Create projects',
-                                                                    value: 'create-project'
-                                                                },
-                                                                {
-                                                                    label: 'Edit projects',
-                                                                    value: 'edit-project'
-                                                                },
-                                                                {
-                                                                    label: 'Delete projects',
-                                                                    value: 'delete-project'
-                                                                },
-                                                                {
-                                                                    label: 'Add members',
-                                                                    value: 'add-project-member'
-                                                                },
-                                                            ],
-                                                            Opportunities: [
-                                                                {
-                                                                    label: 'Create opportunities',
-                                                                    value: 'create-jobs'
-                                                                },
-                                                                {
-                                                                    label: 'Edit opportunities',
-                                                                    value: 'edit-jobs'
-                                                                },
-                                                                {
-                                                                    label: 'Delete opportunities',
-                                                                    value: 'delete-jobs'
-                                                                },
-                                                            ]
-                                                        }} />
+                                                        editPermissions && <Multiselect onSelect={(v) => setCurrentPermissions(v)} defaultValue={currentPermissions} items={allPermisions} />
                                                     }
                                                 </Field> :
                                                 <Field className="gap-2">

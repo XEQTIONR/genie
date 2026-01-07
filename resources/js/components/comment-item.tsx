@@ -67,7 +67,7 @@ export default function CommentItem({comment, className = ''} : {comment: Commen
                 </div>
             </ItemTitle>
             <ItemDescription 
-                className='text-foreground line-clamp-none' 
+                className='text-foreground line-clamp-none text-left' 
                 dangerouslySetInnerHTML={{__html: comment.comment.replace(/(?:\r\n|\r|\n)/g, '<br>')}} 
             />
         </ItemContent>

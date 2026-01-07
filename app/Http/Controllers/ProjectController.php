@@ -142,7 +142,7 @@ class ProjectController extends Controller
                 $query->where('user_id', Auth::id());
             },
             'comments.user'
-        ])->withCount(['likes', 'views']);
+        ])->loadCount(['likes', 'views', 'comments']);
 
         $owns = false;
 
