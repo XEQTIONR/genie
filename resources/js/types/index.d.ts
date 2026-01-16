@@ -148,6 +148,7 @@ export interface User {
         skills?: string[]
         websites?: string[]
         tools?: string[]
+        socials?: string[]
     } | null
     owned_projects?: Project[]
     [key: string]: unknown // This allows for additional properties...

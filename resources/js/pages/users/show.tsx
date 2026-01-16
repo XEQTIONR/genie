@@ -1,5 +1,5 @@
 import AppLayout from '@/layouts/app-layout'
-import { ArrowUpRightIcon, BriefcaseBusiness, Check, Eraser, Image, LayoutGrid, Lightbulb, Plus, Save, Settings, Sparkle, Trash, Trash2, UserPlus, X } from "lucide-react"
+import { ArrowUpRightIcon, BriefcaseBusiness, Check, Eraser, Image, Instagram, LayoutGrid, Lightbulb, LinkIcon, Plus, Save, Settings, Sparkle, Trash, Trash2, UserPlus, X } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Camera, EllipsisVertical, Pencil, PencilRuler, Rocket, Users } from 'lucide-react'
 import axios from 'axios'
@@ -538,6 +538,11 @@ export default function Profile({
         field: 'websites',
         websites: user.meta?.websites ?? ['']
     })
+
+    const socialsForm = useForm<{socials: string[], field: string}>({
+        field: 'socials',
+        socials: user.meta?.socials ?? ['']
+    })
     
     function EditButton({ 
         disabled = false, 
@@ -563,6 +568,34 @@ export default function Profile({
                     <Pencil />
                 </Button>
             : null
+    }
+
+    function inferIcon(l: string, className = '') {
+        if (l.toLowerCase().includes('facebook.com')) {
+                    return <Facebook className={className} />
+                }
+
+                if (l.toLowerCase().includes('twitter.com') || l.toLowerCase().includes('x.com')) {
+                    return <Twitter className={className} />
+                }
+
+                if (l.toLowerCase().includes('twitch.tv')) {
+                    return <Twitch className={className} />
+                }
+
+                if (l.toLowerCase().includes('youtube.com')) {
+                    return <Youtube className={className} />
+                }
+
+                if (l.toLowerCase().includes('instagram.com')) {
+                    return <Instagram className={className} />
+                }
+
+                if (l.toLowerCase().includes('linkedin.com')) {
+                    return <LinkedIn className={className} />
+                }
+                
+                return <LinkIcon className={className == '' ? '' : 'size-4'} />
     }
 
     function showTab(tab: string) {
@@ -984,36 +1017,80 @@ export default function Profile({
                         <Separator />
                         <div className="flex flex-col md:flex-row gap-3 md:gap-0 px-5 mb-32">
                             <div className="w-full md:w-1/5 text-sm font-semibold">Socials</div>
-                            <div className="w-full text-sm">
-                                <ul>
-                                    <li className="mb-3 flex items-center gap-1">
-                                        <Facebook className="size-5" />
-                                        <a href="https://linkedin.com/XEQTIONR">XEQTIONR</a>
-                                        
-                                    </li>
-                                    <li className="mb-3 flex items-center gap-1">
-                                        <LinkedIn className="size-5" />
-                                        <a href="https://linkedin.com/in/ishteharhussain">/in/ishteharhussain</a>
-                                        
-                                    </li>
-                                    <li className="mb-3 ml-0.5 flex items-center gap-1">
-                                        <Twitter className="size-4" />
-                                        <a href="https://x.com/@XEQTIONR">@XEQTIONR</a>
-                                    </li>
-                                    <li className="mb-3 flex items-center gap-1">
-                                        <Twitch className="size-5" />
-                                        <a href="">https://www.twitch.tv/curry</a>
-                                        curry
-                                    </li>
-                                    <li className="mb-3 ml-0.5 flex items-center gap-1">
-                                        <Youtube className="size-4" />
-                                        <a href="https://www.youtube/@XEQTIONR">@XEQTIONR</a>
-                                    </li>
-                                    <li className="mb-3 flex items-center gap-1">
-                                        <Discord className="size-5" />
-                                        XEQTIONR#1534
-                                    </li>
-                                </ul>
+                            <div className="w-full text-sm flex gap-2">
+                                <div className='w-full flex flex-col gap-2.5'>
+                                    <ul className="w-full">
+                                        {
+                                            socialsForm.data.socials.map((social, i) => {
+                                                if (editing === 'socials') {
+                                                    return <li className="mb-3">
+                                                    <InputGroup>
+                                                        <InputGroupInput 
+                                                            value={social}
+                                                            onChange={(e) => socialsForm
+                                                                .setData('socials', socialsForm.data.socials.map((s, idx) => (idx == i) ? e.target.value : s))}
+                                                        />
+                                                        <InputGroupAddon>
+                                                            { inferIcon(social) }
+                                                            {/* <LinkIcon /> */}
+                                                        </InputGroupAddon>
+                                                        <InputGroupAddon align="inline-end">
+                                                            <InputGroupButton onClick={() => socialsForm.setData('socials', socialsForm.data.socials.filter((_, index) => i !== index))} size="icon-xs">
+                                                                <Trash2 />
+                                                            </InputGroupButton>
+                                                        </InputGroupAddon>
+                                                    </InputGroup>
+                                                    </li>
+                                                }
+
+                                                return <li className="mb-3 flex items-center gap-1.5">
+                                                    { inferIcon(social, 'size-4.5') }
+                                                    <a href={social}>{social}</a>
+                                                </li>
+                                            })
+                                        }
+                                    </ul>
+                                    {
+                                        editing == 'socials' && (
+                                            <div>
+                                                <Button
+                                                    
+                                                    onClick={() => socialsForm.setData('socials', socialsForm.data.socials ? [...socialsForm.data.socials, ''] : [''])} 
+                                                    size="sm"
+                                                >
+                                                        <Plus />Add Another
+                                                </Button>
+                                            </div>
+                                        )
+                                    }
+                                </div>
+                                {
+                                    editing === 'socials'
+                                        ? <>
+                                            <Button 
+                                                type="button" 
+                                                variant="outline" 
+                                                size="icon"
+                                                onClick={() => {
+                                                    socialsForm.patch(updateUser({user: user}).url)
+                                                    setEditing(false)
+                                                }}
+                                            >
+                                                <Check />
+                                            </Button>
+                                            <Button
+                                                variant="outline"
+                                                size="icon" 
+                                                type="button" 
+                                                onClick={() => {
+                                                    socialsForm.setData('socials', user.meta?.socials ?? [])
+                                                    setEditing(false)
+                                                }}
+                                            >
+                                                <X />
+                                            </Button>
+                                        </> : <EditButton what='socials' />
+                                }
                             </div>
                         </div>
                     </div>

@@ -80,6 +80,8 @@ class UserProfileController extends Controller
                 return $this->updateLocation($request, $user);
             case 'skills':
                 return $this->updateSkills($request, $user);
+            case 'socials':
+                return $this->updateSocials($request, $user);
             case 'tools':
                 return $this->updateTools($request, $user);
             case 'status':
@@ -359,6 +361,47 @@ class UserProfileController extends Controller
         ])->with('notification', [
             'type' => 'info',
             'message' => "Websites updated.",
+            'button' => null
+        ]);
+    }
+
+    protected function updateSocials(Request $request, User $user)
+    {
+        $validated = $request->validateWithBag('userInfo', [
+            'socials' => [
+                'nullable',
+                'list',
+                'distinct',
+                Rule::doesntContain([null, ''])
+            ],
+            //'websites.*' => 'active_url'
+        ]);
+
+        $meta = $user->meta;
+
+        if (!$meta) { // existing meta is empty
+            $meta = [];
+        }
+        
+        if (! array_key_exists('socials', $validated)) { // no fav games input
+            unset($meta['socials']);
+        } else {
+            $meta['socials'] = $validated['socials'];
+        }
+
+        $user->meta = $meta;
+
+        if ($meta == []) { // if existing meta is still empty
+            $user->meta = null;
+        }
+
+        $user->save();
+
+        return to_route('users.about', [
+            'user' => $user
+        ])->with('notification', [
+            'type' => 'info',
+            'message' => "Social links updated.",
             'button' => null
         ]);
     }
