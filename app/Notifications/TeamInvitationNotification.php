@@ -27,7 +27,7 @@ class TeamInvitationNotification extends Notification implements ShouldQueue
      */
     public function via(object $notifiable): array
     {
-        return ['mail'];
+        return ['mail', 'database'];
     }
 
     /**
@@ -53,8 +53,13 @@ class TeamInvitationNotification extends Notification implements ShouldQueue
      */
     public function toArray(object $notifiable): array
     {
+        $this->invitation->load(['inviter', 'team']);
         return [
-            //
+            'inviter' => $this->invitation->inviter,
+            'team' => $this->invitation->team,
+            'roles' => $this->invitation->roles,
+            'permissions' => $this->invitation->permissions,
+            'to_email' => $this->invitation->to_email,
         ];
     }
 }

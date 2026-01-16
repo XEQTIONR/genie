@@ -118,8 +118,8 @@ class TeamController extends Controller
 
                 $invitation->save();
 
-                Notification::route('mail', $invitation->to_email)
-                    ->notify(new TeamInvitationNotification($invitation));
+                $invitee_user = User::find($invitee['id']);
+                $invitee_user->notify(new TeamInvitationNotification($invitation));
             }
         }
         
