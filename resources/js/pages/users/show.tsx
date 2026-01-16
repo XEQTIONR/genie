@@ -1,5 +1,5 @@
 import AppLayout from '@/layouts/app-layout'
-import { ArrowUpRightIcon, BriefcaseBusiness, Eraser, LayoutGrid, Lightbulb, Sparkle, UserPlus } from "lucide-react"
+import { ArrowUpRightIcon, BriefcaseBusiness, Check, Eraser, Image, LayoutGrid, Lightbulb, Plus, Save, Settings, Sparkle, Trash, Trash2, UserPlus, X } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Camera, EllipsisVertical, Pencil, PencilRuler, Rocket, Users } from 'lucide-react'
 import axios from 'axios'
@@ -67,7 +67,11 @@ import { store as storeLike, destroy as destroyLike } from '@/routes/api/likes'
 import { index as indexProject } from '@/routes/users/projects'
 import ProjectGridCard from '@/components/project-grid-card'
 import Step from '@/components/step'
-
+import { Textarea } from '@/components/ui/textarea'
+import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput, InputGroupText } from '@/components/ui/input-group'
+import allRoles from '@/data/roles'
+import SearchBar from '@/components/ui/search-bar'
+import { Badge } from '@/components/ui/badge'
 type ProfileTab = NavItem & {key: string, className?: string}
 
 function RenderMultilineText({ text } : { text: string }) {
@@ -445,12 +449,13 @@ export default function Profile({
     activities,
     user, 
     tab = 'showcase', 
-    teams, projects 
+    teams,
+    projects 
 } : {
     activities: Activity[]
-    user: User, 
-    tab: string, 
-    teams?: Team[], 
+    user: User 
+    tab: string 
+    teams?: Team[] 
     projects?: Project[] 
 }) {
 
@@ -462,13 +467,11 @@ export default function Profile({
 
     const [editing, setEditing] = useState<string|false>(false)
 
-    const [favGames, setFavGames] = useState(user.meta?.fav_games ?? [])
+    // const [currentSection, setCurrentSection] = useState('overview')
 
-    const [currentSection, setCurrentSection] = useState('overview')
+    // const [windowWidth, setWindowWidth] = useState(window.innerWidth)
 
-    const [windowWidth, setWindowWidth] = useState(window.innerWidth)
-
-    const rz = useDebouncedCallback(() => {setWindowWidth(window.innerWidth)}, 100)
+    // const rz = useDebouncedCallback(() => {setWindowWidth(window.innerWidth)}, 100)
 
     const [likes, setLikes] = useState(user.likes ?? [])
 
@@ -482,10 +485,10 @@ export default function Profile({
         return "Following"
     })
 
-    useEffect(() => {
-        window.addEventListener("resize", rz)
-        return () => window.removeEventListener("resize", rz)
-    }, [rz])
+    // useEffect(() => {
+    //     window.addEventListener("resize", rz)
+    //     return () => window.removeEventListener("resize", rz)
+    // }, [rz])
 
     const { auth, apiToken } = usePage<SharedData>().props
 
@@ -504,17 +507,36 @@ export default function Profile({
         { title: "Teams / Studios", href: showTeams({ user: user.username }).url, key: "teams"},
     ]
 
-    // if ( auth.user?.id === user.id ) {
-    //     tabs.push({ title: "Invite", href: "/", key: "invite", icon: Mail, className: "ml-2 border" })
-    // } else {
-    //     tabs.push({ title: "Add to team", href: "/", key: "invite", icon: UserPlus, className: "ml-2 border" })
-    // }
-
     const isPro = true
 
     const skillForm = useForm<{skills: string[], field: string}>({
         field: 'skills',
         skills: user.meta?.skills ?? []
+    })
+
+    const gamesForm = useForm<{fav_games: string[], field: string}>({
+        field: 'fav_games',
+        fav_games: user.meta?.fav_games ?? []
+    })
+
+    const toolsForm = useForm<{tools: string[], field: string}>({
+        field: 'tools',
+        tools: user.meta?.tools ?? []
+    })
+
+    const statusForm = useForm<{status: string, field: string}>({
+        field: 'status',
+        status: user.status ?? '',
+    })
+
+    const bioForm = useForm<{bio: string, field: string}>({
+        field: 'bio',
+        bio: user.bio ?? '',
+    })
+
+    const websitesForm = useForm<{websites: string[], field: string}>({
+        field: 'websites',
+        websites: user.meta?.websites ?? ['']
     })
     
     function EditButton({ 
@@ -526,7 +548,7 @@ export default function Profile({
         what: string
         onClick?: () => void 
     }) {
-        return auth.user?.id === user.id && editing !== what 
+        return auth.user?.id === user.id
             ? <Button
                 onClick={() => {
                     if (onClick) {
@@ -536,11 +558,11 @@ export default function Profile({
                 }} 
                 disabled={disabled} 
                 className="cursor-pointer" 
-                size="icon" variant="ghost"
+                size="icon" variant="outline"
                 >
                     <Pencil />
                 </Button>
-            : <div className="size-8"></div>
+            : null
     }
 
     function showTab(tab: string) {
@@ -585,65 +607,384 @@ export default function Profile({
             case 'about':
                 return (
                     <div className="w-full max-w-3xl mx-auto mt-20 flex flex-col gap-8">
-                        <div className="flex flex-col md:flex-row gap-3 md:gap-0 px-5">
+                        <div className="flex flex-col md:flex-row gap-3 px-5">
                             <div className="w-full md:w-1/5 text-sm font-semibold">Status</div>
-                            <div className="w-full md:w-3/5 text-sm">{user.status}</div>
+                            {
+                                editing === 'status'
+                                    ? <>
+                                        <Input value={statusForm.data.status} onChange={(e) => statusForm.setData('status', e.target.value)} />
+                                        <Button onClick={() => {
+                                            statusForm.patch(updateUser({user: user}).url)
+                                            setEditing(false)
+                                        }} size="icon" variant="outline"><Check /></Button>
+                                        <Button onClick={() => setEditing(false)} size="icon" variant="outline"><X /></Button>
+                                    </> : <>
+                                        <div className="w-full text-sm">{user.status}</div>
+                                        <EditButton what='status' />
+                                    </>
+                            }
                         </div>
                         <Separator />
-                        <div className="flex flex-col md:flex-row gap-3 md:gap-0 px-5">
+                        <div className="flex flex-col md:flex-row gap-3 px-5">
                             <div className="w-full md:w-1/5 text-sm font-semibold">Biography</div>
-                            <div className="w-full md:w-3/5 text-sm">{user.bio}</div>
+                            {
+                                editing === 'bio'
+                                    ? <>
+                                        <Textarea value={bioForm.data.bio} onChange={(e) => bioForm.setData('bio', e.target.value)} />
+                                        <Button onClick={() => {
+                                            bioForm.patch(updateUser({user: user}).url)
+                                            setEditing(false)
+                                        }} size="icon" variant="outline"><Check /></Button>
+                                        <Button onClick={() => setEditing(false)} size="icon" variant="outline"><X /></Button>
+                                    </> : <>
+                                        <div className="w-full text-sm">{user.bio}</div>
+                                        <EditButton what='bio' />
+                                    </>
+                            }
+                            
+                            
                         </div>
                         <Separator />
                         <div className="flex flex-col md:flex-row gap-3 md:gap-0 px-5">
                             <div className="w-full md:w-1/5 text-sm font-semibold">Websites</div>
-                            <div className="w-full md:w-3/5 text-sm">
-                                <ul>
-                                    <li className="mb-0.5">ishteharhussain.com</li>
-                                    <li className="mb-0.5">dglcore.com</li>
+                            <div className="w-full  text-sm flex justify-between gap-3">
+                                <ul className='w-full'>
+                                {
+                                    websitesForm.data.websites.map((website, index) => {
+                                        return <li className="mb-3">{
+                                            editing == 'websites'
+                                                ? (
+                                                    <InputGroup>
+                                                        <InputGroupInput 
+                                                            onChange={(e) => {
+                                                                websitesForm.setData('websites', websitesForm.data.websites.map((w, i) => {
+                                                                    if (i == index) {
+                                                                        return e.target.value.split(/^https?:\/{2}/).pop() ?? ''
+                                                                    }
+                                                                    return w
+                                                                }))
+                                                            }} 
+                                                            value={website} 
+                                                            placeholder="example.com" 
+                                                            className="!pl-1" 
+                                                        />
+                                                        <InputGroupAddon>
+                                                            <InputGroupText>https://</InputGroupText>
+                                                        </InputGroupAddon>
+                                                        <InputGroupAddon align="inline-end">
+                                                            <InputGroupButton onClick={() => websitesForm.setData('websites', websitesForm.data.websites.filter((_, i) => i !== index))} size="icon-xs">
+                                                                <Trash2 />
+                                                            </InputGroupButton>
+                                                        </InputGroupAddon>
+                                                    </InputGroup>
+                                                )
+                                                : website
+                                        }</li>
+                                    })
+                                }
+                                {
+                                    editing == 'websites' && (
+                                        <li>
+                                            <Button
+                                                className="mt-2" 
+                                                onClick={() => websitesForm.setData('websites', [...websitesForm.data.websites, ''])} 
+                                                size="sm"
+                                            >
+                                                    <Plus />Add Another
+                                            </Button>
+                                        </li>
+                                    )
+                                }
+                                    
                                 </ul>
+                                {
+                                    editing === 'websites'
+                                        ? 
+                                        <>
+                                            <Button 
+                                                type="button" 
+                                                variant="outline" 
+                                                size="icon"
+                                                onClick={() => {
+                                                    websitesForm.patch(updateUser({ user: user}).url)
+                                                    setEditing(false)
+                                                }}
+                                            >
+                                                <Check />
+                                            </Button>
+                                            <Button
+                                                variant="outline"
+                                                size="icon" 
+                                                type="button" 
+                                                onClick={() => {
+                                                    websitesForm.setData('websites', user.meta?.websites ?? [])
+                                                    setEditing(false)
+                                                }}
+                                            >
+                                                <X />
+                                            </Button>
+                                        </>
+                                        : <EditButton what='websites' />
+                                }
+                                
                             </div>
                         </div>
                         <Separator />
                         <div className="flex flex-col md:flex-row gap-3 md:gap-0 px-5">
                             <div className="w-full md:w-1/5 text-sm font-semibold">Skills</div>
-                            <div className="w-full md:w-3/5 flex flex-wrap gap-2 relative md:-top-1">
-                            {
-                                user.meta?.skills &&
-                                user.meta?.skills.map((skill) => (
-                                    <span className="text-xs px-2.5 py-2 rounded-lg bg-foreground/5">{skill}</span>
-                                ))
-                            }
+                            <div className="w-full flex gap-2 relative md:-top-1">
+                                
+                                <div className="flex flex-col w-full gap-3">
+                                    {
+                                        skillForm.data.skills.length > 0 && 
+                                        <div className="flex flex-wrap gap-2 w-full">
+                                        {
+                                            skillForm.data.skills.map((skill, idx) => (
+                                                <Badge
+                                                    variant="secondary"
+                                                    className={cn({"cursor-pointer": editing === 'skills'})}
+                                                    onClick={() => {
+                                                        if (editing === 'skills') {
+                                                            skillForm.setData('skills', skillForm.data.skills.filter((_, i) => i !== idx))
+                                                        }
+                                                    }}
+                                                >
+                                                    {skill} 
+                                                    {
+
+                                                    }
+                                                    { editing === 'skills' && <X /> }
+                                                </Badge>
+                                            ))
+                                        }
+                                        </div>
+                                    }
+                                    
+                                    {
+                                        editing === 'skills' && (
+                                            <SearchBar
+                                                placeholder="Select skills"
+                                                onSelectOption={(val) => {
+                                                    if (skillForm.data.skills.indexOf(val) === -1) {
+                                                        skillForm.setData('skills', [...skillForm.data.skills, val])
+                                                    }
+                                                }} 
+                                                searchOptions={allRoles.map(({name, items}) => {
+                                                    return {
+                                                        heading: name,
+                                                        options: items.map((item) => {
+                                                            return {
+                                                                label: item,
+                                                                value: item
+                                                            }
+                                                        })
+                                                    }
+                                                })}
+                                            />
+                                        )
+                                    }
+                                </div>
+                                
+                                {
+                                    editing === 'skills'
+                                        ? <>
+                                            <Button 
+                                                type="button" 
+                                                variant="outline" 
+                                                size="icon"
+                                                onClick={() => {
+                                                    skillForm.patch(updateUser({ user: user}).url)
+                                                    setEditing(false)
+                                                }}
+                                            >
+                                                <Check />
+                                            </Button>
+                                            <Button
+                                                variant="outline"
+                                                size="icon" 
+                                                type="button" 
+                                                onClick={() => {
+                                                    skillForm.setData('skills', user.meta?.skills ?? [])
+                                                    setEditing(false)
+                                                }}
+                                            >
+                                                <X />
+                                            </Button>
+                                        </> : <EditButton what='skills' />
+                                }
+
                             </div>
+                            
                         </div>
                         <Separator />
                         <div className="flex flex-col md:flex-row gap-3 md:gap-0 px-5">
                             <div className="w-full md:w-1/5 text-sm font-semibold">Tools</div>
-                            <div className="w-full md:w-3/5 flex flex-wrap gap-2 relative md:-top-1">
-                            {
-                                user.meta?.skills &&
-                                user.meta?.skills.map((skill) => (
-                                    <span className="text-xs px-2.5 py-2 rounded-lg bg-foreground/5">{skill}</span>
-                                ))
-                            }
+                            <div className="w-full flex gap-2 relative md:-top-1">
+                                
+                                <div className="flex flex-col w-full gap-3">
+                                    {
+                                        toolsForm.data.tools.length > 0 &&
+                                        <div className="flex flex-wrap gap-2 w-full">
+                                        {
+                                            toolsForm.data.tools.map((tool, idx) => (
+                                                <Badge
+                                                    variant="secondary"
+                                                    className={cn({"cursor-pointer": editing === 'tools'})}
+                                                    onClick={() => {
+                                                        if (editing === 'tools') {
+                                                            toolsForm.setData('tools', toolsForm.data.tools.filter((_, i) => i !== idx))
+                                                        }
+                                                    }}
+                                                >
+                                                    {tool} 
+                                                    { editing === 'tools' && <X /> }
+                                                </Badge>
+                                            ))
+                                        }
+                                        </div>
+                                    }
+                                    {
+                                        editing === 'tools' && (
+                                            <SearchBar
+                                                placeholder="Select tools"
+                                                onSelectOption={(val) => {
+                                                    if (toolsForm.data.tools.indexOf(val) === -1) {
+                                                        toolsForm.setData('tools', [...toolsForm.data.tools, val])
+                                                    }
+                                                }} 
+                                                searchOptions={allRoles.map(({name, items}) => {
+                                                    return {
+                                                        heading: name,
+                                                        options: items.map((item) => {
+                                                            return {
+                                                                label: item,
+                                                                value: item
+                                                            }
+                                                        })
+                                                    }
+                                                })}
+                                            />
+                                        )
+                                    }
+                                </div>
+                                
+                                {
+                                    editing === 'tools'
+                                        ? <>
+                                            <Button 
+                                                type="button" 
+                                                variant="outline" 
+                                                size="icon"
+                                                onClick={() => {
+                                                    toolsForm.patch(updateUser({user: user}).url)
+                                                    setEditing(false)
+                                                }}
+                                            >
+                                                <Check />
+                                            </Button>
+                                            <Button
+                                                variant="outline"
+                                                size="icon" 
+                                                type="button" 
+                                                onClick={() => {
+                                                    toolsForm.setData('tools', user.meta?.tools ?? [])
+                                                    setEditing(false)
+                                                }}
+                                            >
+                                                <X />
+                                            </Button>
+                                        </> : <EditButton what='tools' />
+                                }
+
                             </div>
+                            
                         </div>
                         <Separator />
                         <div className="flex flex-col md:flex-row gap-3 md:gap-0 px-5">
                             <div className="w-full md:w-1/5 text-sm font-semibold">Favorite Games</div>
-                            <div className="w-full md:w-3/5 text-sm flex gap-2 relative -top-1">
+                            <div className="w-full  text-sm flex justify-between gap-3">
+                                <ul className='w-full'>
                                 {
-                                    user.meta?.fav_games &&
-                                    user.meta?.fav_games.map((game) => (
-                                        <span className="text-xs px-2.5 py-2 rounded-lg bg-foreground/5">{game}</span>
-                                    ))
+                                    gamesForm.data.fav_games.map((game, index) => {
+                                        return <li className="mb-3">{
+                                            editing == 'fav_games'
+                                                ? (
+                                                    <InputGroup>
+                                                        <InputGroupInput 
+                                                            onChange={(e) => {
+                                                                gamesForm.setData('fav_games', gamesForm.data.fav_games.map((w, i) => {
+                                                                    if (i == index) {
+                                                                        return e.target.value
+                                                                    }
+                                                                    return w
+                                                                }))
+                                                            }} 
+                                                            value={game} 
+                                                            placeholder="example.com" 
+                                                            
+                                                        />
+                                                        <InputGroupAddon align="inline-end">
+                                                            <InputGroupButton onClick={() => gamesForm.setData('fav_games', gamesForm.data.fav_games.filter((_, i) => i !== index))} size="icon-xs">
+                                                                <Trash2 />
+                                                            </InputGroupButton>
+                                                        </InputGroupAddon>
+                                                    </InputGroup>
+                                                )
+                                                : game
+                                        }</li>
+                                    })
                                 }
+                                {
+                                    editing == 'fav_games' && (
+                                        <li>
+                                            <Button
+                                                className="mt-2" 
+                                                onClick={() => gamesForm.setData('fav_games', gamesForm.data.fav_games ? [...gamesForm.data.fav_games, ''] : [''])} 
+                                                size="sm"
+                                            >
+                                                    <Plus />Add Another
+                                            </Button>
+                                        </li>
+                                    )
+                                }
+                                    
+                                </ul>
+                                {
+                                    editing === 'fav_games'
+                                        ? 
+                                        <>
+                                        <Button 
+                                            type="button" 
+                                            variant="outline" 
+                                            size="icon"
+                                            onClick={() => {
+                                                gamesForm.patch(updateUser({ user: user}).url)
+                                                setEditing(false)
+                                            }}
+                                        >
+                                            <Check />
+                                        </Button>
+                                        <Button
+                                            variant="outline"
+                                            size="icon" 
+                                            type="button" 
+                                            onClick={() => {
+                                                gamesForm.setData('fav_games', user.meta?.fav_games ?? [])
+                                                setEditing(false)
+                                            }}
+                                        >
+                                            <X />
+                                        </Button>
+                                        </>
+                                        : <EditButton what='fav_games' />
+                                }
+                                
                             </div>
                         </div>
                         <Separator />
                         <div className="flex flex-col md:flex-row gap-3 md:gap-0 px-5 mb-32">
                             <div className="w-full md:w-1/5 text-sm font-semibold">Socials</div>
-                            <div className="w-full md:w-3/5 text-sm">
+                            <div className="w-full text-sm">
                                 <ul>
                                     <li className="mb-3 flex items-center gap-1">
                                         <Facebook className="size-5" />
@@ -840,7 +1181,6 @@ export default function Profile({
                     className="h-88 flex gap-4 justify-between border-sidebar-border/70 dark:border-sidebar-border"
                 >
                     <div className="w-full h-full relative flex justify-end items-start md:items-end px-4 py-5">
-                    
                     {
                         user.id === auth.user?.id ?
                         <Button
@@ -873,14 +1213,14 @@ export default function Profile({
                     }
                     </div>
                 </div>
-                <div className="relative -top-68 -mb-56 flex flex-col items-center gap-3 w-full">
+                <div className="relative -top-68 -mb-44 flex flex-col items-center gap-3 w-full">
                     <Avatar className="size-24 ring-background">
-                        {
-                            auth.user && auth.user.id === user.id &&
-                            <div onClick={() => setShowAvatarDialog(true)} className="cursor-pointer size-full flex items-center justify-center absolute bg-neutral-950/50 z-50 opacity-0 hover:opacity-100">
-                                <Camera className="opacity-90 stroke-white" size={25} />
-                            </div>
-                        }
+                    {
+                        auth.user && auth.user.id === user.id &&
+                        <div onClick={() => setShowAvatarDialog(true)} className="cursor-pointer size-full flex items-center justify-center absolute bg-neutral-950/50 z-50 opacity-0 hover:opacity-100">
+                            <Camera className="opacity-90 stroke-white" size={25} />
+                        </div>
+                    }
                         <AvatarImage src={user.avatar} />
                         <AvatarFallback className="text-3xl">{user.name.split(' ').map(word => word.charAt(0)).join("")}</AvatarFallback>
                     </Avatar>
@@ -964,11 +1304,10 @@ export default function Profile({
                         >
                             {followButtonText}
                         </Button>
-
                     }
                     
                 </div>
-                <div className="w-full flex flex-col mx-auto gap-0 items-center z-50 sticky top-0 bg-foreground dark:bg-background border-b shadow-lg dark:shadow-neutral-900/80">
+                <div className="w-full flex flex-col mx-auto gap-0 items-center z-50 sticky top-0 bg-background border-b shadow-lg dark:shadow-neutral-900/80">
                     <TabbedSectionHeaders
                         className="w-full px-1"
                         current={tab}

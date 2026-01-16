@@ -146,6 +146,8 @@ export interface User {
     meta: {
         fav_games?: string[]
         skills?: string[]
+        websites?: string[]
+        tools?: string[]
     } | null
     owned_projects?: Project[]
     [key: string]: unknown // This allows for additional properties...

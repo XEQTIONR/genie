@@ -64,7 +64,7 @@ class UserProfileController extends Controller
     public function update(Request $request, User $user)
     {   
         $validated = $request->validate([
-            'field' => 'required|string|in:avatar,banner,bio,contact,fav_games,location,skills,socials,status',
+            'field' => 'required|string|in:avatar,banner,bio,contact,fav_games,location,skills,socials,status,tools,websites',
         ]);
 
         switch ($validated['field']) {
@@ -80,8 +80,12 @@ class UserProfileController extends Controller
                 return $this->updateLocation($request, $user);
             case 'skills':
                 return $this->updateSkills($request, $user);
+            case 'tools':
+                return $this->updateTools($request, $user);
             case 'status':
                 return $this->updateStatus($request, $user);
+            case 'websites':
+                return $this->updateWebsites($request, $user);
         }
     }
 
@@ -277,6 +281,84 @@ class UserProfileController extends Controller
         ])->with('notification', [
             'type' => 'info',
             'message' => "Skills updated.",
+            'button' => null
+        ]);
+    }
+
+    protected function updateTools(Request $request, User $user)
+    {
+        $validated = $request->validateWithBag('userInfo', ['tools' => [
+            'nullable',
+            'list',
+            Rule::doesntContain([null, ''])
+        ]]);
+
+        $meta = $user->meta;
+
+        if (!$meta) { // existing meta is empty
+            $meta = [];
+        }
+        
+        if (! array_key_exists('tools', $validated)) { // no fav games input
+            unset($meta['tools']);
+        } else {
+            $meta['tools'] = $validated['tools'];
+        }
+
+        $user->meta = $meta;
+
+        if ($meta == []) { // if existing meta is still empty
+            $user->meta = null;
+        }
+
+        $user->save();
+
+        return to_route('users.about', [
+            'user' => $user
+        ])->with('notification', [
+            'type' => 'info',
+            'message' => "Tools updated.",
+            'button' => null
+        ]);
+    }
+
+    protected function updateWebsites(Request $request, User $user)
+    {
+        $validated = $request->validateWithBag('userInfo', [
+            'websites' => [
+                'nullable',
+                'list',
+                'distinct',
+                Rule::doesntContain([null, ''])
+            ],
+            //'websites.*' => 'active_url'
+        ]);
+
+        $meta = $user->meta;
+
+        if (!$meta) { // existing meta is empty
+            $meta = [];
+        }
+        
+        if (! array_key_exists('websites', $validated)) { // no fav games input
+            unset($meta['websites']);
+        } else {
+            $meta['websites'] = $validated['websites'];
+        }
+
+        $user->meta = $meta;
+
+        if ($meta == []) { // if existing meta is still empty
+            $user->meta = null;
+        }
+
+        $user->save();
+
+        return to_route('users.about', [
+            'user' => $user
+        ])->with('notification', [
+            'type' => 'info',
+            'message' => "Websites updated.",
             'button' => null
         ]);
     }
