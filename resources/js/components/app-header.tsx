@@ -48,12 +48,13 @@ import { index as indexJobs } from '@/routes/opportunities'
 import { index as indexUsers } from '@/routes/users';
 import { type BreadcrumbItem, type NavItem, type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { BadgeHelpIcon, Bell, BookOpen, BriefcaseBusiness, ChevronDown, Folder, Handshake, Lightbulb, LogIn, LucideIcon, Menu, MessageCircle, MessageSquareText, PencilRuler, Plus, Search, User2, UserRoundSearch, UserSearch } from 'lucide-react';
+import { BadgeHelpIcon, Bell, BookOpen, BriefcaseBusiness, ChevronDown, Folder, Handshake, Lightbulb, LogIn, LucideIcon, Menu, MessageCircle, MessageSquareText, PencilRuler, Plus, Search, ShieldAlertIcon, User2, UserRoundSearch, UserSearch } from 'lucide-react';
 import AppLogo from './app-logo';
 import AppLogoIcon from './app-logo-icon';
 import { useEffect, useState } from 'react';
 import { useDebouncedCallback } from 'use-debounce'
 import { Input } from './ui/input';
+import { Item, ItemActions, ItemContent, ItemDescription, ItemMedia, ItemTitle } from './ui/item';
 
 const rightNavItems: NavItem[] = [
     {
@@ -262,7 +263,6 @@ export function AppHeader({ breadcrumbs = [], maxWidth, stickyAfter = 0 }: AppHe
                             </Link>
                         
                             {/* Desktop Navigation */}
-                            {/* <div className='flex'> */}
                             <NavigationMenu className="hidden lg:flex" viewport={false}>
                                 <NavigationMenuList>
                                     <NavigationMenuItem key="explore">
@@ -351,18 +351,12 @@ export function AppHeader({ breadcrumbs = [], maxWidth, stickyAfter = 0 }: AppHe
                                     </div>
                                 )
                             }
-                            
-                        {/* </div> */}
                         </div>
                         
                         
                         {/* Right Navigation */}
                         <div className="flex items-center space-x-2">
                             <div className="relative flex items-center gap-3">
-                                <Button className="hidden lg:flex cursor-pointer" onClick={() => router.visit(createPost()) }>
-                                    <Plus />
-                                    Share Work
-                                </Button>
                                 <Button
                                     onClick={() => {
                                         console.log(showMobileSearchBar)
@@ -382,76 +376,76 @@ export function AppHeader({ breadcrumbs = [], maxWidth, stickyAfter = 0 }: AppHe
                                 >
                                     <MessageCircle className="!size-5 opacity-80 group-hover:opacity-100" />
                                 </Button> */}
-                                <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    className="group cursor-pointer"
-                                >
-                                    <Bell className="!size-5 opacity-80 group-hover:opacity-100" />
-                                </Button>
-                                {/* <div className="hidden lg:flex">
-                                    {rightNavItems.map((item) => (
-                                        <TooltipProvider
-                                            key={item.title}
-                                            delayDuration={0}
-                                        >
-                                            <Tooltip>
-                                                <TooltipTrigger>
-                                                    <a
-                                                        href={
-                                                            typeof item.href ===
-                                                            'string'
-                                                                ? item.href
-                                                                : item.href.url
-                                                        }
-                                                        target="_blank"
-                                                        rel="noopener noreferrer"
-                                                        className="group ml-1 inline-flex h-9 w-9 items-center justify-center rounded-md bg-transparent p-0 text-sm font-medium text-accent-foreground ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50"
-                                                    >
-                                                        <span className="sr-only">
-                                                            {item.title}
-                                                        </span>
-                                                        {item.icon && (
-                                                            <Icon
-                                                                iconNode={item.icon}
-                                                                className="size-5 opacity-80 group-hover:opacity-100"
-                                                            />
-                                                        )}
-                                                    </a>
-                                                </TooltipTrigger>
-                                                <TooltipContent>
-                                                    <p>{item.title}</p>
-                                                </TooltipContent>
-                                            </Tooltip>
-                                        </TooltipProvider>
-                                    ))}
-                                </div> */}
-                            </div>
-                            {
-                                auth.user ? (
-                                    <DropdownMenu>
-                                        <DropdownMenuTrigger asChild>
-                                            <Button
-                                                variant="ghost"
-                                                className="size-10 rounded-full p-1"
-                                            >
-                                                <Avatar className="size-8 overflow-hidden rounded-full">
-                                                    <AvatarImage
-                                                        src={auth.user.avatar}
-                                                        alt={auth.user.name}
-                                                    />
-                                                    <AvatarFallback className="rounded-lg bg-neutral-200 text-black dark:bg-neutral-700 dark:text-white">
-                                                        {getInitials(auth.user.name)}
-                                                    </AvatarFallback>
-                                                </Avatar>
-                                            </Button>
-                                        </DropdownMenuTrigger>
-                                        <DropdownMenuContent className="w-56 z-100" align="end">
-                                            <UserMenuContent user={auth.user} />
-                                        </DropdownMenuContent>
-                                    </DropdownMenu>
-                                ) : (
-                                    <>
+                                {
+                                    auth.user ? (<>
+                                        <Button className="hidden lg:flex cursor-pointer" onClick={() => router.visit(createPost()) }>
+                                            <Plus />
+                                            Share Work
+                                        </Button>
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger asChild>
+                                                {/* <> */}
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="group cursor-pointer relative"
+                                                >
+                                                    <Bell className="!size-5 opacity-80 group-hover:opacity-100" />
+                                                    <span className="bg-red-700 px-1 rounded-full absolute right-0 top-0 text-xs">8</span>
+                                                </Button>
+                                                
+                                                {/* </> */}
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent align="end">
+                                                <DropdownMenuGroup>
+                                                    {
+                                                        [1,2,3,4,5].map((_,i,a) => (
+                                                            <>
+                                                            <DropdownMenuItem className='p-0'>
+                                                                <Item>
+                                                                    <ItemMedia variant="icon">
+                                                                        <ShieldAlertIcon />
+                                                                    </ItemMedia>
+                                                                    <ItemContent>
+                                                                    <ItemTitle>Security Alert</ItemTitle>
+                                                                    <ItemDescription>
+                                                                        New login detected from unknown device.
+                                                                    </ItemDescription>
+                                                                    </ItemContent>
+                                                                    
+                                                                </Item>
+                                                            </DropdownMenuItem>
+                                                            {
+                                                                (i < a.length - 1) &&  <DropdownMenuSeparator />
+                                                            }
+                                                            
+                                                            </>
+                                                        ))
+                                                    }
+                                                    
+                                                    
+                                                </DropdownMenuGroup>
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger asChild>
+                                                <Button
+                                                    variant="ghost"
+                                                    className="size-10 rounded-full p-1"
+                                                >
+                                                    <Avatar className="size-8 overflow-hidden rounded-full">
+                                                        <AvatarImage src={auth.user.avatar} alt={auth.user.name} />
+                                                        <AvatarFallback className="rounded-lg bg-neutral-200 text-black dark:bg-neutral-700 dark:text-white">
+                                                            {getInitials(auth.user.name)}
+                                                        </AvatarFallback>
+                                                    </Avatar>
+                                                </Button>
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent className="w-56 z-100" align="end">
+                                                <UserMenuContent user={auth.user} />
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
+                                    </>) : (<>
                                         <Button size="icon" onClick={() => router.visit(login())} className="cursor-pointer lg:hidden" variant="outline">
                                             <LogIn />
                                         </Button>
@@ -459,11 +453,9 @@ export function AppHeader({ breadcrumbs = [], maxWidth, stickyAfter = 0 }: AppHe
                                             <LogIn />
                                             Sign In
                                         </Button>
-                                    </>
-
-                                )
-                            }
-                            
+                                    </>)
+                                }
+                            </div>
                         </div>
                     </div>
                 </div>
