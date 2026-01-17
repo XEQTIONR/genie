@@ -68,8 +68,10 @@ class OpportunityInquiryNotification extends Notification
      */
     public function toArray(object $notifiable): array
     {
+        
         return [
-            //
+            'opportunity' => $this->opportunity,
+            'inquiry' => $this->inquiry,
         ];
     }
 }

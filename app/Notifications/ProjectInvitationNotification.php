@@ -27,7 +27,7 @@ class ProjectInvitationNotification extends Notification
      */
     public function via(object $notifiable): array
     {
-        return ['mail'];
+        return ['mail', 'database'];
     }
 
     /**
@@ -53,8 +53,13 @@ class ProjectInvitationNotification extends Notification
      */
     public function toArray(object $notifiable): array
     {
+        $this->invitation->load(['inviter', 'project']);
         return [
-            //
+            'inviter' => $this->invitation->inviter,
+            'project' => $this->invitation->project,
+            'roles' => $this->invitation->roles,
+            'permissions' => $this->invitation->permissions,
+            'to_email' => $this->invitation->to_email,
         ];
     }
 }

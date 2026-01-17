@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Middleware;
 use Laravel\Sanctum\PersonalAccessToken;
 
@@ -48,7 +49,14 @@ class HandleInertiaRequests extends Middleware
             ],
             'apiToken' => fn() => resolve(PersonalAccessToken::class),
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
-            'notification' => session('notification', null)
+            'notification' => session('notification', null),
+            'notifications' => function() {
+                if (Auth::user()) {
+                    return Auth::user()->notifications;
+                }
+
+                return [];
+            }
         ];
     }
 }

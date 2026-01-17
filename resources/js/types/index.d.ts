@@ -37,6 +37,8 @@ export interface SharedData {
         message: string,
         button: NotificationButton | null
     }
+
+    notifications: unknown[]
 }
 
 interface Location {

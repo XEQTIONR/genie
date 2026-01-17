@@ -66,9 +66,11 @@ class ProjectMembershipController extends Controller
                 ]);
 
                 $invitation->save();
-
-                Notification::route('mail', $invitation->to_email)
-                    ->notify(new ProjectInvitationNotification($invitation));
+                
+                $invitee_user = User::find($invitee['id']);
+                $invitee_user->notify(new ProjectInvitationNotification($invitation));
+                // Notification::route('mail', $invitation->to_email)
+                //     ->notify(new ProjectInvitationNotification($invitation));
             }
         }
 

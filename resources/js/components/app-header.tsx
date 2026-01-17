@@ -105,7 +105,7 @@ interface AppHeaderProps {
 
 export function AppHeader({ breadcrumbs = [], maxWidth, stickyAfter = 0 }: AppHeaderProps) {
     const page = usePage<SharedData>();
-    const { auth, notification } = page.props;
+    const { auth, notification, notifications } = page.props;
     const getInitials = useInitials();
 
     const [scrollY, setScrollY] = useState(window.scrollY ?? 0)
@@ -356,8 +356,8 @@ export function AppHeader({ breadcrumbs = [], maxWidth, stickyAfter = 0 }: AppHe
                         
                         {/* Right Navigation */}
                         <div className="flex items-center space-x-2">
-                            <div className="relative flex items-center gap-3">
-                                <Button
+                            <div className="relative flex items-center gap-5">
+                                {/* <Button
                                     onClick={() => {
                                         console.log(showMobileSearchBar)
                                         console.log('setShowMobileSearchBar')
@@ -368,7 +368,7 @@ export function AppHeader({ breadcrumbs = [], maxWidth, stickyAfter = 0 }: AppHe
                                     className="group cursor-pointer lg:hidden"
                                 >
                                     <Search className="!size-5 opacity-80 group-hover:opacity-100" />
-                                </Button>
+                                </Button> */}
                                 {/* <Button
                                     variant="ghost"
                                     size="icon"
@@ -384,22 +384,23 @@ export function AppHeader({ breadcrumbs = [], maxWidth, stickyAfter = 0 }: AppHe
                                         </Button>
                                         <DropdownMenu>
                                             <DropdownMenuTrigger asChild>
-                                                {/* <> */}
                                                 <Button
                                                     variant="ghost"
                                                     size="icon"
                                                     className="group cursor-pointer relative"
                                                 >
                                                     <Bell className="!size-5 opacity-80 group-hover:opacity-100" />
-                                                    <span className="bg-red-700 px-1 rounded-full absolute right-0 top-0 text-xs">8</span>
+                                                    {
+                                                        notifications.length > 0 && (
+                                                            <span className="bg-red-700 px-1 min-w-4 rounded-full absolute right-0 top-0 text-xs">{notifications.length}</span>
+                                                        )
+                                                    }
                                                 </Button>
-                                                
-                                                {/* </> */}
                                             </DropdownMenuTrigger>
                                             <DropdownMenuContent align="end">
                                                 <DropdownMenuGroup>
                                                     {
-                                                        [1,2,3,4,5].map((_,i,a) => (
+                                                        notifications.map((_,i,a) => (
                                                             <>
                                                             <DropdownMenuItem className='p-0'>
                                                                 <Item>
@@ -422,8 +423,6 @@ export function AppHeader({ breadcrumbs = [], maxWidth, stickyAfter = 0 }: AppHe
                                                             </>
                                                         ))
                                                     }
-                                                    
-                                                    
                                                 </DropdownMenuGroup>
                                             </DropdownMenuContent>
                                         </DropdownMenu>
