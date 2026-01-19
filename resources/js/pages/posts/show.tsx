@@ -10,7 +10,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { useInitials } from '@/hooks/use-initials'
 import { Separator } from '@/components/ui/separator'
 import { Button } from '@/components/ui/button'
-import { Heart, MessageCircle, Pencil, Share, Smile, X } from 'lucide-react'
+import { Heart, Info, MessageCircle, Pencil, Share, Smile, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { edit } from '@/routes/posts'
 import { ResizablePanelGroup } from "@/components/ui/resizable"
@@ -124,7 +124,7 @@ export default function ShowPost({post, owns} : {post: Post, owns: boolean}) {
                 {
                     !o && (
                         <div className='relative hidden lg:flex flex-col gap-2'>
-                            <Button className="rounded-full" variant="outline" onClick={() => setO(!o)} size="icon">
+                            <Button className="rounded-full cursor-pointer" variant="outline" onClick={() => setO(!o)} size="icon">
                                 <MessageCircle />
                             </Button>
                             {
@@ -132,18 +132,12 @@ export default function ShowPost({post, owns} : {post: Post, owns: boolean}) {
                                     <Badge variant="destructive" className='absolute -right-1.5 -top-1 px-1 rounded-full font-semibold cursor-pointer min-w-5.5'>{post.comments_count}</Badge>
                                 ) : null
                             }
-                            <Button onClick={async () => {
-                                console.log('share')
-                                await navigator.share({
-                                    title: "MDN",
-                                    text: post.title,
-                                    url: "https://developer.mozilla.org",
-                                })
-                            }} type="button" className="rounded-full" variant="outline" size="icon"><Share /></Button>
+                            <Button type="button" className="rounded-full cursor-pointer" variant="outline" size="icon"><Share /></Button>
+                            <Button type="button" className='rounded-full cursor-pointer' variant='outline' size="icon"><Info /></Button>
                         </div>
                     )
                 }
-                {
+                {/* {
                     !drawerOpen && (
                         <div className='flex flex-col gap-2 relative lg:hidden'>
                             <Button className="rounded-full" variant="outline" onClick={() => {
@@ -164,9 +158,10 @@ export default function ShowPost({post, owns} : {post: Post, owns: boolean}) {
                                     url: "https://developer.mozilla.org",
                                 })
                             }} className="rounded-full" variant="outline" size="icon"><Share /></Button>
+                            <Button type="button" className='rounded-full' variant='outline' size="icon"><Info /></Button>
                         </div>
                     )
-                }
+                } */}
                     
                     
                 </div>
@@ -248,7 +243,33 @@ export default function ShowPost({post, owns} : {post: Post, owns: boolean}) {
                             }
                         })
                     }
-                    <div className="flex flex-col w-full gap-5 mt-30">
+
+                    <div className='flex gap-4 relative lg:hidden mx-auto mt-10'>
+                        <div className='relative'>
+                            <Button className="rounded-full cursor-pointer" variant="outline" onClick={() => {
+                                console.log('setDraweropen:', !drawerOpen)
+                                setDrawerOpen(!drawerOpen)
+                            }} size="icon">
+                                <MessageCircle />
+                            </Button>
+                            {
+                                (post.comments_count && post.comments_count > 0) ? (
+                                    <Badge variant="destructive" className='absolute -right-1.5 -top-1 px-1 rounded-full font-semibold cursor-pointer min-w-5.5'>{post.comments_count}</Badge>
+                                ) : null
+                            }
+                        </div>
+                        
+                        {/*  */}
+                        <Button onClick={async() => {
+                            await navigator.share({
+                                title: "MDN",
+                                text: post.title,
+                                url: "https://developer.mozilla.org",
+                            })
+                        }} className="rounded-full cursor-pointer" variant="outline" size="icon"><Share /></Button>
+                        <Button type="button" className="rounded-full cursor-pointer" variant="outline" size="icon"><Info /></Button>
+                    </div>
+                    <div className="flex flex-col w-full gap-5 mt-3 md:mt-20">
                         <div className='w-full flex items-center gap-5'>
                             <div className='w-full'>
                                 <Separator />
@@ -263,7 +284,7 @@ export default function ShowPost({post, owns} : {post: Post, owns: boolean}) {
                         </div>
                         <h2 className="text-center text-xl font-semibold tracking-wide">{post.owner?.name ?? post.owner?.title}</h2>
                         <div className='w-full flex justify-center'>
-                            <Button className="rounded-full py-5 px-5 mb-10 font-semibold">Send Inquiry</Button>
+                            <Button className="rounded-full py-5 px-5 mb-10 font-semibold cursor-pointer">Send Inquiry</Button>
                         </div>
                     </div>
                     
@@ -277,10 +298,10 @@ export default function ShowPost({post, owns} : {post: Post, owns: boolean}) {
                     <div className='w-full h-full flex'>
                         <div className="h-full w-5 border-r flex flex-col items-center">
                         </div>
-                        <Button onClick={() => setO(!o)} variant="secondary" size="icon-sm" className="sticky top-28 -translate-x-4 -mr-2 scrollbar-hide rounded-full">
+                        <Button onClick={() => setO(!o)} variant="secondary" size="icon-sm" className="sticky top-28 -translate-x-4 -mr-2 scrollbar-hide rounded-full cursor-pointer">
                             <X />
                         </Button>
-                        <div className="w-full flex flex-col gap-3 h-[90vh] overflow-y-scroll overflow-x-hidden pr-12 top-0">
+                        <div className="w-full flex flex-col gap-3 h-[93vh] overflow-y-scroll overflow-x-hidden pr-12 top-0">
                             <div className='flex gap-3 pb-2 w-full justify-between items-center sticky top-4 pt-7 bg-background z-40'>
                                 <h1 className='text-xl font-bold'>Comments</h1>
                                 <div className='flex gap-3'>
@@ -295,7 +316,8 @@ export default function ShowPost({post, owns} : {post: Post, owns: boolean}) {
                                         likeClasses
                                     )} />
                                 </Button>
-                                <Button className="rounded-full" variant="outline" size="icon"><Share /></Button>
+                                <Button className="rounded-full cursor-pointer" variant="outline" size="icon"><Share /></Button>
+                                <Button type="button" className='rounded-full cursor-pointer' variant='outline' size="icon"><Info /></Button>
                                 </div>
                             </div>
                             
@@ -323,8 +345,12 @@ export default function ShowPost({post, owns} : {post: Post, owns: boolean}) {
         <Drawer open={drawerOpen} onOpenChange={(open) => { setDrawerOpen(open) }}>
             <DrawerContent className='lg:hidden'>
                 <ScrollArea className='mt-5 w-full max-w-lg flex flex-col mx-auto px-4 h-full overflow-y-scroll'>
-                    <div className='w-full sticky top-0 bg-background z-50'>
+                    <div className='w-full sticky top-0 bg-background z-50 flex justify-between items-center'>
                         <h1 className='text-xl font-bold pb-2'>Comments</h1>
+                        <div className='flex gap-2 items-center'>
+                            <Button type="button" className='rounded-full cursor-pointer' variant='outline' size="icon"><Share /></Button>
+                            <Button type="button" className='rounded-full cursor-pointer' variant='outline' size="icon"><Info /></Button>
+                        </div>
                     </div>
                     
                     { comments.map(comment => <CommentItem className='relative -left-4' comment={comment} />) }

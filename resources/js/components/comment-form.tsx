@@ -40,43 +40,42 @@ export default function CommentForm({
         </ItemMedia>
         <ItemContent>
             <ItemDescription>
-            <InputGroup>
+                <InputGroup>
                     <InputGroupTextarea className="text-pretty" value={comment} onChange={(e) => setComment(e.target.value)} placeholder="Write your comment ..." />
                     <InputGroupAddon align="block-end">
-                
-                    <InputGroupButton
-                    variant="secondary"
-                    className="rounded-full ml-auto"
-                    size="icon-sm"
-                    onClick={() => {
-                        axios.post(store().url, {
-                            commentable_type: commentableType,
-                            commentable_id: commentableId,
-                            comment,
-                        }, {
-                            headers: {
-                                Authorization: 'Bearer ' + apiToken
-                            }
-                        })
-                            .then(res => {
-                                if (onSuccess) {
-                                    onSuccess(res.data)
-                                }
-                                setComment("") 
-                            })
-                            .catch(e => {
-                                if(onError) {
-                                    onError(e)
-                                }
-                            })
-                        
-                    }}
-                >
-                    <Send  />
-                    <span className="sr-only">Send</span>
-                </InputGroupButton>
-                </InputGroupAddon>
-            </InputGroup>
+                        <InputGroupButton
+                            variant="secondary"
+                            className="rounded-full ml-auto cursor-pointer"
+                            size="icon-sm"
+                            onClick={() => {
+                                axios.post(store().url, {
+                                    commentable_type: commentableType,
+                                    commentable_id: commentableId,
+                                    comment,
+                                }, {
+                                    headers: {
+                                        Authorization: 'Bearer ' + apiToken
+                                    }
+                                })
+                                    .then(res => {
+                                        if (onSuccess) {
+                                            onSuccess(res.data)
+                                        }
+                                        setComment("") 
+                                    })
+                                    .catch(e => {
+                                        if(onError) {
+                                            onError(e)
+                                        }
+                                    })
+                                
+                            }}
+                        >
+                            <Send  />
+                            <span className="sr-only">Send</span>
+                        </InputGroupButton>
+                    </InputGroupAddon>
+                </InputGroup>
             </ItemDescription>
         </ItemContent>
     </Item>

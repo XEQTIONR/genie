@@ -141,7 +141,9 @@ class ProjectController extends Controller
             'likes' => function(MorphMany $query) {
                 $query->where('user_id', Auth::id());
             },
-            'comments.user'
+            'comments' => function($query) {
+                $query->with('user')->paginate(3);
+            },
         ])->loadCount(['likes', 'views', 'comments']);
 
         $owns = false;
@@ -207,6 +209,7 @@ class ProjectController extends Controller
             'project' => $project,
             'h' => $h,
             'owns' => $owns,
+            'komments' => $project->comments,
         ]);
     }
 
@@ -294,7 +297,8 @@ class ProjectController extends Controller
 
         $project->load([
             'owner', 
-            'creator', 
+            'creator',
+            'comments', 
             'members',
             'posts',
             'likes' => function(MorphMany $query) {
@@ -360,6 +364,7 @@ class ProjectController extends Controller
             'owner', 
             'creator', 
             'posts',
+            'comments',
             'likes' => function(MorphMany $query) {
                 $query->where('user_id', Auth::id());
             }

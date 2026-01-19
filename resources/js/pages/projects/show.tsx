@@ -9,7 +9,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet"
 import { Button } from "@/components/ui/button";
-import { Bookmark, BriefcaseBusiness, ChartNoAxesColumnIncreasing, Heart, Lightbulb, Menu, MessageCircle, Pencil, PencilRuler, Share, Share2, Sparkles, UserPlus, X } from "lucide-react";
+import { Bookmark, BriefcaseBusiness, ChartNoAxesColumnIncreasing, Heart, Info, Lightbulb, Menu, MessageCircle, Pencil, PencilRuler, Share, Share2, Sparkles, UserPlus, X } from "lucide-react";
 import { Facebook,Twitch,Twitter, Youtube } from "@/components/icons/svgs";
 import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
@@ -60,6 +60,8 @@ import {
 import { usePanelRef } from "react-resizable-panels";
 import CommentForm from "@/components/comment-form";
 import CommentItem from "@/components/comment-item";
+import { Drawer, DrawerContent } from "@/components/ui/drawer";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 export default function ShowProject({ project, h, owns, tab = 'kontent', activities } : { 
     project: Project 
@@ -84,6 +86,7 @@ export default function ShowProject({ project, h, owns, tab = 'kontent', activit
 
     const [currentTab, setCurrentTab] = useState(tab)
     const [sidebarOpen, setSidebarOpen] = useState(false)
+    const [drawerOpen, setDrawerOpen] = useState(false)
     const sectionNav = useRef(null)
 
     const [numLikes, setNumLikes] = useState(project.likes_count ?? 0)
@@ -169,7 +172,7 @@ export default function ShowProject({ project, h, owns, tab = 'kontent', activit
             {
                 !o && (
                     <div className="size-10 sticky top-1/2 left-full -translate-x-4 z-100 flex flex-col gap-1 -mt-10">
-                        <div className='relative'>
+                        <div className='relative hidden lg:inline'>
                             <Button className="rounded-full cursor-pointer" variant="outline" onClick={() => setO(!o)} size="icon">
                                 <MessageCircle />
                             </Button>
@@ -179,6 +182,8 @@ export default function ShowProject({ project, h, owns, tab = 'kontent', activit
                                 )
                             }
                         </div>
+                        
+                        
                     </div>
                 )
             }
@@ -205,7 +210,7 @@ export default function ShowProject({ project, h, owns, tab = 'kontent', activit
                             }
                         </div>
                         <h2 className="w-full md:w-1/3 text-center mx-auto mt-1 mb-3">{project.excerpt}</h2>
-                        <div className="flex flex-col md:gap-7 md:flex-row mx-auto w-full md:max-w-7xl items-stretch">
+                        <div className="flex flex-col md:px-5 md:gap-7 md:flex-row mx-auto w-full md:max-w-7xl items-stretch">
                             <Carousel 
                                 className="block w-full px-2 md:px-0 md:w-2/3 md:my-5"
                                 opts={{ loop: true,
@@ -385,7 +390,7 @@ export default function ShowProject({ project, h, owns, tab = 'kontent', activit
                         !sidebarOpen && "shadow-xl"
                     )}>
                         <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
-                            <ul ref={sectionNav} className="flex h-full gap-4 text-sm">
+                            <ul ref={sectionNav} className="flex h-full gap-4 text-sm overflow-x-scroll">
                                 <li className={cn(
                                     "flex items-center px-5 border-b-4 gap-3",
                                     currentTab == 'kontent' ? 'border-foreground font-semibold' : 'border-transparent'
@@ -411,15 +416,6 @@ export default function ShowProject({ project, h, owns, tab = 'kontent', activit
                                     "flex items-center px-5 border-b-4 gap-3",
                                     currentTab == 'posts' ? 'border-foreground font-semibold' : 'border-transparent'
                                 )}>
-                                    {
-                                        currentTab == 'posts' && (
-                                            <SheetTrigger className="md:hidden" asChild>
-                                            {
-                                                sidebarOpen ? <Menu size={16} /> : <ChartNoAxesColumnIncreasing onClick={(e) => e.stopPropagation()} size={16} className="rotate-90" />
-                                            }
-                                            </SheetTrigger>
-                                        )
-                                    }
                                     <Link
                                         preserveScroll
                                         href={postsIndex(project)} 
@@ -452,6 +448,22 @@ export default function ShowProject({ project, h, owns, tab = 'kontent', activit
                                     >
                                         Activities
                                     </Link>
+                                </li>
+                                <li onClick={() => {
+                                    // setDrawerOpen(true)
+                                    console.log('innerWidth:', window.innerWidth)
+                                    if (window.innerWidth >= 1024) {
+                                        setDrawerOpen(false)
+                                        setO(true)
+                                    } else {
+                                        setDrawerOpen(true)
+                                        setO(false)
+                                    }
+                                }} className={cn(
+                                    "flex items-center px-5 border-b-4 border-transparent cursor-pointer",
+                                )}>
+                                    Comments
+                                    <Badge variant="destructive" className="rounded-full min-w-4.5 p-0 relative -top-2">{project.comments_count}</Badge>
                                 </li>
                             </ul>
                             <SheetContent side="left">
@@ -732,7 +744,7 @@ export default function ShowProject({ project, h, owns, tab = 'kontent', activit
                 </div>
                 <div className={ cn(
                     "transition-all duration-300 overflow-x-clip",
-                    o ? "w-md" : "w-0"
+                    o ? "w-0 lg:w-md" : "w-0"
                 )}>
                     <div className="w-md h-full flex">
                         <div className="h-full w-5 border-r flex flex-col items-center ">
@@ -745,13 +757,13 @@ export default function ShowProject({ project, h, owns, tab = 'kontent', activit
                             )
                         }
                         
-                        <div className="w-md h-full flex pr-11">
+                        <div className="w-full h-full flex">
                             {/* <div className="h-full w-5 border-r flex flex-col items-center ">
                             </div>
                             <Button onClick={() => setO(!o)} variant="outline" size="icon-sm" className="sticky top-32 -translate-x-4 scrollbar-hide rounded-full">
                                 <X />
                             </Button> */}
-                            <div className="w-full flex flex-col gap-3 h-[90vh] overflow-y-scroll sticky top-19">
+                            <div className="w-full flex flex-col gap-3 h-[90vh] overflow-y-scroll overflow-x-clip sticky top-19 pr-12">
                                 <div className='flex gap-3 mt-10 w-full justify-end'>
                                     <Button
                                         onClick={() => {
@@ -828,6 +840,31 @@ export default function ShowProject({ project, h, owns, tab = 'kontent', activit
                     </div>
                 </div>
             </ResizablePanelGroup>
+            <Drawer open={drawerOpen} onOpenChange={(open) => { setDrawerOpen(open) }}>
+            <DrawerContent className='lg:hidden'>
+                <ScrollArea className='mt-5 w-full max-w-lg flex flex-col mx-auto px-4 h-full overflow-y-scroll'>
+                    <div className='w-full sticky top-0 bg-background z-50 flex justify-between items-center'>
+                        <h1 className='text-xl font-bold pb-2'>Comments</h1>
+                        <div className='flex gap-2 items-center'>
+                            <Button type="button" className='rounded-full cursor-pointer' variant='outline' size="icon"><Share /></Button>
+                            <Button type="button" className='rounded-full cursor-pointer' variant='outline' size="icon"><Info /></Button>
+                        </div>
+                    </div>
+                    
+                    { comments.map(comment => <CommentItem className='relative -left-4' comment={comment} />) }
+                    {
+                        auth.user && <CommentForm 
+                            className='pl-0 pr-0.5 sticky bottom-0 bg-background' 
+                            commentableId={project.id}
+                            commentableType='project'
+                            user={auth.user}
+                            onSuccess={(newComment) => setComments(c => [newComment, ...c,])}
+                            onError={(e) => console.log('error:', e)}
+                        />
+                    }
+                </ScrollArea>
+            </DrawerContent>
+        </Drawer>
         </AppLayout>
     )
 }
