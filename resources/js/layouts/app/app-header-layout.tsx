@@ -10,15 +10,22 @@ export default function AppHeaderLayout({
     maxHeaderWidth,
     maxBodyWidth,
     stickyAfter = 0,
+    customMargin = ""
 }: PropsWithChildren<{ 
     breadcrumbs?: BreadcrumbItem[],
     maxHeaderWidth: string, 
     maxBodyWidth: string, 
     stickyAfter?: number
+    customMargin?: string
 }>) {
     return (
         <AppShell>
-            <AppHeader stickyAfter={stickyAfter} maxWidth={maxHeaderWidth} breadcrumbs={breadcrumbs} />
+            <AppHeader 
+                stickyAfter={stickyAfter} 
+                maxWidth={maxHeaderWidth} 
+                breadcrumbs={breadcrumbs}
+                customMargin={customMargin} 
+            />
             <AppContent maxWidth={maxBodyWidth}>{children}</AppContent>
         </AppShell>
     );

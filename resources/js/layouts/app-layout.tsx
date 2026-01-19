@@ -11,6 +11,7 @@ interface AppLayoutProps {
     maxHeaderWidth?: string,
     maxBodyWidth?: string,
     stickyAfter?: number
+    customMargin?: string
 }
 
 export default ({ 
@@ -20,6 +21,7 @@ export default ({
     maxHeaderWidth,
     maxBodyWidth,
     stickyAfter = 0,
+    customMargin = "",
     ...props 
 }: AppLayoutProps) => {
     const { appearance } = useAppearance();
@@ -30,7 +32,8 @@ export default ({
             stickyAfter={stickyAfter}
             maxHeaderWidth={hWidth}
             maxBodyWidth={bWidth}
-            breadcrumbs={breadcrumbs} 
+            breadcrumbs={breadcrumbs}
+            customMargin={customMargin} 
             {...props}
         >
             <Toaster offset={{ top: '75px' }} theme={appearance} richColors position="top-center"/>

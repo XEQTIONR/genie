@@ -101,9 +101,10 @@ interface AppHeaderProps {
     breadcrumbs?: BreadcrumbItem[]
     maxWidth: string
     stickyAfter?: number
+    customMargin?: string
 }
 
-export function AppHeader({ breadcrumbs = [], maxWidth, stickyAfter = 0 }: AppHeaderProps) {
+export function AppHeader({ breadcrumbs = [], maxWidth, stickyAfter = 0, customMargin = "" }: AppHeaderProps) {
     const page = usePage<SharedData>();
     const { auth, notification, notifications } = page.props;
     const getInitials = useInitials();
@@ -160,7 +161,8 @@ export function AppHeader({ breadcrumbs = [], maxWidth, stickyAfter = 0 }: AppHe
             
             
             <div className={cn(
-                "h-20 top-0 z-50 bg-background border-b",
+                "h-20 top-0 z-50 bg-background border-b", // -mb-20
+                customMargin,
                 scrollY >= stickyAfter ? "sticky" : null
             )}>
                 <div className={cn(
