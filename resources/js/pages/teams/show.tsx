@@ -462,7 +462,7 @@ export default function TeamProfile({
                         {
                             opportunities?.data.length ?? 0 > 0
                                 ? <>
-                                    <h3 className="text-xl font-semibold mt-6">Current Openings</h3>f
+                                    <h3 className="text-xl font-semibold mt-6">Current Openings</h3>
                                     <OpportunityList opportunities={opportunities?.data ?? []} />
                                 </>
                                 : <NoJobs />

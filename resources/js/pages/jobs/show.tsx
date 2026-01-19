@@ -3,6 +3,7 @@ import { show } from "@/routes/opportunities"
 import { show as showUser } from "@/routes/users"
 import { show as showTeam } from "@/routes/teams"
 import { show as showProject } from "@/routes/projects"
+import { edit } from '@/routes/opportunities'
 import { store } from "@/routes/opportunities/inquiries"
 import { BreadcrumbItem, Opportunity } from "@/types"
 import {
@@ -15,7 +16,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
-import { Form, Head, Link } from "@inertiajs/react"
+import { Form, Head, Link, router } from "@inertiajs/react"
 import '/resources/css/projects.css'
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -26,7 +27,7 @@ import { useEffect, useState } from "react"
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { PencilRuler, Send } from "lucide-react"
+import { Pencil, PencilRuler, Send } from "lucide-react"
 
 export default function ShowJobPosting({ job, notification } : { job: { data: Opportunity }, notification: object }) {
 
@@ -98,6 +99,7 @@ export default function ShowJobPosting({ job, notification } : { job: { data: Op
 
             </Dialog>
             <div className="w-full flex flex-col px-4 mt-5 ">
+                <div className="flex justify-between">
                 {
                     job.data.owner_type == 'Team' &&
                     
@@ -131,6 +133,9 @@ export default function ShowJobPosting({ job, notification } : { job: { data: Op
                         </Link>
 
                 }
+                    <Button onClick={() => router.visit(edit({opportunity: job.data}))} variant="outline" size="icon"><Pencil /></Button>
+                </div>
+                
                 <h1 className="text-xl font-medium mb-0.5">{job.data.title}</h1>
                 <div className="flex flex-wrap gap-4 mb-3 text-dim text-sm">{
                     job.data.location_type == 'global' 

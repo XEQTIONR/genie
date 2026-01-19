@@ -196,6 +196,7 @@ export interface Opportunity {
     work_location: string[]
     creator?: User
     owner?: Team | Project
+    owner_id: number,
     owner_type: 'Team' | 'Project'
     created_at: string
     publish: boolean

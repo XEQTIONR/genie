@@ -52,6 +52,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 Route::get('/opportunities', [OpportunityController::class, 'index'])->name('opportunities.index');
 Route::get('/opportunities/{opportunity}', [OpportunityController::class, 'show'])->name('opportunities.show');
+Route::get('/opportunities/{opportunity}/edit', [OpportunityController::class, 'edit'])->name('opportunities.edit');
+Route::put('/opportunities/{opportunity}', [OpportunityController::class, 'update'])->name('opportunities.update');
 Route::post('/opportunities/{opportunity}/inquiry', [OpportunityInquiryController::class, 'store'])->name('opportunities.inquiries.store');
 
 
