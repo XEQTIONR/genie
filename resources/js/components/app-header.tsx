@@ -160,7 +160,7 @@ export function AppHeader({ breadcrumbs = [], maxWidth, stickyAfter = 0 }: AppHe
             
             
             <div className={cn(
-                "h-20 top-0 z-50 bg-background",
+                "h-20 top-0 z-50 bg-background border-b",
                 scrollY >= stickyAfter ? "sticky" : null
             )}>
                 <div className={cn(

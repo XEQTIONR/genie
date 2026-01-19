@@ -117,39 +117,48 @@ export default function ShowPost({post, owns} : {post: Post, owns: boolean}) {
             .catch(e => console.log('error:', e))
     }, [])
     return (
-    <AppLayout breadcrumbs={breadcrumbs}>
+    <AppLayout maxBodyWidth='w-screem' breadcrumbs={breadcrumbs}>
         {
-            !o && (
+            
                 <div className="size-10 sticky top-1/2 left-full -translate-x-2 z-100 flex flex-col gap-1 -my-10">
-                    <div className='relative hidden lg:inline'>
-                        <Button className="rounded-full" variant="outline" onClick={() => setO(!o)} size="icon">
-                            <MessageCircle />
-                        </Button>
-                        {
-                            (post.comments_count && post.comments_count > 0) ? (
-                                <Badge variant="destructive" className='absolute -right-1.5 -top-1 px-1 rounded-full font-semibold cursor-pointer'>{post.comments_count}</Badge>
-                            ) : null
-                        }
-                    </div>
-                    <div className='relative lg:hidden'>
-                        <Button className="rounded-full" variant="outline" onClick={() => {
-                            console.log('setDraweropen:', !drawerOpen)
-                            setDrawerOpen(!drawerOpen)
-                        }} size="icon">
-                            <MessageCircle />
-                        </Button>
-                        {
-                            (post.comments_count && post.comments_count > 0) ? (
-                                <Badge variant="destructive" className='absolute -right-1.5 -top-1 px-1 rounded-full font-semibold cursor-pointer'>{post.comments_count}</Badge>
-                            ) : null
-                        }
-                    </div>
+                {
+                    !o && (
+                        <div className='relative hidden lg:inline'>
+                            <Button className="rounded-full" variant="outline" onClick={() => setO(!o)} size="icon">
+                                <MessageCircle />
+                            </Button>
+                            {
+                                (post.comments_count && post.comments_count > 0) ? (
+                                    <Badge variant="destructive" className='absolute -right-1.5 -top-1 px-1 rounded-full font-semibold cursor-pointer'>{post.comments_count}</Badge>
+                                ) : null
+                            }
+                        </div>
+                    )
+                }
+                {
+                    !drawerOpen && (
+                        <div className='relative lg:hidden'>
+                            <Button className="rounded-full" variant="outline" onClick={() => {
+                                console.log('setDraweropen:', !drawerOpen)
+                                setDrawerOpen(!drawerOpen)
+                            }} size="icon">
+                                <MessageCircle />
+                            </Button>
+                            {
+                                (post.comments_count && post.comments_count > 0) ? (
+                                    <Badge variant="destructive" className='absolute -right-1.5 -top-1 px-1 rounded-full font-semibold cursor-pointer'>{post.comments_count}</Badge>
+                                ) : null
+                            }
+                        </div>
+                    )
+                }
+                    
+                    
                 </div>
-            )
         }
         <ResizablePanelGroup>
             <div className="w-full flex flex-col mx-auto max-w-5xl gap-6 px-4">
-                <div className={cn("flex gap-5 items-center",  !o ? "mt-20" : "mt-10")}>
+                <div className={cn("flex gap-5 items-center",   "mt-19")}>
                     <h1 className='text-2xl font-semibold'>{post.title}</h1>
                     {
                         owns && (
@@ -247,51 +256,56 @@ export default function ShowPost({post, owns} : {post: Post, owns: boolean}) {
                 
             </div>
             <div className={ cn(
-                "transition-all duration-300 overflow-x-clip",
+                "transition-all duration-300 overflow-hidden",
                 o ? "w-0 lg:w-md" : "w-0"
             )}>
-                <div className="w-md h-full flex">
-                    <div className="h-full w-5 border-r flex flex-col items-center ">
-                    </div>
-                    <Button onClick={() => setO(!o)} variant="secondary" size="icon-sm" className="sticky top-32 -translate-x-4 scrollbar-hide rounded-full">
-                        <X />
-                    </Button>
-                    <div className="w-full flex flex-col gap-3 h-[90vh] overflow-y-scroll overflow-x-hidden pr-4.5 sticky top-19">
-                        <div className='flex gap-3 mt-10 w-full justify-end'>
-                            <Button
-                                onClick={() => like()}
-                                className="cursor-pointer rounded-full mt-1.5"
-                                variant="outline" 
-                                size="icon"
-                            >
-                                <Heart className={cn(
-                                    (numLikes ?? 0 > 0) ? "fill-pink-600 stroke-pink-600 " : "hover:fill-pink-600 hover:stroke-pink-600",
-                                    likeClasses
-                                )} />
-                            </Button>
-                            <Button className="rounded-full mt-1.5" variant="outline" size="icon"><Share /></Button>
+                <div className="w-md h-full">
+                    <div className='w-full h-full flex'>
+                        <div className="h-full w-5 border-r flex flex-col items-center">
                         </div>
-                        <h1 className='text-xl font-bold'>Comments</h1>
-                        {
-                            auth.user && <CommentForm 
-                                className='relative -left-4 -mr-8' 
-                                commentableId={post.id}
-                                commentableType='post'
-                                user={auth.user}
-                                onSuccess={(newComment) => setComments(c => [newComment, ...c,])}
-                                onError={(e) => console.log('error:', e)}
-                            />
-                        }
-                        {
-                            comments.map(comment => <CommentItem className='relative -left-4 -mr-4' comment={comment} />)
-                        }
+                        <Button onClick={() => setO(!o)} variant="secondary" size="icon-sm" className="sticky top-20 -translate-x-4 -mr-2 scrollbar-hide rounded-full">
+                            <X />
+                        </Button>
+                        <div className="w-full flex flex-col gap-3 h-[90vh] overflow-y-scroll overflow-x-hidden pr-12 top-0 border-b">
+                            <div className='flex gap-3 mt-10 pb-2 pt-9 w-full justify-between items-center sticky top-10 bg-background z-40'>
+                                <h1 className='text-xl font-bold'>Comments</h1>
+                                <div className='flex gap-3'>
+                                <Button
+                                    onClick={() => like()}
+                                    className="cursor-pointer rounded-full"
+                                    variant="outline" 
+                                    size="icon"
+                                >
+                                    <Heart className={cn(
+                                        (numLikes ?? 0 > 0) ? "fill-pink-600 stroke-pink-600 " : "hover:fill-pink-600 hover:stroke-pink-600",
+                                        likeClasses
+                                    )} />
+                                </Button>
+                                <Button className="rounded-full" variant="outline" size="icon"><Share /></Button>
+                                </div>
+                            </div>
+                            
+                            {
+                                auth.user && <CommentForm 
+                                    className='relative -left-4 -mr-8' 
+                                    commentableId={post.id}
+                                    commentableType='post'
+                                    user={auth.user}
+                                    onSuccess={(newComment) => setComments(c => [newComment, ...c,])}
+                                    onError={(e) => console.log('error:', e)}
+                                />
+                            }
+                            {
+                                comments.map(comment => <CommentItem className='relative -left-4 -mr-4' comment={comment} />)
+                            }
+                        </div>
                     </div>
                 </div>
             </div>
             
         </ResizablePanelGroup>
-        <Drawer handleOnly={false} open={drawerOpen} onOpenChange={(open) => { setDrawerOpen(open) }}>
-            <DrawerContent className='max-h-[50vh] lg:hidden'>
+        <Drawer open={drawerOpen} onOpenChange={(open) => { setDrawerOpen(open) }}>
+            <DrawerContent className='lg:hidden'>
                 <ScrollArea className='mt-5 w-full max-w-lg flex flex-col mx-auto px-4 h-full overflow-y-scroll'>
                     <div className='w-full sticky top-0 bg-background z-50'>
                         <h1 className='text-xl font-bold pb-2'>Comments</h1>
