@@ -35,7 +35,7 @@ export default function CommentForm({
         <ItemMedia>
             <Avatar className="size-7">
                 <AvatarImage src={user.avatar} />
-                <AvatarFallback>{getInitials(user.name ?? "")}</AvatarFallback>
+                <AvatarFallback className='text-xs'>{getInitials(user.name ?? "")}</AvatarFallback>
             </Avatar>
         </ItemMedia>
         <ItemContent>

@@ -3,7 +3,6 @@ import { Post, BreadcrumbItem, SharedData } from '@/types'
 import { useEffect, useState } from 'react'
 import { store as storeView } from '@/routes/api/views'
 import { store as storeLike, destroy } from '@/routes/api/likes'
-import { store as storeComment } from '@/routes/api/comments'
 import axios from 'axios'
 import { router, usePage } from '@inertiajs/react'
 import '/resources/css/projects.css'
@@ -11,29 +10,17 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { useInitials } from '@/hooks/use-initials'
 import { Separator } from '@/components/ui/separator'
 import { Button } from '@/components/ui/button'
-import { ArrowUpIcon, Heart, MessageCircle, Pencil, Plus, Send, SendHorizonal, Share, X } from 'lucide-react'
+import { Heart, MessageCircle, Pencil, Share, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { edit } from '@/routes/posts'
-import {
-  InputGroup,
-  InputGroupAddon,
-  InputGroupButton,
-  InputGroupInput,
-  InputGroupText,
-  InputGroupTextarea,
-} from "@/components/ui/input-group"
-import {
-  ResizableHandle,
-  ResizablePanel,
-  ResizablePanelGroup,
-} from "@/components/ui/resizable"
+import { ResizablePanelGroup } from "@/components/ui/resizable"
 
 import { usePanelRef } from "react-resizable-panels"
-import { Textarea } from '@/components/ui/textarea'
-import { Item, ItemContent, ItemDescription, ItemMedia, ItemTitle } from '@/components/ui/item'
 import CommentItem from '@/components/comment-item'
 import CommentForm from '@/components/comment-form'
 import { Badge } from '@/components/ui/badge'
+import { Drawer, DrawerContent } from '@/components/ui/drawer'
+import { ScrollArea } from '@/components/ui/scroll-area'
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -57,8 +44,7 @@ export default function ShowPost({post, owns} : {post: Post, owns: boolean}) {
     const [likeClasses, setLikeClasses] = useState("")
     const [likeButtonDisabled, setLikeButtonDisabled] = useState(false)
     const [o, setO] = useState(false)
-
-    const [comment, setComment] = useState("")
+    const [drawerOpen, setDrawerOpen] = useState(false)
     const [comments, setComments] = useState(post?.comments ?? [])
     
     const { apiToken, auth } = usePage<SharedData>().props
@@ -66,7 +52,6 @@ export default function ShowPost({post, owns} : {post: Post, owns: boolean}) {
     const pref = usePanelRef()
 
     const like = () => {
-        console.log('post.likes:', post.likes)
         if (auth.user) {
             if (numLikes === 0) {
                 setLikeButtonDisabled(true)
@@ -136,22 +121,35 @@ export default function ShowPost({post, owns} : {post: Post, owns: boolean}) {
         {
             !o && (
                 <div className="size-10 sticky top-1/2 left-full -translate-x-2 z-100 flex flex-col gap-1 -my-10">
-                    <div className='relative'>
+                    <div className='relative hidden lg:inline'>
                         <Button className="rounded-full" variant="outline" onClick={() => setO(!o)} size="icon">
                             <MessageCircle />
                         </Button>
                         {
-                            post.comments_count && post.comments_count > 0 && (
+                            (post.comments_count && post.comments_count > 0) ? (
                                 <Badge variant="destructive" className='absolute -right-1.5 -top-1 px-1 rounded-full font-semibold cursor-pointer'>{post.comments_count}</Badge>
-                            )
+                            ) : null
+                        }
+                    </div>
+                    <div className='relative lg:hidden'>
+                        <Button className="rounded-full" variant="outline" onClick={() => {
+                            console.log('setDraweropen:', !drawerOpen)
+                            setDrawerOpen(!drawerOpen)
+                        }} size="icon">
+                            <MessageCircle />
+                        </Button>
+                        {
+                            (post.comments_count && post.comments_count > 0) ? (
+                                <Badge variant="destructive" className='absolute -right-1.5 -top-1 px-1 rounded-full font-semibold cursor-pointer'>{post.comments_count}</Badge>
+                            ) : null
                         }
                     </div>
                 </div>
             )
         }
         <ResizablePanelGroup>
-            <div className="w-full flex flex-col mx-auto max-w-5xl gap-6">
-                <div className="flex gap-5 items-center mt-10">
+            <div className="w-full flex flex-col mx-auto max-w-5xl gap-6 px-4">
+                <div className={cn("flex gap-5 items-center",  !o ? "mt-20" : "mt-10")}>
                     <h1 className='text-2xl font-semibold'>{post.title}</h1>
                     {
                         owns && (
@@ -250,7 +248,7 @@ export default function ShowPost({post, owns} : {post: Post, owns: boolean}) {
             </div>
             <div className={ cn(
                 "transition-all duration-300 overflow-x-clip",
-                o ? "w-md" : "w-0"
+                o ? "w-0 lg:w-md" : "w-0"
             )}>
                 <div className="w-md h-full flex">
                     <div className="h-full w-5 border-r flex flex-col items-center ">
@@ -258,7 +256,7 @@ export default function ShowPost({post, owns} : {post: Post, owns: boolean}) {
                     <Button onClick={() => setO(!o)} variant="secondary" size="icon-sm" className="sticky top-32 -translate-x-4 scrollbar-hide rounded-full">
                         <X />
                     </Button>
-                    <div className="w-full flex flex-col gap-3 h-[90vh] overflow-y-scroll sticky top-19">
+                    <div className="w-full flex flex-col gap-3 h-[90vh] overflow-y-scroll overflow-x-hidden pr-4.5 sticky top-19">
                         <div className='flex gap-3 mt-10 w-full justify-end'>
                             <Button
                                 onClick={() => like()}
@@ -276,7 +274,7 @@ export default function ShowPost({post, owns} : {post: Post, owns: boolean}) {
                         <h1 className='text-xl font-bold'>Comments</h1>
                         {
                             auth.user && <CommentForm 
-                                className='relative -left-4' 
+                                className='relative -left-4 -mr-8' 
                                 commentableId={post.id}
                                 commentableType='post'
                                 user={auth.user}
@@ -285,13 +283,33 @@ export default function ShowPost({post, owns} : {post: Post, owns: boolean}) {
                             />
                         }
                         {
-                            comments.map(comment => <CommentItem className='relative -left-4' comment={comment} />)
+                            comments.map(comment => <CommentItem className='relative -left-4 -mr-4' comment={comment} />)
                         }
                     </div>
                 </div>
             </div>
-        </ResizablePanelGroup>
             
+        </ResizablePanelGroup>
+        <Drawer handleOnly={false} open={drawerOpen} onOpenChange={(open) => { setDrawerOpen(open) }}>
+            <DrawerContent className='max-h-[50vh] lg:hidden'>
+                <ScrollArea className='mt-5 w-full max-w-lg flex flex-col mx-auto px-4 h-full overflow-y-scroll'>
+                    <div className='w-full sticky top-0 bg-background z-50'>
+                        <h1 className='text-xl font-bold pb-2'>Comments</h1>
+                    </div>
+                    {
+                        auth.user && <CommentForm 
+                            className='pl-0 pr-0.5' 
+                            commentableId={post.id}
+                            commentableType='post'
+                            user={auth.user}
+                            onSuccess={(newComment) => setComments(c => [newComment, ...c,])}
+                            onError={(e) => console.log('error:', e)}
+                        />
+                    }
+                    { comments.map(comment => <CommentItem className='relative -left-4' comment={comment} />) }
+                </ScrollArea>
+            </DrawerContent>
+        </Drawer>
         
     </AppLayout>)
 }

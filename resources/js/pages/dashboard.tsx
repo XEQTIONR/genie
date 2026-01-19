@@ -14,13 +14,6 @@ import {
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuPortal,
-  DropdownMenuSeparator,
-  DropdownMenuShortcut,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Button } from '@/components/ui/button';
@@ -31,9 +24,6 @@ const breadcrumbs: BreadcrumbItem[] = [
         href: home().url,
     },
 ];
-
-const items: Array<string> = []//(new Array(50)).fill(0)
-
 
 export default function Dashboard({posts} : {posts: Post[]}) {
     const [q, setQ] = useState("")
@@ -100,7 +90,7 @@ export default function Dashboard({posts} : {posts: Post[]}) {
                     posts.length > 0 && (
                         <>
                             <h2 className="text-xl font-bold mt-10 mb-5">Discover</h2>
-                            <div className="grid auto-rows-min gap-8 md:grid-cols-4">
+                            <div className="grid auto-rows-min gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                                 {
                                     posts.map((post) => (
                                         <div className="relative overflow-hidden">

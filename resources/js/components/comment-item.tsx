@@ -54,7 +54,7 @@ export default function CommentItem({comment, className = ''} : {comment: Commen
         <ItemMedia>
             <Avatar className="size-7">
                 <AvatarImage src={comment.user?.avatar} />
-                <AvatarFallback>{getInitials(comment.user?.name ?? "")}</AvatarFallback>
+                <AvatarFallback className="text-xs">{getInitials(comment.user?.name ?? "")}</AvatarFallback>
             </Avatar>
         </ItemMedia>
         <ItemContent>
