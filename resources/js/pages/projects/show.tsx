@@ -9,7 +9,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet"
 import { Button } from "@/components/ui/button";
-import { Bookmark, BriefcaseBusiness, ChartNoAxesColumnIncreasing, Heart, Info, Lightbulb, Menu, MessageCircle, Pencil, PencilRuler, Share, Share2, Sparkles, UserPlus, X } from "lucide-react";
+import { Bookmark, BriefcaseBusiness, ChartNoAxesColumnIncreasing, ChevronLeft, ChevronRight, Heart, Info, Lightbulb, Menu, MessageCircle, Pencil, PencilRuler, Share, Share2, Sparkles, UserPlus, X } from "lucide-react";
 import { Facebook,Twitch,Twitter, Youtube } from "@/components/icons/svgs";
 import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
@@ -62,6 +62,7 @@ import CommentForm from "@/components/comment-form";
 import CommentItem from "@/components/comment-item";
 import { Drawer, DrawerContent } from "@/components/ui/drawer";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useDebouncedCallback } from "use-debounce";
 
 export default function ShowProject({ project, h, owns, tab = 'kontent', activities } : { 
     project: Project 
@@ -87,8 +88,27 @@ export default function ShowProject({ project, h, owns, tab = 'kontent', activit
     const [currentTab, setCurrentTab] = useState(tab)
     const [sidebarOpen, setSidebarOpen] = useState(false)
     const [drawerOpen, setDrawerOpen] = useState(false)
-    const sectionNav = useRef(null)
+    const sectionNav = useRef<HTMLUListElement>(null)
+    const [scrollLeft, setScrollLeft] = useState<number|undefined>(0)
+    const [scrollLength, setScrollLength] = useState<number>(0)
+    const scrollThresh = 2
 
+    const fn = useDebouncedCallback(() => {
+        console.log('boom')
+        setScrollLeft(sectionNav.current?.scrollLeft)
+    }, 100)
+
+    const updateScrollLength = () => setScrollLength(sectionNav.current.scrollWidth - sectionNav.current.offsetWidth)
+
+    useEffect(() => {
+        updateScrollLength()
+        document.querySelector('#sectionNav')?.addEventListener('scroll', fn)
+        window.addEventListener("resize", updateScrollLength)
+        return () => {
+            document.querySelector('#sectionNav')?.removeEventListener('scroll', fn)
+            window.removeEventListener("resize", updateScrollLength)
+        }
+    }, [sectionNav, fn])
     const [numLikes, setNumLikes] = useState(project.likes_count ?? 0)
     const [likes, setILike] = useState<Like[]>(project.likes ?? [])
     const [likeClasses, setLikeClasses] = useState('')
@@ -96,6 +116,7 @@ export default function ShowProject({ project, h, owns, tab = 'kontent', activit
     const { apiToken, auth } = usePage<SharedData>().props
 
     const pref = usePanelRef();
+    const div = useRef<HTMLUListElement>(null)
     const [comments, setComments] = useState(project?.comments ?? [])
 
     useEffect(() => {
@@ -390,82 +411,96 @@ export default function ShowProject({ project, h, owns, tab = 'kontent', activit
                         !sidebarOpen && "shadow-xl"
                     )}>
                         <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
-                            <ul ref={sectionNav} className="flex h-full gap-4 text-sm overflow-x-scroll">
-                                <li className={cn(
-                                    "flex items-center px-5 border-b-4 gap-3",
-                                    currentTab == 'kontent' ? 'border-foreground font-semibold' : 'border-transparent'
-                                )}>
-                                    {
-                                        currentTab == 'kontent' && (
-                                            <SheetTrigger className="md:hidden" asChild>
-                                            {
-                                                sidebarOpen ? <Menu size={16} /> : <ChartNoAxesColumnIncreasing onClick={(e) => e.stopPropagation()} size={16} className="rotate-90" />
-                                            }
-                                            </SheetTrigger>
-                                        )
-                                    }
-                                    <Link
-                                        preserveScroll
-                                        href={show(project)} 
-                                        className="flex gap-4"
-                                    >
-                                        Project
-                                    </Link>
-                                </li>
-                                <li className={cn(
-                                    "flex items-center px-5 border-b-4 gap-3",
-                                    currentTab == 'posts' ? 'border-foreground font-semibold' : 'border-transparent'
-                                )}>
-                                    <Link
-                                        preserveScroll
-                                        href={postsIndex(project)} 
-                                        className="flex gap-4"
-                                    >
-                                        Showcase
-                                    </Link>
-                                </li>
-                                
-                                <li className={cn(
-                                    "flex items-center px-5 border-b-4",
-                                    currentTab == 'second' ? 'border-foreground font-semibold' : 'border-transparent'
-                                )}>
-                                    <a 
-                                        href="#second"
-                                        onClick={() => {
-                                            setCurrentTab('second')
-                                        }}
-                                    >
-                                        Creator
-                                    </a>
-                                </li>
-                                <li className={cn(
-                                    "flex items-center px-5 border-b-4",
-                                    currentTab == 'activities' ? 'border-foreground font-semibold' : 'border-transparent'
-                                )}>
-                                    <Link
-                                        preserveScroll 
-                                        href={activitiesIndex(project)}
-                                    >
-                                        Activities
-                                    </Link>
-                                </li>
-                                <li onClick={() => {
-                                    // setDrawerOpen(true)
-                                    console.log('innerWidth:', window.innerWidth)
-                                    if (window.innerWidth >= 1024) {
-                                        setDrawerOpen(false)
-                                        setO(true)
-                                    } else {
-                                        setDrawerOpen(true)
-                                        setO(false)
-                                    }
-                                }} className={cn(
-                                    "flex items-center px-5 border-b-4 border-transparent cursor-pointer",
-                                )}>
-                                    Comments
-                                    <Badge variant="destructive" className="rounded-full min-w-4.5 p-0 relative -top-2">{project.comments_count}</Badge>
-                                </li>
-                            </ul>
+
+                            <section className="w-full h-full flex md:justify-center">
+                                {
+                                    (scrollLeft ?? 0) > 0 && <div className="absolute top-13 md:top-14 -mt-10 left-0 flex items-center bg-neutral-50/50 dark:bg-neutral-900/50 size-10">
+                                        <ChevronLeft onClick={() => sectionNav.current.scrollLeft -= 200 } className="block mx-auto" />
+                                    </div> 
+                                }
+                                <ul id="sectionNav" ref={sectionNav} className="flex h-full gap-4 text-sm overflow-x-scroll md:mx-auto scroll-smooth scrollbar-hide">
+                                    <li className={cn(
+                                        "flex items-center px-5 border-b-4 gap-3",
+                                        currentTab == 'kontent' ? 'border-foreground font-semibold' : 'border-transparent'
+                                    )}>
+                                        {
+                                            currentTab == 'kontent' && (
+                                                <SheetTrigger className="md:hidden" asChild>
+                                                {
+                                                    sidebarOpen ? <Menu size={16} /> : <ChartNoAxesColumnIncreasing onClick={(e) => e.stopPropagation()} size={16} className="rotate-90" />
+                                                }
+                                                </SheetTrigger>
+                                            )
+                                        }
+                                        <Link
+                                            preserveScroll
+                                            href={show(project)} 
+                                            className="flex gap-4"
+                                        >
+                                            Project
+                                        </Link>
+                                    </li>
+                                    <li className={cn(
+                                        "flex items-center px-5 border-b-4 gap-3",
+                                        currentTab == 'posts' ? 'border-foreground font-semibold' : 'border-transparent'
+                                    )}>
+                                        <Link
+                                            preserveScroll
+                                            href={postsIndex(project)} 
+                                            className="flex gap-4"
+                                        >
+                                            Showcase
+                                        </Link>
+                                    </li>
+                                    
+                                    <li className={cn(
+                                        "flex items-center px-5 border-b-4",
+                                        currentTab == 'second' ? 'border-foreground font-semibold' : 'border-transparent'
+                                    )}>
+                                        <a 
+                                            href="#second"
+                                            onClick={() => {
+                                                setCurrentTab('second')
+                                            }}
+                                        >
+                                            Creator
+                                        </a>
+                                    </li>
+                                    <li className={cn(
+                                        "flex items-center px-5 border-b-4",
+                                        currentTab == 'activities' ? 'border-foreground font-semibold' : 'border-transparent'
+                                    )}>
+                                        <Link
+                                            preserveScroll 
+                                            href={activitiesIndex(project)}
+                                        >
+                                            Activities
+                                        </Link>
+                                    </li>
+                                    <li onClick={() => {
+                                        // setDrawerOpen(true)
+                                        console.log('innerWidth:', window.innerWidth)
+                                        if (window.innerWidth >= 1024) {
+                                            setDrawerOpen(false)
+                                            setO(true)
+                                        } else {
+                                            setDrawerOpen(true)
+                                            setO(false)
+                                        }
+                                    }} className={cn(
+                                        "flex items-center px-5 border-b-4 border-transparent cursor-pointer",
+                                    )}>
+                                        Comments
+                                        <Badge variant="destructive" className="rounded-full min-w-4.5 p-0 relative -top-2">{project.comments_count}</Badge>
+                                    </li>
+                                </ul>
+                                {
+                                    sectionNav.current && (scrollLength > 0) && (scrollLength - (scrollLeft ?? 0) > scrollThresh) && <div className="absolute right-0 top-13 md:top-14 -mt-10 float-right flex items-center bg-neutral-50/50 dark:bg-neutral-900/50 size-10">
+                                        <ChevronRight onClick={() => sectionNav.current.scrollLeft += 200 } className="block mx-auto" />
+                                    </div>
+                                }
+                            </section>
+                            
                             <SheetContent side="left">
                                 {
                                     currentTab == 'kontent' && (
@@ -513,20 +548,13 @@ export default function ShowProject({ project, h, owns, tab = 'kontent', activit
                                         <ul>
                                         {
                                             h.map(({hash, tag, text}) => (
-                                                <li 
-                                                // onClick={() => setTimeout(() => {
-                                                //     if (sectionNav.current) {
-                                                //         window.scrollBy(0, -100)
-                                                //     }
-                                                // }, 1000)} 
-                                                className="mb-3">
+                                                <li className="mb-3">
                                                     <div className="flex">
                                                         { tag == 'h2' && <div className="mr-1 mt-0.5 inline rotate-180">&not;</div>}
                                                         <a className="hover:underline" href={'#' + hash}>
                                                             {text}
                                                         </a>
                                                     </div>
-                                                    
                                                 </li>
                                             ))    
                                         }
@@ -600,41 +628,12 @@ export default function ShowProject({ project, h, owns, tab = 'kontent', activit
                                 <div className="w-full md:w-2/5 xl:w-1/4">
                                     <h2 className="text-lg mt-4 md:mt-10 mb-4 font-semibold">Other Projects</h2>
                                     <div className="w-full flex gap-2.5 flex-col mb-4">
-                                        {/* {
-                                            collaborators.map(({name, initials}) => (
-                                                <Item variant="muted">
-                                                    <ItemMedia>
-                                                        <Avatar className="size-10">
-                                                            <AvatarImage src="" />
-                                                            <AvatarFallback>{initials}</AvatarFallback>
-                                                        </Avatar>
-                                                    </ItemMedia>
-                                                    <ItemContent>
-                                                        <ItemTitle>{name}</ItemTitle>
-                                                        <ItemDescription>-</ItemDescription>
-                                                    </ItemContent>
-                                                </Item>
-                                            ))
-                                        } */}
+                                        
                                         
                                     </div>
                                     
                                 </div>
                             </div>
-                            // <ThreeColLayout
-                            //     id="second"
-                            //     leftChildren={<></>}
-                            //     rightChildren={<></>}
-                            // >
-                            //     <h1 className="text-2xl ">About the creator</h1>
-                            //     <div className="flex items-center gap-3 mt-4">
-                            //         <div className="relative size-18 rounded-full border overflow-hidden">
-                            //             <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
-                            //         </div>
-                            //         <h3 className="font-bold text-lg">{project.creator?.name}</h3>
-                            //     </div>
-                            //     <p className="mt-5">{project.creator?.bio}</p>
-                            // </ThreeColLayout>
                         )
                     }
                     {
@@ -730,14 +729,6 @@ export default function ShowProject({ project, h, owns, tab = 'kontent', activit
                                         }
                                     })
                                 }
-                                {/* <Step bg="bg-transparent" step={<Send size={16} />} heading={"Some heading"}>
-                                    Something
-                                </Step>
-                                <Step step={1}>
-                                    <div className='w-full h-32'>
-                                        SSADSADA
-                                    </div>
-                                </Step> */}
                             </div>
                         )
                     }
@@ -756,84 +747,83 @@ export default function ShowProject({ project, h, owns, tab = 'kontent', activit
                                 </Button>
                             )
                         }
-                        
                         <div className="w-full h-full flex">
-                            {/* <div className="h-full w-5 border-r flex flex-col items-center ">
-                            </div>
-                            <Button onClick={() => setO(!o)} variant="outline" size="icon-sm" className="sticky top-32 -translate-x-4 scrollbar-hide rounded-full">
-                                <X />
-                            </Button> */}
                             <div className="w-full flex flex-col gap-3 h-[90vh] overflow-y-scroll overflow-x-clip sticky top-19 pr-12">
-                                <div className='flex gap-3 mt-10 w-full justify-end'>
-                                    <Button
-                                        onClick={() => {
-                                            if (auth.user) {
-                                                if (likes.length === 0) {
-                                                    axios.post(store().url, {
-                                                        likeable_id: project.id,
-                                                        likeable_type: 'project'
-                                                    }, {
-                                                        headers: {
-                                                            'Content-Type': 'multipart/form-data',
-                                                            Authorization: 'Bearer ' + apiToken
-                                                        }
-                                                    }).then(res => {
-                                                        setNumLikes(l => l+1)
-                                                        setILike(l => {
-                                                            if (l) {
-                                                                return [...l, res.data]
+                                <div className='w-full sticky top-0 pt-12  z-50 flex justify-between items-center bg-background'>
+                                    <h1 className='text-xl font-bold'>Comments</h1>
+                                    <div className='flex gap-2 items-center'>
+                                        <Button
+                                            onClick={() => {
+                                                if (auth.user) {
+                                                    if (likes.length === 0) {
+                                                        axios.post(store().url, {
+                                                            likeable_id: project.id,
+                                                            likeable_type: 'project'
+                                                        }, {
+                                                            headers: {
+                                                                'Content-Type': 'multipart/form-data',
+                                                                Authorization: 'Bearer ' + apiToken
                                                             }
-                                                            return [res.data]
+                                                        }).then(res => {
+                                                            setNumLikes(l => l+1)
+                                                            setILike(l => {
+                                                                if (l) {
+                                                                    return [...l, res.data]
+                                                                }
+                                                                return [res.data]
+                                                            })
+                                                            setLikeClasses("")
+                                                            setTimeout(() => {
+                                                                setLikeClasses("animate-wave fill-yellow-400 stroke-yellow-400 ")
+                                                            }, 100)
+                                                        }).catch(e => {
+                                                            console.log('like error:', e)
                                                         })
-                                                        setLikeClasses("")
-                                                        setTimeout(() => {
-                                                            setLikeClasses("animate-wave fill-yellow-400 stroke-yellow-400 ")
-                                                        }, 100)
-                                                    }).catch(e => {
-                                                        console.log('like error:', e)
-                                                    })
-                                                } else {
-                                                    axios.delete(destroy({ like: likes[0].id }).url, {
-                                                        headers: {
-                                                            'Content-Type': 'multipart/form-data',
-                                                            Authorization: 'Bearer ' + apiToken
-                                                        }
-                                                    }).then(() => {
-                                                        setNumLikes(l => l - 1)
-                                                        setILike([])
-                                                        setLikeClasses("")
-                                                        setTimeout(() => {
-                                                            setLikeClasses("animate-wave")
-                                                        }, 100)
-                                                    }).catch((e) => {
-                                                        console.log('unlike error:', e)
-                                                    })
+                                                    } else {
+                                                        axios.delete(destroy({ like: likes[0].id }).url, {
+                                                            headers: {
+                                                                'Content-Type': 'multipart/form-data',
+                                                                Authorization: 'Bearer ' + apiToken
+                                                            }
+                                                        }).then(() => {
+                                                            setNumLikes(l => l - 1)
+                                                            setILike([])
+                                                            setLikeClasses("")
+                                                            setTimeout(() => {
+                                                                setLikeClasses("animate-wave")
+                                                            }, 100)
+                                                        }).catch((e) => {
+                                                            console.log('unlike error:', e)
+                                                        })
+                                                    }
                                                 }
-                                            }
-                                        }} 
-                                        className="cursor-pointer rounded-full mt-1.5"
-                                        variant="outline" 
-                                        size="icon"
-                                    >
-                                        <Bookmark 
-                                            className={likeClasses}
-                                        />
-                                    </Button>
-                                    <Button className="rounded-full mt-1.5" variant="outline" size="icon"><Share /></Button>
+                                            }} 
+                                            className="cursor-pointer rounded-full"
+                                            variant="outline" 
+                                            size="icon"
+                                        >
+                                            <Bookmark 
+                                                className={likeClasses}
+                                            />
+                                        </Button>
+                                        <Button type="button" className='rounded-full cursor-pointer' variant='outline' size="icon"><Share /></Button>
+                                        <Button type="button" className='rounded-full cursor-pointer' variant='outline' size="icon"><Info /></Button>
+                                        
+                                    </div>
                                 </div>
-                                <h1 className='text-xl font-bold'>Comments</h1>
+                                
+                                {
+                                    comments.map(comment => <CommentItem className='relative -left-4 -mr-8' comment={comment} />)
+                                }
                                 {
                                     auth.user && <CommentForm 
-                                        className='relative -left-4 -mr-8' 
+                                        className='sticky bottom-0 pl-0 bg-background' 
                                         commentableId={project.id}
                                         commentableType='project'
                                         user={auth.user}
                                         onSuccess={(newComment) => setComments(c => [newComment, ...c,])}
                                         onError={(e) => console.log('error:', e)}
                                     />
-                                }
-                                {
-                                    comments.map(comment => <CommentItem className='relative -left-4 -mr-8' comment={comment} />)
                                 }
                             </div>
                         </div>
@@ -846,6 +836,60 @@ export default function ShowProject({ project, h, owns, tab = 'kontent', activit
                     <div className='w-full sticky top-0 bg-background z-50 flex justify-between items-center'>
                         <h1 className='text-xl font-bold pb-2'>Comments</h1>
                         <div className='flex gap-2 items-center'>
+                            <Button
+                                onClick={() => {
+                                    if (auth.user) {
+                                        if (likes.length === 0) {
+                                            axios.post(store().url, {
+                                                likeable_id: project.id,
+                                                likeable_type: 'project'
+                                            }, {
+                                                headers: {
+                                                    'Content-Type': 'multipart/form-data',
+                                                    Authorization: 'Bearer ' + apiToken
+                                                }
+                                            }).then(res => {
+                                                setNumLikes(l => l+1)
+                                                setILike(l => {
+                                                    if (l) {
+                                                        return [...l, res.data]
+                                                    }
+                                                    return [res.data]
+                                                })
+                                                setLikeClasses("")
+                                                setTimeout(() => {
+                                                    setLikeClasses("animate-wave fill-yellow-400 stroke-yellow-400 ")
+                                                }, 100)
+                                            }).catch(e => {
+                                                console.log('like error:', e)
+                                            })
+                                        } else {
+                                            axios.delete(destroy({ like: likes[0].id }).url, {
+                                                headers: {
+                                                    'Content-Type': 'multipart/form-data',
+                                                    Authorization: 'Bearer ' + apiToken
+                                                }
+                                            }).then(() => {
+                                                setNumLikes(l => l - 1)
+                                                setILike([])
+                                                setLikeClasses("")
+                                                setTimeout(() => {
+                                                    setLikeClasses("animate-wave")
+                                                }, 100)
+                                            }).catch((e) => {
+                                                console.log('unlike error:', e)
+                                            })
+                                        }
+                                    }
+                                }} 
+                                className="cursor-pointer rounded-full"
+                                variant="outline" 
+                                size="icon"
+                            >
+                                <Bookmark 
+                                    className={likeClasses}
+                                />
+                            </Button>
                             <Button type="button" className='rounded-full cursor-pointer' variant='outline' size="icon"><Share /></Button>
                             <Button type="button" className='rounded-full cursor-pointer' variant='outline' size="icon"><Info /></Button>
                         </div>

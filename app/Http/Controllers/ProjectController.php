@@ -298,13 +298,15 @@ class ProjectController extends Controller
         $project->load([
             'owner', 
             'creator',
-            'comments', 
+            'comments' => function($query) {
+                $query->with('user')->paginate(3);
+            },
             'members',
             'posts',
             'likes' => function(MorphMany $query) {
                 $query->where('user_id', Auth::id());
-            }
-        ])->withCount(['likes', 'views']);
+            },
+        ])->loadCount(['likes', 'comments', 'views']);
 
         $owns = false;
 
@@ -360,15 +362,18 @@ class ProjectController extends Controller
             }
         }
 
-        $project->load([
+        $project
+            ->load([
             'owner', 
             'creator', 
             'posts',
-            'comments',
+            'comments' => function($query) {
+                $query->with('user')->paginate(3);
+            },
             'likes' => function(MorphMany $query) {
                 $query->where('user_id', Auth::id());
             }
-        ])->withCount(['likes', 'views']);
+        ])->loadCount(['likes', 'comments' , 'views']);
 
         $owns = false;
 
