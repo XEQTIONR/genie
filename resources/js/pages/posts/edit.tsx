@@ -609,10 +609,10 @@ export default function EditPost ({ post } : { post: Post }) {
     const renderCover = () => {
         switch(data.cover_type.split('/')[0]) {
             case "image":
-                return <img className="w-full max-w-7xl mt-10 mx-auto" src={data.cover} />
+                return <img className="w-full max-w-5xl mt-10 mx-auto rounded-xl" src={data.cover} />
 
             case "video":
-                return <video className="w-full max-w-7xl mt-10 mx-auto" autoPlay loop>
+                return <video className="w-full max-w-5xl mt-10 mx-auto rounded-xl" autoPlay loop>
                     <source src={data.cover} type={data.cover_type} />
                 </video>
         }
@@ -684,20 +684,20 @@ export default function EditPost ({ post } : { post: Post }) {
                     value={data.title} 
                     ref={titleInput} 
                     textSizeClasses="text-3xl"
-                    className="mt-14 font-bold max-w-4xl min-h-14" 
+                    className="mt-14 font-bold max-w-5xl min-h-14" 
                     placeholder="Add a post title"
                 />
                 
-                <div className="w-full flex flex-col">
+                <div className="w-full flex">
                     { renderCover() }
                 </div>
                 {
-                    <div className="w-full max-w-7xl mt-10 flex flex-col grow px-10">
+                    <div className="w-full max-w-6xl px-10 mt-10 flex flex-col grow ">
                         {
                             body.map((item, idx) => {
                                 return (
                                     <>
-                                        <div className="flex items-center w-full my-5 max-w-7xl opacity-0 hover:opacity-100">
+                                        <div className="flex items-center w-full my-5 opacity-0 hover:opacity-100">
                                             <div className="grow h-full w-full">
                                                 <Separator className="mt-4" />
                                             </div>

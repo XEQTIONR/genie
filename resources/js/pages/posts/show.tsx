@@ -10,7 +10,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { useInitials } from '@/hooks/use-initials'
 import { Separator } from '@/components/ui/separator'
 import { Button } from '@/components/ui/button'
-import { Heart, Info, MessageCircle, Pencil, Share, Smile, X } from 'lucide-react'
+import { Heart, Info, MessageCircle, Pencil, Share, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { edit } from '@/routes/posts'
 import { ResizablePanelGroup } from "@/components/ui/resizable"
@@ -30,8 +30,8 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 function replaceNbsps(str: string) {
-  const re = new RegExp(String.fromCharCode(160), "g");
-  return str.replace(re, " ");
+    const re = new RegExp(String.fromCharCode(160), "g");
+    return str.replaceAll(re, " ").replaceAll("-", "&#8209;").replaceAll('<p></p>', '<br />')
 }
 
 export default function ShowPost({post, owns} : {post: Post, owns: boolean}) {

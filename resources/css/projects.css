@@ -1,17 +1,20 @@
 #description h1 {
     font-size: 1.25rem;
-    font-weight: 500;
+    font-weight: 600;
     line-height: 250%;
+    margin: 0 0 1rem;
 }
 
 #description h2 {
     font-size: 1rem;
     font-weight: 600;
     line-height: 200%;
+    margin: 0 0 1rem;
 }
 
 #description p {
     font-size: 1rem;
+    margin: 0 0 1rem;
 }
 
 
@@ -36,59 +39,29 @@
     margin-left: 15px;
 }
 
-
-#description h1 {
-    font-size: 1.25rem;
-    font-weight: 500;
-    line-height: 250%;
-}
-
-#description h2 {
-    font-size: 1rem;
-    font-weight: 600;
-    line-height: 200%;
-}
-
-#description p {
-    font-size: 1rem;
-}
-
-
-#description a {
-    color: blue;
-    text-decoration: underline;
-}
-
 #description img {
     display: block;
     margin-left: auto;
     margin-right: auto;
 }
 
-#description ol [data-list=ordered] {
-    list-style: numeric;
-    margin-left: 15px;
-}
-
-#description ol [data-list=bullet] {
-    list-style: disc;
-    margin-left: 15px;
-}
-
 .description h1 {
     font-size: 1.25rem;
-    font-weight: 500;
+    font-weight: 600;
     line-height: 250%;
+    margin: 0 0 1rem;
 }
 
 .description h2 {
     font-size: 1rem;
     font-weight: 600;
     line-height: 200%;
+    margin: 0 0 1rem;
 }
 
 .description p {
     font-size: 1rem;
+    margin: 0 0 1rem;
 }
 
 
@@ -113,41 +86,8 @@
     margin-left: 15px;
 }
 
-
-.description h1 {
-    font-size: 1.25rem;
-    font-weight: 500;
-    line-height: 250%;
-}
-
-.description h2 {
-    font-size: 1rem;
-    font-weight: 600;
-    line-height: 200%;
-}
-
-.description p {
-    font-size: 1rem;
-}
-
-
-.description a {
-    color: blue;
-    text-decoration: underline;
-}
-
 .description img {
     display: block;
     margin-left: auto;
     margin-right: auto;
-}
-
-.description ol [data-list=ordered] {
-    list-style: numeric;
-    margin-left: 15px;
-}
-
-.description ol [data-list=bullet] {
-    list-style: disc;
-    margin-left: 15px;
 }
