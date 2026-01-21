@@ -15,6 +15,7 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->string('title');
             $table->boolean('publish');
+            $table->boolean('multiple');
             $table->string('primary_role')->nullable();
             $table->string('location_type');
             $table->json('locations')->nullable();
@@ -28,6 +29,7 @@ return new class extends Migration
             $table->string('compensation_type');
             $table->string('compensation')->nullable();
             $table->string('status')->default('created');
+            $table->timestamp('expires_at')->nullable();
             $table->timestamps();
 
             $table->foreign('creator_id')->references('id')->on('users');

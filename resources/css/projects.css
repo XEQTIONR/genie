@@ -1,8 +1,17 @@
+#description .ql‑align‑center {
+    text-align: center;
+}
+
+#description .ql‑align‑right {
+    text-align: right;
+}
+
 #description h1 {
     font-size: 1.25rem;
     font-weight: 600;
     line-height: 250%;
     margin: 0 0 1rem;
+    color: blue;
 }
 
 #description h2 {
@@ -45,11 +54,21 @@
     margin-right: auto;
 }
 
+/* the dashes in ql-align-center are special */
+.description .ql‑align‑center {
+    text-align: center;
+}
+
+.description .ql‑align‑right {
+    text-align: right;
+}
+
 .description h1 {
     font-size: 1.25rem;
     font-weight: 600;
     line-height: 250%;
     margin: 0 0 1rem;
+    /* color: pink; */
 }
 
 .description h2 {

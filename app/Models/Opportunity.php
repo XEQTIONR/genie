@@ -25,6 +25,8 @@ class Opportunity extends Model
         'compensation_type',
         'status',
         'creator_id',
+        'expires_at',
+        'multiple'
     ];
 
     protected function casts(): array
@@ -35,6 +37,8 @@ class Opportunity extends Model
             'tags' => 'array',
             'work_location' => 'array',
             'employment_type' => 'array',
+            'expires_at' => 'date',
+            'multiple' => 'boolean'
         ];
     }
 

@@ -200,6 +200,8 @@ export interface Opportunity {
     owner_type: 'Team' | 'Project'
     created_at: string
     publish: boolean
+    multiple: boolean
+    expires_at: string
 }
 
 export interface Comment {

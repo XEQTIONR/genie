@@ -40,6 +40,7 @@ class OpportunityController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|min:5',
             'publish' => 'required|boolean',
+            'multiple' => 'required|boolean',
             'primary_role' => 'nullable|string',
             'location_type' => 'required|string|in:global,specific',
             'locations' => 'required_if:location_type,specific|array',
@@ -51,12 +52,14 @@ class OpportunityController extends Controller
             'owner_type' => 'required|string|in:project,team',
             'owner_id' => 'required|integer',
             'description_html' => 'required|string',
-            'description' => 'required|string'
+            'description' => 'required|string',
+            'expires_at' => 'nullable|date'
         ]);
 
         $job = new Opportunity([
             'title' => $validated['title'],
             'publish' => $validated['publish'],
+            'multiple' => $validated['multiple'],
             'primary_role' => $validated['primary_role'],
             'location_type' => $validated['location_type'],
             'locations' => count($validated['locations']) > 0 ? $validated['locations'] : null,
@@ -65,6 +68,7 @@ class OpportunityController extends Controller
             'employment_type' => $validated['employment_type'],
             'compensation_type' => $validated['compensation_type'],
             'description' => $validated['description_html'],
+            'expires_at' => $validated['expires_at'],
             'creator_id' => Auth::id(),
         ]);
 
@@ -137,6 +141,7 @@ class OpportunityController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|min:5',
             'publish' => 'required|boolean',
+            'multiple' => 'required|boolean',
             'primary_role' => 'nullable|string',
             'location_type' => 'required|string|in:global,specific',
             'locations' => 'required_if:location_type,specific|array',
@@ -148,7 +153,8 @@ class OpportunityController extends Controller
             'owner_type' => 'required|string|in:project,team',
             'owner_id' => 'required|integer',
             'description_html' => 'required|string',
-            'description' => 'required|string'
+            'description' => 'required|string',
+            'expires_at' => 'nullable|date'
         ]);
 
         $opportunity->title = $validated['title'];
@@ -160,6 +166,8 @@ class OpportunityController extends Controller
         $opportunity->work_location = $validated['work_location'];
         $opportunity->employment_type = $validated['employment_type'];
         $opportunity->compensation_type = $validated['compensation_type'];
+        $opportunity->expires_at = $validated['expires_at'] ?? null;
+        $opportunity->multiple = $validated['multiple'];
         //$opportunity->description_html = $validated['description_html'];
         $opportunity->description = $validated['description_html'];
 

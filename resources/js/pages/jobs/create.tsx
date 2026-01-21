@@ -2,7 +2,7 @@ import AppLayout from '@/layouts/app-layout'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { BreadcrumbItem, Location, Project } from '@/types'
-import { BriefcaseBusiness, Check, Heading1, Heading2, List, ListChecks, ListOrdered, PencilRuler, Plus, WrapText, X } from 'lucide-react'
+import { BriefcaseBusiness, CalendarCheck, CalendarClock, Check, Heading1, Heading2, List, ListChecks, ListOrdered, PencilRuler, Plus, User, Users, WrapText, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { ButtonGroup } from '@/components/ui/button-group'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -39,6 +39,7 @@ import '/resources/css/quill.bubble.css'
 import { Combobox, GroupedOptions } from '@/components/ui/combobox'
 import axios from 'axios'
 import Step from '@/components/step'
+import { DatePicker } from '@/components/date-picker'
 
 export default function CreateJobPosting({ projects, teams } : { projects: Project[], teams: Team[] }) {
 
@@ -117,6 +118,8 @@ export default function CreateJobPosting({ projects, teams } : { projects: Proje
     const { data, setData, transform, post } = useForm<{
         title: string
         publish: boolean
+        multiple: boolean
+        expires_at: Date | undefined
         primary_role: string 
         locations: Location[]
         location_type: string
@@ -129,6 +132,8 @@ export default function CreateJobPosting({ projects, teams } : { projects: Proje
     }>({
         title: '',
         publish: true,
+        multiple: false,
+        expires_at: undefined,
         primary_role: '',
         locations: [],
         location_type: 'global',
@@ -187,7 +192,7 @@ export default function CreateJobPosting({ projects, teams } : { projects: Proje
                             <Input value={data.title} onChange={(e) => setData('title', e.target.value)} name="title" />
                         </Field>
                         <Field>
-                            <FieldLabel>Primary Role</FieldLabel>
+                            <FieldLabel>Primary Role *</FieldLabel>
                             <Combobox onSelectValue={(val) => setData('primary_role', val)} placeholder="Select primary role" items={getRoleOptions()} />
                         </Field>
                         <Field className="gap-3">
@@ -595,9 +600,45 @@ export default function CreateJobPosting({ projects, teams } : { projects: Proje
                         </FieldGroup>
                     </FieldSet>
 
+                    {/* Multiple */}
                     <Field className="w-full mt-8" orientation="horizontal">
                         <FieldContent>
-                            <FieldLabel htmlFor="publish">Publish this job upon creation *</FieldLabel>
+                            <FieldLabel htmlFor="publish">Number of hires for position</FieldLabel>
+                            <FieldDescription className="hidden md:inline max-w-md">
+                                Where you are hiring single or multiple candidates for this position
+                            </FieldDescription>
+                        </FieldContent>
+                        <div className='flex items-center gap-3'>
+                            <Select 
+                                value={data.multiple ? "multiple" : "single"}
+                                onValueChange={(value) => {
+                                    if (value == "single") {
+                                        setData('multiple', false)
+                                    } else {
+                                        setData('multiple', true)
+                                    }
+                                }}
+                            >
+                                <SelectTrigger className="w-full min-w-42">
+                                    <SelectValue placeholder="Select expiry" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectGroup>
+                                        <SelectItem value="single"><User/> Single</SelectItem>
+                                        <SelectItem value="multiple"><Users/> Multiple</SelectItem>
+                                    </SelectGroup>
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    </Field>
+                    <FieldDescription className="md:hidden pt-2">
+                        Whether this listing is always active or removed after some time
+                    </FieldDescription>
+
+                    {/* Publish */}
+                    <Field className="w-full mt-8" orientation="horizontal">
+                        <FieldContent>
+                            <FieldLabel htmlFor="publish">Publish this job upon creation ?</FieldLabel>
                             <FieldDescription className="hidden md:inline max-w-md">
                                 This posting will be published immediately upon creation and people will
                                 be able to view this and reply to it.
@@ -613,9 +654,67 @@ export default function CreateJobPosting({ projects, teams } : { projects: Proje
                         </div>
                     </Field>
                     <FieldDescription className="md:hidden pt-2">
-                        This posting will be published immediately upon creation and people will
+                        This posting will not be published immediately upon creation and people will
                         be able to view this and reply to it.
                     </FieldDescription>
+
+                    {/* Expires */}
+                    <Field className="w-full mt-8" orientation="horizontal">
+                        <FieldContent>
+                            <FieldLabel htmlFor="publish">Does this posting expire ?</FieldLabel>
+                            <FieldDescription className="hidden md:inline max-w-md">
+                                Whether this listing is always active or removed after some time
+                            </FieldDescription>
+                        </FieldContent>
+                        <div className='flex items-center gap-3'>
+                            <Select 
+                                value={data.expires_at ? "on" : "never"}
+                                onValueChange={(value) => {
+                                    if (value == "never") {
+                                        setData('expires_at', undefined)
+                                    } else {
+                                        setData('expires_at', new Date())
+                                    }
+                                }}
+                            >
+                                <SelectTrigger className="w-full min-w-42">
+                                    <SelectValue placeholder="Select expiry" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectGroup>
+                                        <SelectItem value="never"><CalendarCheck/> Never expires</SelectItem>
+                                        <SelectItem value="on"><CalendarClock/> Expires on</SelectItem>
+                                    </SelectGroup>
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    </Field>
+                    <FieldDescription className="md:hidden pt-2">
+                        Whether this listing is always active or removed after some time
+                    </FieldDescription>
+
+                    {/* Expiry Date */}
+                    {
+                        data.expires_at && <>
+                            <Field className="w-full mt-8" orientation="horizontal">
+                                <FieldContent>
+                                    <FieldLabel htmlFor="publish">Select expiry date *</FieldLabel>
+                                    <FieldDescription className="hidden md:inline max-w-md">
+                                        Select when the post should expire
+                                    </FieldDescription>
+                                </FieldContent>
+                                
+                                <DatePicker onSelect={(d) => {
+                                    console.log('onSelect:', d)
+                                    setData('expires_at', d)
+                                }} className='min-w-63' />
+                            </Field>
+                            <FieldDescription className="md:hidden pt-2">
+                                Select when the post should expire
+                            </FieldDescription>
+                        </>
+                    }
+                    
                 </Step>
                 <div className="w-full flex justify-end  max-w-4xl mx-auto py-4">
                     <Button type="submit" className="mr-3 md:mr-0">Create job listing</Button>

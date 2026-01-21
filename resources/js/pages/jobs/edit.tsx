@@ -2,7 +2,7 @@ import AppLayout from '@/layouts/app-layout'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { BreadcrumbItem, Location, Opportunity, Project } from '@/types'
-import { BriefcaseBusiness, Check, Heading1, Heading2, List, ListChecks, ListOrdered, PencilRuler, Plus, WrapText, X } from 'lucide-react'
+import { BriefcaseBusiness, CalendarCheck, CalendarClock, Check, Heading1, Heading2, List, ListChecks, ListOrdered, PencilRuler, Plus, User, Users, WrapText, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { ButtonGroup } from '@/components/ui/button-group'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -39,6 +39,7 @@ import '/resources/css/quill.bubble.css'
 import { Combobox, GroupedOptions } from '@/components/ui/combobox'
 import axios from 'axios'
 import Step from '@/components/step'
+import { DatePicker } from '@/components/date-picker'
 
 export default function EditJobPosting({ projects, teams, job } : { projects: Project[], teams: Team[], job: Opportunity }) {
 
@@ -130,6 +131,8 @@ export default function EditJobPosting({ projects, teams, job } : { projects: Pr
         employment_type: string[]
         owner_type: string|null
         owner_id: number|null
+        multiple: boolean
+        expires_at: Date|undefined
     }>({
         title: job.title,
         publish: job.publish,
@@ -141,7 +144,9 @@ export default function EditJobPosting({ projects, teams, job } : { projects: Pr
         work_location: job.work_location,
         employment_type: job.employment_type,
         owner_type: job.owner_type ? (job.owner_type.split('\\').pop() ?? "").toLowerCase() : "",
-        owner_id: job.owner_id
+        owner_id: job.owner_id,
+        multiple: job.multiple,
+        expires_at: job.expires_at ? new Date(job.expires_at) : undefined
     })
 
     transform((data) => ({
@@ -599,6 +604,41 @@ export default function EditJobPosting({ projects, teams, job } : { projects: Pr
                         </FieldGroup>
                     </FieldSet>
 
+                    {/* Multiple */}
+                    <Field className="w-full mt-8" orientation="horizontal">
+                        <FieldContent>
+                            <FieldLabel htmlFor="publish">Number of hires for position</FieldLabel>
+                            <FieldDescription className="hidden md:inline max-w-md">
+                                Where you are hiring single or multiple candidates for this position
+                            </FieldDescription>
+                        </FieldContent>
+                        <div className='flex items-center gap-3'>
+                            <Select 
+                                value={data.multiple ? "multiple" : "single"}
+                                onValueChange={(value) => {
+                                    if (value == "single") {
+                                        setData('multiple', false)
+                                    } else {
+                                        setData('multiple', true)
+                                    }
+                                }}
+                            >
+                                <SelectTrigger className="w-full min-w-42">
+                                    <SelectValue placeholder="Select expiry" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectGroup>
+                                        <SelectItem value="single"><User/> Single</SelectItem>
+                                        <SelectItem value="multiple"><Users/> Multiple</SelectItem>
+                                    </SelectGroup>
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    </Field>
+                    <FieldDescription className="md:hidden pt-2">
+                        Whether this listing is always active or removed after some time
+                    </FieldDescription>
+
                     <Field className="w-full mt-8" orientation="horizontal">
                         <FieldContent>
                             <FieldLabel htmlFor="publish">Publish this job upon creation *</FieldLabel>
@@ -620,6 +660,65 @@ export default function EditJobPosting({ projects, teams, job } : { projects: Pr
                         This posting will be published immediately upon creation and people will
                         be able to view this and reply to it.
                     </FieldDescription>
+
+                    {/* Expires */}
+                    <Field className="w-full mt-8" orientation="horizontal">
+                        <FieldContent>
+                            <FieldLabel htmlFor="publish">Does this posting expire ?</FieldLabel>
+                            <FieldDescription className="hidden md:inline max-w-md">
+                                Whether this listing is always active or removed after some time
+                            </FieldDescription>
+                        </FieldContent>
+                        <div className='flex items-center gap-3'>
+                            <Select 
+                                value={data.expires_at ? "on" : "never"}
+                                onValueChange={(value) => {
+                                    if (value == "never") {
+                                        setData('expires_at', undefined)
+                                    } else {
+                                        setData('expires_at', new Date())
+                                    }
+                                }}
+                            >
+                                <SelectTrigger className="w-full min-w-42">
+                                    <SelectValue placeholder="Select expiry" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectGroup>
+                                        <SelectItem value="never"><CalendarCheck/> Never expires</SelectItem>
+                                        <SelectItem value="on"><CalendarClock/> Expires on</SelectItem>
+                                    </SelectGroup>
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    </Field>
+                    <FieldDescription className="md:hidden pt-2">
+                        Whether this listing is always active or removed after some time
+                    </FieldDescription>
+
+                    {/* Expiry Date */}
+                    {
+                        data.expires_at && <>
+                            <Field className="w-full mt-8" orientation="horizontal">
+                                <FieldContent>
+                                    <FieldLabel htmlFor="publish">Select expiry date *</FieldLabel>
+                                    <FieldDescription className="hidden md:inline max-w-md">
+                                        Select when the post should expire
+                                    </FieldDescription>
+                                </FieldContent>
+                                
+                                <DatePicker 
+                                    initialDate={data.expires_at}
+                                    onSelect={(d) => {
+                                    console.log('onSelect:', d)
+                                    setData('expires_at', d)
+                                }} className='min-w-42' />
+                            </Field>
+                            <FieldDescription className="md:hidden pt-2">
+                                Select when the post should expire
+                            </FieldDescription>
+                        </>
+                    }
                 </Step>
                 <div className="w-full flex justify-end  max-w-4xl mx-auto py-4">
                     <Button type="submit" className="mr-3 md:mr-0">Create job listing</Button>
