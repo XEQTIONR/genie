@@ -689,23 +689,19 @@ export default function CreatePost ({ projects, teams } : { projects: Project[],
                 <Head title="Create a new post" />
                 <div className="flex w-full justify-between">
                     <Button
+                        className="cursor-pointer"
                         onClick={() => {
-                            setSWidth((v) => {
-                                if (v == "20rem")
-                                    return "50rem"
-
-                                return "20rem"
-                            })
+                            history.back()
                         }} 
                         variant="outline"
                     >
                         Cancel
                     </Button>
                     <div className="flex gap-3">
-                        <Button variant="secondary">Save as draft</Button>
+                        <Button className="cursor-pointer" variant="secondary">Save as draft</Button>
                         <Dialog>
                             <DialogTrigger asChild>
-                                <Button type="button" onClick={() => {
+                                <Button className="cursor-pointer" type="button" onClick={() => {
                                     //submitPost()
                                 }}>Continue</Button>
                             </DialogTrigger>
@@ -764,9 +760,10 @@ export default function CreatePost ({ projects, teams } : { projects: Project[],
                                 </div>
                                 <DialogFooter>
                                     <DialogClose>
-                                        <Button variant="outline">Cancel</Button>
+                                        <Button className="cursor-pointer" variant="outline">Cancel</Button>
                                     </DialogClose>
-                                    <Button 
+                                    <Button
+                                        className="cursor-pointer" 
                                         type="button" 
                                         onClick={() => {
                                             submitPost()

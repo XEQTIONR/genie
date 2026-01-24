@@ -86,7 +86,7 @@ export default function FileDragArea({
             </EmptyHeader>
             <EmptyContent>
                 <div className="flex gap-2">
-                    <Button type="button" onClick={() => fileInput.current?.click()}>Browse</Button>
+                    <Button className="cursor-pointer" type="button" onClick={() => fileInput.current?.click()}>Browse</Button>
                     <input 
                         ref={fileInput} 
                         className="hidden" 

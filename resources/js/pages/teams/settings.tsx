@@ -7,14 +7,12 @@ import { update as updateTeam } from '@/routes/teams'
 import { show as jobsShow } from '@/routes/opportunities'
 import { edit as editTeam, show as showTeam } from '@/routes/teams'
 import { members as editMembers, opportunities as editJobs } from '@/routes/teams/edit'
-import { index as jobsIndex } from '@/routes/teams/opportunities'
-import { Opportunity, NavItem, Project, ProjectMember, Team, type BreadcrumbItem, Activity, Location, User } from '@/types'
+import { NavItem, Team, type BreadcrumbItem, Location, User } from '@/types'
 import { Form, Head, Link, router, useForm } from '@inertiajs/react'
-import { Camera, Eraser, Globe, MapPin, Pencil, PencilRuler, Instagram, Sparkles, UserPlus, Lightbulb, BriefcaseBusiness, Settings, Image, ChevronRight, BadgeCheck, Users, LinkIcon, Trash, X, Trash2, EllipsisVertical, Mail, Plus, ArrowLeft, ShieldAlert } from 'lucide-react'
+import {  Pencil, Instagram,  LinkIcon,  X, Trash2, EllipsisVertical, Mail, Plus, ArrowLeft } from 'lucide-react'
 import { Facebook, Twitter, Twitch, Youtube } from '@/components/icons/svgs'
 
 import { useInitials } from '@/hooks/use-initials';
-import { Spinner } from '@/components/ui/spinner'
 import { useEffect, useState } from 'react'
 
 import { Input } from "@/components/ui/input"
@@ -32,10 +30,7 @@ import { Textarea } from '@/components/ui/textarea'
 import {
   InputGroup,
   InputGroupAddon,
-  InputGroupButton,
   InputGroupInput,
-  InputGroupText,
-  InputGroupTextarea,
 } from "@/components/ui/input-group"
 import { Combobox, GroupedOptions } from '@/components/ui/combobox'
 import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table'
@@ -43,7 +38,6 @@ import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/h
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
-import { Label } from '@/components/ui/label'
 import SearchBar from '@/components/ui/search-bar'
 import { Multiselect } from '@/components/ui/multiselect'
 import { update as updateMember } from '@/routes/teams/edit/members'

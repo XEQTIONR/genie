@@ -13,7 +13,7 @@ import { router } from "@inertiajs/react"
 
 export default function NoProjects() {
     return (
-        <Empty className="h-full w-full">
+        <Empty className="h-full w-full my-auto">
             <EmptyHeader>
                 <EmptyMedia variant="icon">
                     <PencilRuler />

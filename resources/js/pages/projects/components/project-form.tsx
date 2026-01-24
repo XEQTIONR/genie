@@ -563,12 +563,12 @@ export default function ProjectForm({
                                 <ItemContent>
                                     <ItemTitle>Choose visibility *</ItemTitle>
                                     <ItemDescription>
-                                        Choose an owner for this project
+                                        Choose project visibility
                                     </ItemDescription>
                                 </ItemContent>
                                 <ItemActions>
-                                    <Select defaultValue="public" onValueChange={(v) => setOwnerLabel(v)} name="visibility">
-                                        <SelectTrigger defaultValue={project?.visibility ?? 'public'} className="min-w-[155px]">
+                                    <Select defaultValue={project?.visibility ?? 'public'} onValueChange={(v) => setOwnerLabel(v)} name="visibility">
+                                        <SelectTrigger className="min-w-[155px]">
                                             {/* <SelectValue /> */}
                                             <SelectValue placeholder="Select an owner">
                                             {

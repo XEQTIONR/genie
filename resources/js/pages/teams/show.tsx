@@ -704,7 +704,7 @@ export default function TeamProfile({
                     />
                 </div>
                 
-                <div className="w-full h-full md:min-h-[50vh] mx-auto flex items-stretch overflow-hidden">
+                <div className="w-full h-full max-w-8xl md:min-h-[50vh] mx-auto flex items-stretch overflow-hidden">
                     {
                         loading 
                             ? <Spinner className="block m-auto size-6" />

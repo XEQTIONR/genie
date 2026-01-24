@@ -58,7 +58,6 @@ import { store as storeImage } from '@/routes/api/uploads'
 import { update as updateUser } from '@/actions/App/Http/Controllers/UserProfileController'
 import { TabbedSectionHeaders } from '@/components/ui/tabbed-sections'
 import { useEffect, useState } from 'react'
-import { useDebouncedCallback } from 'use-debounce'
 import { Slider } from '@/components/ui/slider'
 import { getCroppedImage } from '@/hooks/use-crop'
 import { Discord, Facebook, LinkedIn, Twitter, Twitch, Youtube } from '@/components/icons/svgs'
@@ -1395,7 +1394,7 @@ export default function Profile({
                     />
                 </div>
                 
-                <div className="w-full h-full md:min-h-[50vh] mx-auto relative flex overflow-hidden border-sidebar-border/70 dark:border-sidebar-border">
+                <div className="w-full max-w-8xl h-full md:min-h-[50vh] mx-auto relative flex overflow-hidden border-sidebar-border/70 dark:border-sidebar-border">
                 {
                     loading 
                         ? <Spinner className="block m-auto size-6" />

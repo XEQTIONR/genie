@@ -224,7 +224,12 @@ class ProjectController extends Controller
 
         $teams = $user->teams;
 
-        return Inertia::render('projects/edit', compact('project', 'user', 'teams'));
+        return Inertia::render('projects/settings', [
+            'project' => $project,
+            'user' => $user,
+            'teams' => $teams,
+            'tab' => 'general'
+        ]);
     }
 
     /**
