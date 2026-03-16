@@ -1,14 +1,13 @@
-import GridCard from '@/components/grid-card';
-import { Input } from '@/components/ui/input';
-import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
-import { Separator } from '@/components/ui/separator';
-import AppLayout from '@/layouts/app-layout';
-import { home } from '@/routes';
-import { Post, type BreadcrumbItem } from '@/types';
-import { Head, router } from '@inertiajs/react';
-import { ChevronDown, SearchIcon, XIcon } from 'lucide-react';
-import { useState } from 'react';
-import { show } from '@/routes/posts';
+import GridCard from '@/components/grid-card'
+import { Input } from '@/components/ui/input'
+import { PlaceholderPattern } from '@/components/ui/placeholder-pattern'
+import AppLayout from '@/layouts/app-layout'
+import { home } from '@/routes'
+import { Post, type BreadcrumbItem } from '@/types'
+import { Head, router } from '@inertiajs/react'
+import { ChevronDown, SearchIcon, XIcon } from 'lucide-react'
+import { useState } from 'react'
+import { show } from '@/routes/posts'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,7 +15,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/button'
 
 const breadcrumbs: BreadcrumbItem[] = [
     {

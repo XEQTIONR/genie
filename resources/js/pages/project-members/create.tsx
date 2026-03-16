@@ -6,7 +6,7 @@ import { Head, useForm, usePage } from '@inertiajs/react'
 import { useRef, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { index } from '@/routes/api/users'
-import { store } from '@/routes/project/members'
+import { store } from '@/routes/projects/members'
 
 // import 'quill/dist/quill.bubble.css'
 import '/resources/css/quill.bubble.css'

@@ -198,9 +198,12 @@ export default function ShowProject({ project, h, owns, tab = 'kontent', activit
                                 <MessageCircle />
                             </Button>
                             {
-                                project.comments_count && project.comments_count > 0 && (
-                                    <Badge variant="destructive" className='absolute -right-1.5 -top-1 px-1 rounded-full font-semibold'>{project.comments_count}</Badge>
-                                )
+                                ( project.comments_count && project.comments_count > 0 ) 
+                                    ? (
+                                        <Badge variant="destructive" className='absolute -right-1.5 -top-1 px-1 rounded-full font-semibold'>
+                                            {project.comments_count}
+                                        </Badge>
+                                    ) : null
                             }
                         </div>
                         
@@ -210,7 +213,7 @@ export default function ShowProject({ project, h, owns, tab = 'kontent', activit
             }
             <ResizablePanelGroup>
                 <div className="w-full">
-                    <div className="w-full md:min-h-[50vh] bg-secondary dark:bg-neutral-900">
+                    <div className="w-full md:min-h-[50vh]">
                         <div className="flex items-center gap-4 justify-center pt-5 md:pt-10">
                             <span className={cn(
                                 "text-center text-2xl font-semibold",
@@ -264,7 +267,7 @@ export default function ShowProject({ project, h, owns, tab = 'kontent', activit
                                 <CarouselPrevious className="hidden md:flex z-60" />
                                 <CarouselNext className="hidden md:flex z-60" />
                             </Carousel>
-                            <div className="md:w-1/3 my-5 mb-18 p-5 hidden md:flex flex-col bg-background rounded justify-between">
+                            <div className="md:w-1/3 my-5 mb-18 p-5 hidden md:flex flex-col border shadow-lg dark:shadow-neutral-900 rounded justify-between">
                                 <div>
                                     <div className="flex justify-between items-center mt-3">
                                         <h1 className="text-2xl font-semibold">{project.title}</h1>

@@ -25,21 +25,6 @@ import {
   FieldLabel,
 } from "@/components/ui/field"
 import { Textarea } from '@/components/ui/textarea'
-// import {
-//   InputGroup,
-//   InputGroupAddon,
-//   InputGroupInput,
-// } from "@/components/ui/input-group"
-// import { Combobox, GroupedOptions } from '@/components/ui/combobox'
-// import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table'
-// import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card'
-// import { Badge } from '@/components/ui/badge'
-// import { cn } from '@/lib/utils'
-// import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
-// import SearchBar from '@/components/ui/search-bar'
-// import { Multiselect } from '@/components/ui/multiselect'
-// import { update as updateMember } from '@/routes/teams/edit/members'
-// import allPermisions from '@/data/permissions'
 import { Carousel, CarouselApi, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel'
 import FileDragArea from '@/components/file-drag-area'
 import { store as storeImage } from '@/routes/api/uploads'
@@ -54,17 +39,18 @@ import '/resources/css/quill.bubble.css'
 import { Item, ItemActions, ItemContent, ItemDescription, ItemTitle } from '@/components/ui/item'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Checkbox } from '@/components/ui/checkbox'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 
 type ProfileTab = NavItem & {key: string, className?: string}
 
 export default function ProjectSettings({ 
     project,
     tab,
-    apiToken 
+    apiToken,
 } : {
     project: Project
     tab: string
-    apiToken: string 
+    apiToken: string
 }) {
     const breadcrumbs: BreadcrumbItem[] = [
         {
@@ -83,7 +69,7 @@ export default function ProjectSettings({
         { title: "Release", href: "#", key: "release" },
     ]
 
-    const [currentTab] = useState(tab)
+    const [currentTab, setCurrentTab] = useState(tab)
 
     // const [selectedMember, setSelectedMember] = useState<User|undefined>(undefined)
     // const [currentRoles, setCurrentRoles] = useState<string[]>([])
@@ -150,28 +136,31 @@ export default function ProjectSettings({
     const [image, setImage] = useState<Blob|null>(null)
 
     useEffect(() => {
-        const quill = new Quill('#editor', {
-            theme: 'bubble',
-            bounds: '#editor',
-            modules: {
-                toolbar: [
-                    ['bold', 'italic', 'underline', 'strike'],
-                    ['link'],
-                ]
-            },
-            formats: [
-                'bold', 'italic', 'underline', 'strike',
-                'blockquote',
-                'header', 'list',
-                'align',
-                'image',
-                'video',
-            ],
-            placeholder: 'Detailed description and information about your project'
-        })
+        if (document.querySelector('#editor')) {
+            const quill = new Quill('#editor', {
+                theme: 'bubble',
+                bounds: '#editor',
+                modules: {
+                    toolbar: [
+                        ['bold', 'italic', 'underline', 'strike'],
+                        ['link'],
+                    ]
+                },
+                formats: [
+                    'bold', 'italic', 'underline', 'strike',
+                    'blockquote',
+                    'header', 'list',
+                    'align',
+                    'image',
+                    'video',
+                ],
+                placeholder: 'Detailed description and information about your project'
+            })
 
-        quill.clipboard.dangerouslyPasteHTML(0, project?.description ?? "")
-        editor.current = quill
+            quill.clipboard.dangerouslyPasteHTML(0, project?.description ?? "")
+            editor.current = quill
+        }
+        
     }, [])
 
     const {transform, post} = useForm({
@@ -183,17 +172,16 @@ export default function ProjectSettings({
     return (
         <AppLayout maxWidth='md:max-w-11xl' maxHeaderWidth='md:max-w-10xl' breadcrumbs={breadcrumbs}>
             <Head title="Project Settings" />
-            <Link href={showProject(project)} className='flex items-center gap-1.5 my-3 w-full max-w-10xl px-4 mx-auto'>
-                
-                <PencilRuler className="size-5"/>
-                <h2 className="font-medium">
-                    
-                    {project.title}
-                </h2>
-            </Link>
             <div className="w-full max-w-10xl px-4 mx-auto flex flex-col">
                 <div className='w-full h-full grow flex'>
                     <aside className='w-xs border-r flex flex-col gap-3'>
+                        <Link href={showProject(project)} className='flex items-center gap-1.5 my-3 w-full max-w-10xl mx-auto'>
+                            <PencilRuler className="size-5"/>
+                            <h2 className="font-medium">
+                                
+                                {project.title}
+                            </h2>
+                        </Link>
                         <h1 className="font-semibold text-xl">Settings</h1>
                         <div className="flex w-full max-w-md flex-col gap-1 pr-3">
                             {
@@ -205,13 +193,14 @@ export default function ProjectSettings({
                                         variant="ghost"
                                         onClick={(e) => {
                                             e.preventDefault()
-                                            router.visit(t.href)
+                                            setCurrentTab(t.key)
+                                            //router.visit(t.href)
                                         }}
                                     >
                                         {/* <Settings /> */}
-                                        <Link href={t.href}>
+                                        {/* <Link href={t.href}> */}
                                             {t.title}
-                                        </Link>
+                                        {/* </Link> */}
                                     </Button>
                                 ))
                             }
@@ -221,7 +210,7 @@ export default function ProjectSettings({
                         currentTab === 'general' && (
                             <Form 
                                 action={updateProject(project)} 
-                                className='w-full px-4 flex flex-col gap-5 items-start'
+                                className='w-full px-5 py-3 flex flex-col gap-5 items-start'
                                 transform={d => ({
                                     ...d,
                                     owner_type: project.owner_type.split("\\").pop()?.toLowerCase(),
@@ -298,231 +287,234 @@ export default function ProjectSettings({
                                                 <CarouselNext />
                                             </Carousel>
                                         </Field>
-                                        <Field className="gap-3">
-                                            <FieldLabel>Description</FieldLabel>
-                                            {/* <Textarea name="description" className="h-28" /> */}
-                                            <div className='max-w-full flex justify-start'>
-                                                <ButtonGroup className="flex-wrap">
-                                                    <ButtonGroup>
-                                                        <Button type="button" variant="outline" size="icon" onClick={() => {
-                                                            const [a, b] = selection()
-                                                            if (a !== undefined && b !== undefined) {
-                                                                editor.current?.formatLine(a, b, 'list', 'ordered')
-                                                            }
-                                                        }}>
-                                                            <ListOrdered />
-                                                        </Button>
-                                                        <Button type="button" variant="outline" size="icon" onClick={() => {
-                                                            const [a, b] = selection()
-                                                            if (a !== undefined && b !== undefined) {
-                                                                editor.current?.formatLine(a, b, 'list', 'bullet')
-                                                            }
-                                                        }}>
-                                                            <List />
-                                                        </Button>
-                                                        <Button type="button" variant="outline" size="icon" onClick={() => {
-                                                            const [a, b] = selection()
-                                                            if (a !== undefined && b !== undefined) {
-                                                                editor.current?.formatLine(a, b, 'list', 'checked')
-                                                            }
-                                                        }}>
-                                                            <ListChecks />
-                                                        </Button>
-                                                    </ButtonGroup>
-                                                    <ButtonGroup>
-                                                        <Button type="button" variant="outline" size="icon" onClick={() => {
-                                                            const [a, b] = selection()
-                                                            if (a !== undefined && b !== undefined) {
-                                                                editor.current?.formatLine(a, b, 'header', 1)
-                                                            }
-                                                        }}>
-                                                            <Heading1 />
-                                                        </Button>
-                                                        <Button type="button" variant="outline" size="icon" onClick={() => {
-                                                            const [a, b] = selection()
-                                                            if (a !== undefined && b !== undefined) {
-                                                                editor.current?.formatLine(a, b, 'header', 2)
-                                                            }
-                                                        }}>
-                                                            <Heading2 />
-                                                        </Button>
-                                                        <Button type="button" variant="outline" size="icon" onClick={() => {
-                                                            const [a, b] = selection()
-                                                            if (a !== undefined && b !== undefined) {
-                                                                editor.current?.removeFormat(a, b)
-                                                            }
-                                                        }}>
-                                                            <WrapText />
-                                                        </Button>
-                                                    </ButtonGroup>
-                                                    <ButtonGroup>
-                                                        <Button variant="outline" size="icon"onClick={() => {
-                                                            const [a, b] = selection()
-                                                            if (a !== undefined && b !== undefined) {
-                                                                editor.current?.formatLine(a, b, 'align', false)
-                                                            }
-                                                        }}> 
-                                                            <AlignLeft /> 
-                                                        </Button>
-                                                        <Button variant="outline" size="icon"onClick={() => {
-                                                            const [a, b] = selection()
-                                                            if (a !== undefined && b !== undefined) {
-                                                                editor.current?.formatLine(a, b, 'align', 'center')
-                                                            }
-                                                        }}> 
-                                                            <AlignCenter /> 
-                                                        </Button>
-                                                        <Button variant="outline" size="icon"onClick={() => {
-                                                            const [a, b] = selection()
-                                                            if (a !== undefined && b !== undefined) {
-                                                                editor.current?.formatLine(a, b, 'align', 'right')
-                                                            }
-                                                        }}> 
-                                                            <AlignRight /> 
-                                                        </Button>
-                                                        <Button variant="outline" size="icon"onClick={() => {
-                                                            const [a, b] = selection()
-                                                            if (a !== undefined && b !== undefined) {
-                                                                editor.current?.formatLine(a, b, 'align', 'justify')
-                                                            }
-                                                        }}> 
-                                                            <AlignJustify /> 
-                                                        </Button>
-                                                    </ButtonGroup>
-                                                    <ButtonGroup>
-                                                        <Dialog open={insertVideoDialogOpen} onOpenChange={setInsertVideoDialogOpen}>
-                                                            <DialogTrigger asChild>
-                                                                <Button type="button" variant="outline" size="icon" 
-                                                                    onClick={() => {
-                                                                        console.log('selektion:', selection())
-                                                                        setLastSelection(selection())
-                                                                    }}
-                                                                >
-                                                                    <Film />
-                                                                </Button>
-                                                            </DialogTrigger>
-                                                            <DialogContent className="sm:max-w-[425px]">
-                                                                <DialogHeader>
-                                                                    <DialogTitle>Edit profile</DialogTitle>
-                                                                    <DialogDescription>
-                                                                        Make changes to your profile here. Click save when you&apos;re
-                                                                        done.
-                                                                    </DialogDescription>
-                                                                </DialogHeader>
-                                                                <div className="grid gap-4">
-                                                                    <div className="grid gap-3">
-                                                                    <Label htmlFor="video-url">URL</Label>
-                                                                    {/* <Input ref={videoInput} id="video-url" name="video-url" defaultValue="https://example.com/video" /> */}
+                                        <Field className="gap-0">
+                                            <div className='w-full sticky z-50 pt-2 top-20 bg-background flex flex-col'>
+                                                <FieldLabel className=''>Description</FieldLabel>
+                                                <div className='max-w-full flex justify-start sticky top-24 z-50 py-3 bg-background'>
+                                                    <ButtonGroup className="flex-wrap">
+                                                        <ButtonGroup>
+                                                            <Button type="button" variant="outline"  size="icon" onClick={() => {
+                                                                const [a, b] = selection()
+                                                                if (a !== undefined && b !== undefined) {
+                                                                    editor.current?.formatLine(a, b, 'list', 'ordered')
+                                                                }
+                                                            }}>
+                                                                <ListOrdered />
+                                                            </Button>
+                                                            <Button type="button"  variant="outline" size="icon" onClick={() => {
+                                                                const [a, b] = selection()
+                                                                if (a !== undefined && b !== undefined) {
+                                                                    editor.current?.formatLine(a, b, 'list', 'bullet')
+                                                                }
+                                                            }}>
+                                                                <List />
+                                                            </Button>
+                                                            <Button type="button"  variant="outline" size="icon" onClick={() => {
+                                                                const [a, b] = selection()
+                                                                if (a !== undefined && b !== undefined) {
+                                                                    editor.current?.formatLine(a, b, 'list', 'checked')
+                                                                }
+                                                            }}>
+                                                                <ListChecks />
+                                                            </Button>
+                                                        </ButtonGroup>
+                                                        <ButtonGroup>
+                                                            <Button type="button"  variant="outline" size="icon" onClick={() => {
+                                                                const [a, b] = selection()
+                                                                if (a !== undefined && b !== undefined) {
+                                                                    editor.current?.formatLine(a, b, 'header', 1)
+                                                                }
+                                                            }}>
+                                                                <Heading1 />
+                                                            </Button>
+                                                            <Button type="button"  variant="outline" size="icon" onClick={() => {
+                                                                const [a, b] = selection()
+                                                                if (a !== undefined && b !== undefined) {
+                                                                    editor.current?.formatLine(a, b, 'header', 2)
+                                                                }
+                                                            }}>
+                                                                <Heading2 />
+                                                            </Button>
+                                                            <Button type="button"  variant="outline" size="icon" onClick={() => {
+                                                                const [a, b] = selection()
+                                                                if (a !== undefined && b !== undefined) {
+                                                                    editor.current?.removeFormat(a, b)
+                                                                }
+                                                            }}>
+                                                                <WrapText />
+                                                            </Button>
+                                                        </ButtonGroup>
+                                                        <ButtonGroup>
+                                                            <Button  variant="outline" size="icon"onClick={() => {
+                                                                const [a, b] = selection()
+                                                                if (a !== undefined && b !== undefined) {
+                                                                    editor.current?.formatLine(a, b, 'align', false)
+                                                                }
+                                                            }}> 
+                                                                <AlignLeft /> 
+                                                            </Button>
+                                                            <Button  variant="outline" size="icon"onClick={() => {
+                                                                const [a, b] = selection()
+                                                                if (a !== undefined && b !== undefined) {
+                                                                    editor.current?.formatLine(a, b, 'align', 'center')
+                                                                }
+                                                            }}> 
+                                                                <AlignCenter /> 
+                                                            </Button>
+                                                            <Button  variant="outline" size="icon"onClick={() => {
+                                                                const [a, b] = selection()
+                                                                if (a !== undefined && b !== undefined) {
+                                                                    editor.current?.formatLine(a, b, 'align', 'right')
+                                                                }
+                                                            }}> 
+                                                                <AlignRight /> 
+                                                            </Button>
+                                                            <Button  variant="outline" size="icon"onClick={() => {
+                                                                const [a, b] = selection()
+                                                                if (a !== undefined && b !== undefined) {
+                                                                    editor.current?.formatLine(a, b, 'align', 'justify')
+                                                                }
+                                                            }}> 
+                                                                <AlignJustify /> 
+                                                            </Button>
+                                                        </ButtonGroup>
+                                                        <ButtonGroup>
+                                                            <Dialog open={insertVideoDialogOpen} onOpenChange={setInsertVideoDialogOpen}>
+                                                                <DialogTrigger asChild>
+                                                                    <Button type="button"  variant="outline" size="icon" 
+                                                                        onClick={() => {
+                                                                            console.log('selektion:', selection())
+                                                                            setLastSelection(selection())
+                                                                        }}
+                                                                    >
+                                                                        <Film />
+                                                                    </Button>
+                                                                </DialogTrigger>
+                                                                <DialogContent className="sm:max-w-[425px]">
+                                                                    <DialogHeader>
+                                                                        <DialogTitle>Edit profile</DialogTitle>
+                                                                        <DialogDescription>
+                                                                            Make changes to your profile here. Click save when you&apos;re
+                                                                            done.
+                                                                        </DialogDescription>
+                                                                    </DialogHeader>
+                                                                    <div className="grid gap-4">
+                                                                        <div className="grid gap-3">
+                                                                        <Label htmlFor="video-url">URL</Label>
+                                                                        {/* <Input ref={videoInput} id="video-url" name="video-url" defaultValue="https://example.com/video" /> */}
 
-                                                                    <InputGroup>
-                                                                        <InputGroupInput ref={videoInput} placeholder="example.com" className="!pl-1" />
-                                                                        <InputGroupAddon>
-                                                                        <InputGroupText>https://</InputGroupText>
-                                                                        </InputGroupAddon>
-                                                                        {/* <InputGroupAddon align="inline-end">
-                                                                        <Tooltip>
-                                                                            <TooltipTrigger asChild>
-                                                                            <InputGroupButton className="rounded-full" size="icon-xs">
-                                                                                <IconInfoCircle />
-                                                                            </InputGroupButton>
-                                                                            </TooltipTrigger>
-                                                                            <TooltipContent>This is content in a tooltip.</TooltipContent>
-                                                                        </Tooltip>
-                                                                        </InputGroupAddon> */}
-                                                                    </InputGroup>
+                                                                        <InputGroup>
+                                                                            <InputGroupInput ref={videoInput} placeholder="example.com" className="!pl-1" />
+                                                                            <InputGroupAddon>
+                                                                            <InputGroupText>https://</InputGroupText>
+                                                                            </InputGroupAddon>
+                                                                            {/* <InputGroupAddon align="inline-end">
+                                                                            <Tooltip>
+                                                                                <TooltipTrigger asChild>
+                                                                                <InputGroupButton className="rounded-full" size="icon-xs">
+                                                                                    <IconInfoCircle />
+                                                                                </InputGroupButton>
+                                                                                </TooltipTrigger>
+                                                                                <TooltipContent>This is content in a tooltip.</TooltipContent>
+                                                                            </Tooltip>
+                                                                            </InputGroupAddon> */}
+                                                                        </InputGroup>
+                                                                        </div>
                                                                     </div>
-                                                                </div>
-                                                                <DialogFooter>
-                                                                    <DialogClose asChild>
-                                                                        <Button variant="outline">Cancel</Button>
-                                                                    </DialogClose>
-                                                                    <Button onClick={() => {
-                                                                        if (lastSelection && lastSelection.length > 0 && lastSelection[0] !== undefined) {
-                                                                            editor.current?.insertEmbed(lastSelection[0], 'video', videoInput.current?.value)
-                                                                        } else {
-                                                                            editor.current?.insertEmbed(0, 'video', videoInput.current?.value)
-                                                                        }
-                                                                        setInsertVideoDialogOpen(false)
-                                                                    }}>Save changes</Button>
-                                                                </DialogFooter>
-                                                            </DialogContent>
-                                                        </Dialog>
-                                                        
-                                                        <Dialog open={insertImageDialogOpen} onOpenChange={setInsertImageDialogOpen}>
-                                                            <DialogTrigger asChild>
-                                                                <Button type="button" variant="outline" size="icon" 
-                                                                    onClick={() => {
-                                                                        setLastSelection(selection())
-                                                                    }}
-                                                                >
-                                                                    <Image />
-                                                                </Button>
-                                                            </DialogTrigger>
-                                                            <DialogContent className="sm:max-w-[425px]">
-                                                                <DialogHeader>
-                                                                    <DialogTitle>Upload image</DialogTitle>
-                                                                    <DialogDescription>
-                                                                        Add an image
-                                                                    </DialogDescription>
-                                                                </DialogHeader>
-                                                                <div className="grid gap-4">
-                                                                    <div className="grid gap-3">
-                                                                        <Label htmlFor="video-url">Image</Label>
-                                                                        <Input
-                                                                            ref={imageInput}
-                                                                            onChange={e => {
-                                                                                if (e.target.files) {
-                                                                                    setImage(e.target.files[0])
-                                                                                } else {
-                                                                                    setImage(null)
+                                                                    <DialogFooter>
+                                                                        <DialogClose asChild>
+                                                                            <Button variant="outline">Cancel</Button>
+                                                                        </DialogClose>
+                                                                        <Button onClick={() => {
+                                                                            if (lastSelection && lastSelection.length > 0 && lastSelection[0] !== undefined) {
+                                                                                editor.current?.insertEmbed(lastSelection[0], 'video', videoInput.current?.value)
+                                                                            } else {
+                                                                                editor.current?.insertEmbed(0, 'video', videoInput.current?.value)
+                                                                            }
+                                                                            setInsertVideoDialogOpen(false)
+                                                                        }}>Save changes</Button>
+                                                                    </DialogFooter>
+                                                                </DialogContent>
+                                                            </Dialog>
+                                                            
+                                                            <Dialog open={insertImageDialogOpen} onOpenChange={setInsertImageDialogOpen}>
+                                                                <DialogTrigger asChild>
+                                                                    <Button  variant="outline" type="button" size="icon" 
+                                                                        onClick={() => {
+                                                                            setLastSelection(selection())
+                                                                        }}
+                                                                    >
+                                                                        <Image />
+                                                                    </Button>
+                                                                </DialogTrigger>
+                                                                <DialogContent className="sm:max-w-[425px]">
+                                                                    <DialogHeader>
+                                                                        <DialogTitle>Upload image</DialogTitle>
+                                                                        <DialogDescription>
+                                                                            Add an image
+                                                                        </DialogDescription>
+                                                                    </DialogHeader>
+                                                                    <div className="grid gap-4">
+                                                                        <div className="grid gap-3">
+                                                                            <Label htmlFor="video-url">Image</Label>
+                                                                            <Input
+                                                                                ref={imageInput}
+                                                                                onChange={e => {
+                                                                                    if (e.target.files) {
+                                                                                        setImage(e.target.files[0])
+                                                                                    } else {
+                                                                                        setImage(null)
+                                                                                    }
+                                                                                }} 
+                                                                                type="file" 
+                                                                                id="image" 
+                                                                                name="image"
+                                                                            />
+                                                                        </div>
+                                                                    </div>
+                                                                    <DialogFooter className="mt-4">
+                                                                        <DialogClose asChild>
+                                                                            <Button type="button" variant="outline">Cancel</Button>
+                                                                        </DialogClose>
+                                                                        <Button
+                                                                            disabled={image === null}
+                                                                            onClick={() => {
+
+                                                                                if ( image !== null) {
+                                                                                    const data = new FormData()
+
+                                                                                    data.append('image', image)
+
+                                                                                    axios.post(storeImage.url(), data, {
+                                                                                        headers: {
+                                                                                            Authorization: 'Bearer ' + apiToken
+                                                                                        }
+                                                                                    }).then((res) => {
+                                                                                        if (lastSelection && lastSelection.length > 0 && lastSelection[0] !== undefined) {
+                                                                                            editor.current?.insertEmbed(lastSelection[0], 'image', res.data.upload)
+                                                                                        } else {
+                                                                                            editor.current?.insertEmbed(0, 'image', res.data.upload)
+                                                                                        }
+                                                                                        setImage(null)
+                                                                                        setInsertImageDialogOpen(false)
+                                                                                    }).catch((error) => {
+                                                                                        console.log('error:', error)
+                                                                                    })
                                                                                 }
                                                                             }} 
-                                                                            type="file" 
-                                                                            id="image" 
-                                                                            name="image"
-                                                                        />
-                                                                    </div>
-                                                                </div>
-                                                                <DialogFooter className="mt-4">
-                                                                    <DialogClose asChild>
-                                                                        <Button type="button" variant="outline">Cancel</Button>
-                                                                    </DialogClose>
-                                                                    <Button
-                                                                        disabled={image === null}
-                                                                        onClick={() => {
-
-                                                                            if ( image !== null) {
-                                                                                const data = new FormData()
-
-                                                                                data.append('image', image)
-
-                                                                                axios.post(storeImage.url(), data, {
-                                                                                    headers: {
-                                                                                        Authorization: 'Bearer ' + apiToken
-                                                                                    }
-                                                                                }).then((res) => {
-                                                                                    if (lastSelection && lastSelection.length > 0 && lastSelection[0] !== undefined) {
-                                                                                        editor.current?.insertEmbed(lastSelection[0], 'image', res.data.upload)
-                                                                                    } else {
-                                                                                        editor.current?.insertEmbed(0, 'image', res.data.upload)
-                                                                                    }
-                                                                                    setImage(null)
-                                                                                    setInsertImageDialogOpen(false)
-                                                                                }).catch((error) => {
-                                                                                    console.log('error:', error)
-                                                                                })
-                                                                            }
-                                                                        }} 
-                                                                        type="button"
-                                                                    >
-                                                                        Add Image
-                                                                    </Button>
-                                                                </DialogFooter>
-                                                            </DialogContent>
-                                                        </Dialog>
+                                                                            type="button"
+                                                                        >
+                                                                            Add Image
+                                                                        </Button>
+                                                                    </DialogFooter>
+                                                                </DialogContent>
+                                                            </Dialog>
+                                                        </ButtonGroup>
                                                     </ButtonGroup>
-                                                </ButtonGroup>
+                                                </div>
                                             </div>
+                                            {/* <Textarea name="description" className="h-28" /> */}
+                                            
                                             <div 
                                                 onClick={() => {
                                                     const textBox: HTMLDivElement|null = document.querySelector('.ql-editor')
@@ -621,317 +613,20 @@ export default function ProjectSettings({
                         )
                     }
                     {
-                        // currentTab === 'members' && (
-                            // <div className='w-full px-4 flex flex-col gap-5 items-start'>
-                            //     <FieldGroup className="">
-                            //         <FieldGroup>
-                            //         {
-                            //                 selectedMember
-                            //                     ? <Field className="gap-2">
-                            //                         <div className='flex flex-col gap-3'>
-                            //                             <div className='flex'>
-                            //                                 <Button
-                            //                                     className='cursor-pointer'
-                            //                                     onClick={() => setSelectedMember(undefined)} 
-                            //                                     type="button" 
-                            //                                     size="sm" 
-                            //                                     variant="secondary"
-                            //                                 >
-                            //                                     <ArrowLeft /> Back to all team members
-                            //                                 </Button>
-                            //                             </div>
-                            //                             <div className="flex items-center gap-1">
-                            //                                 <Avatar className="size-10">
-                            //                                     <AvatarImage src={selectedMember.avatar} />
-                            //                                     <AvatarFallback className="">{getInitials(selectedMember.name)}</AvatarFallback>
-                            //                                 </Avatar>
-                            //                                 {selectedMember.name}
-                            //                             </div>
-                            //                         </div>
-                            //                         <div className='text-xs font-semibold mt-3 flex gap-2 items-center'>
-                            //                             <span>Roles</span>
-                            //                         {
-                            //                             !editRoles && (
-                            //                                 <div onClick={() => setEditRoles(true)} className='rounded-full border p-1.5 hover:bg-muted cursor-pointer'>
-                            //                                     <Pencil size={12} />
-                            //                                 </div>
-                            //                             )
-                            //                         }
-                            //                         {
-                            //                             editRoles && (
-                            //                                 <>
-                            //                                     <Button onClick={() => {
-                            //                                         transform(() => ({
-                            //                                             userId: selectedMember.id,
-                            //                                             roles: currentRoles,
-                            //                                             permissions: currentPermissions
-                            //                                         }))
-
-                            //                                         post(updateMember({
-                            //                                             team: team.id,
-                            //                                             user: selectedMember.id
-                            //                                         }).url)
-                            //                                     }} className="text-xxs cursor-pointer" size="sm" variant="outline" type="button">
-                            //                                         Save
-                            //                                     </Button>
-                            //                                     <Button onClick={() => {
-                            //                                         if (selectedMember) {
-                            //                                             setCurrentRoles(team.users?.find(t => t.id === selectedMember.id)?.pivot.roles ?? [])
-                            //                                         }
-                            //                                         setEditRoles(false)
-                            //                                     }} className="text-xxs cursor-pointer" size="sm" variant="destructive" type="button">
-                            //                                         Cancel
-                            //                                     </Button>
-                            //                                 </>
-                            //                             )
-                            //                         }
-                            //                         </div>
-
-                            //                         <div className='flex flex-wrap text-xs my-3 gap-1.5'>
-                            //                         {
-                            //                             currentRoles.map(r => (
-                            //                                 <Badge
-                            //                                     onClick={() => {
-                            //                                         if (editRoles) {
-                            //                                             setCurrentRoles(role => role.filter(rr => rr!== r))
-                            //                                         }
-                            //                                     }} 
-                            //                                     variant="secondary"
-                            //                                 >
-                            //                                     { r } { editRoles && <X /> }
-                            //                                 </Badge>
-                            //                             ))
-                            //                         }
-                            //                         </div>
-                            //                         {
-                            //                             editRoles && (
-                            //                                 <SearchBar
-                            //                                     onSelectOption={o => setCurrentRoles((c) => {
-                            //                                         if (c.findIndex(x => x === o) == -1) {
-                            //                                             return [...c, o]
-                            //                                         }
-                            //                                         return c
-                            //                                     })} 
-                            //                                     placeholder="Select roles"
-                            //                                     searchOptions={allRoles.map(({name, items}) => {
-                            //                                         return {
-                            //                                             heading: name,
-                            //                                             options: items.map((item) => {
-                            //                                                 return {
-                            //                                                     label: item,
-                            //                                                     value: item
-                            //                                                 }
-                            //                                             })
-                            //                                         }
-                            //                                     })}
-                            //                                 />
-                            //                             )
-                            //                         }
-                                                    
-
-                                                    
-
-                            //                         <div className='text-xs font-semibold mt-3 flex gap-2 items-center'>
-                            //                             <span>Permissions</span>
-                            //                             {
-                            //                                 !editPermissions && (
-                            //                                     <div onClick={() => setEditPermissions(true)} className='rounded-full border p-1.5 hover:bg-muted cursor-pointer'>
-                            //                                         <Pencil size={12} />
-                            //                                     </div>
-                            //                                 )
-                            //                             }
-                            //                             {
-                            //                                 editPermissions && (
-                            //                                     <>
-                            //                                         <Button className="text-xxs cursor-pointer" size="sm" variant="outline" type="button"
-                            //                                             onClick={() => {
-                            //                                                 transform(() => ({
-                            //                                                     userId: selectedMember.id,
-                            //                                                     roles: currentRoles,
-                            //                                                     permissions: currentPermissions
-                            //                                                 }))
-
-                            //                                                 post(updateMember({
-                            //                                                     team: team.id,
-                            //                                                     user: selectedMember.id
-                            //                                                 }).url)
-                            //                                             }}
-                            //                                         >
-                            //                                             Save
-                            //                                         </Button>
-                            //                                         <Button onClick={() => {
-                            //                                             if (selectedMember) {
-                            //                                                 setCurrentPermissions(team.users?.find(t => t.id === selectedMember.id)?.pivot.permissions ?? [])
-                            //                                             }
-                            //                                             setEditPermissions(false)
-                            //                                         }} className="text-xxs cursor-pointer" size="sm" variant="destructive" type="button">
-                            //                                             Cancel
-                            //                                         </Button>
-                            //                                     </>
-                            //                                 )
-                            //                             }
-                            //                         </div>
-                            //                         <div className='flex flex-wrap text-xs mt-3 gap-1.5'>
-                            //                             {
-                            //                                 currentPermissions
-                            //                                     .sort((a,b) => Object.values(allPermisions).flat().findIndex((p) => p.value == a) - Object.values(allPermisions).flat().findIndex((p) => p.value == b))
-                            //                                     .map((r) => <Badge variant="outline">{r}</Badge>)
-                            //                             }
-                            //                         </div>
-                            //                         {
-                            //                             editPermissions && <Multiselect onSelect={(v) => setCurrentPermissions(v)} defaultValue={currentPermissions} items={allPermisions} />
-                            //                         }
-                            //                     </Field> :
-                            //                     <Field className="gap-2">
-                            //                         <FieldLabel>Contributors</FieldLabel>
-                            //                         <div className='flex w-full gap-4'>
-                            //                             {
-                            //                                 team.users?.map(user => (
-                            //                                     <HoverCard>
-                            //                                         <HoverCardTrigger>
-                            //                                             <Avatar onClick={() => setSelectedMember(user)} className='size-10 cursor-pointer'>
-                            //                                                 <AvatarImage src={user.avatar} />
-                            //                                                 <AvatarFallback>{ getInitials(user.name) }</AvatarFallback>
-                            //                                             </Avatar>
-                            //                                         </HoverCardTrigger>
-                            //                                         <HoverCardContent className='min-w-sm'>
-                            //                                             <div className='flex flex-col'>
-                            //                                                 <div className='flex justify-between items-start'>
-                            //                                                     <div className='flex gap-2'>
-                            //                                                         <Avatar className='size-8'>
-                            //                                                             <AvatarImage src={user.avatar} />
-                            //                                                             <AvatarFallback>{ getInitials(user.name) }</AvatarFallback>
-                            //                                                         </Avatar>
-                            //                                                         <div className='flex flex-col'>
-
-                            //                                                         <h4 className="font-bold">{user.name}</h4>
-                            //                                                         <span className="relative -top-1 text-sm">{user.username}</span>
-                            //                                                         </div>
-                            //                                                     </div>
-                            //                                                     <Button type='button' variant="ghost" size="icon-sm">
-                            //                                                         <EllipsisVertical />
-                            //                                                     </Button>
-                            //                                                 </div>
-                                                                            
-                            //                                                 <h5 className='text-xs font-semibold mt-3'>Roles</h5>
-                            //                                                 <div className='flex flex-wrap text-xs my-3 gap-1.5'>
-                            //                                                     {
-                            //                                                         user.pivot.roles.map((r) => <Badge variant="secondary">{r}</Badge>)
-                            //                                                     }
-                            //                                                 </div>
-
-                            //                                                 <h5 className='text-xs font-semibold mt-3'>Permissions</h5>
-                            //                                                 <div className='flex flex-wrap text-xs mt-3 gap-1.5'>
-                            //                                                     {
-                            //                                                         user.pivot.permissions.map((r) => <Badge variant="outline">{r}</Badge>)
-                            //                                                     }
-                            //                                                 </div>
-                                                                            
-                            //                                             </div>
-                            //                                         </HoverCardContent>
-                            //                                     </HoverCard>
-                                                                
-                            //                                 ))
-                            //                             }
-                                                        
-                            //                         </div>
-                            //                     </Field>
-                            //         }  
-                            //         </FieldGroup>
-                            //         {
-                            //             !selectedMember && (
-                            //                 <FieldGroup>
-                            //                     <Field className="gap-2">
-                            //                         <FieldLabel>Pending Invitations</FieldLabel>
-                            //                         <Table>
-                            //                             <TableBody>
-                            //                             {
-                            //                                 team.invitations?.map(invitation => (
-                            //                                     <TableRow className='hover:bg-transparent'>
-                            //                                         <TableCell className='w-6'>
-                            //                                             {
-                            //                                                 invitation.invitee
-                            //                                                     ? <Avatar className='size-6'>
-                            //                                                         <AvatarImage src={invitation.invitee?.avatar} />
-                            //                                                         <AvatarFallback>{ getInitials(invitation.invitee?.name ?? "") }</AvatarFallback>
-                            //                                                     </Avatar> : <div className='bg-muted flex justify-center items-center size-7 rounded-full'>
-                            //                                                         <Mail size={15} />
-                            //                                                     </div>
-                                                                                
-                            //                                             }
-                                                                        
-                            //                                         </TableCell>
-                            //                                         <TableCell>{invitation.invitee?.name ?? invitation.to_email}</TableCell>
-                            //                                         <TableCell>{invitation.roles.join(", ")}</TableCell>
-                            //                                         <TableCell className="text-xs">{invitation.permissions && invitation.permissions.map(p => <Badge variant="outline">{p}</Badge>)}</TableCell>
-                            //                                         <TableCell className='w-6'>
-                            //                                             <Button type='button' variant="ghost" size="icon">
-                            //                                                 <EllipsisVertical />
-                            //                                             </Button>
-                            //                                         </TableCell>
-                            //                                     </TableRow>
-                            //                                 ))
-                            //                             }
-                            //                             </TableBody>
-                            //                         </Table>
-                            //                         {/* <div className='flex w-full gap-4'>
-                            //                             {
-                            //                                 team.users?.map(user => (
-                            //                                     <HoverCard>
-                            //                                         <HoverCardTrigger>
-                            //                                             <Avatar className='size-10 cursor-pointer'>
-                            //                                                 <AvatarImage src={user.avatar} />
-                            //                                                 <AvatarFallback>{ getInitials(user.name) }</AvatarFallback>
-                            //                                             </Avatar>
-                            //                                         </HoverCardTrigger>
-                            //                                         <HoverCardContent className='min-w-sm'>
-                            //                                             <div className='flex flex-col'>
-                            //                                                 <div className='flex justify-between items-start'>
-                            //                                                     <div className='flex gap-2'>
-                            //                                                         <Avatar className='size-8'>
-                            //                                                             <AvatarImage src={user.avatar} />
-                            //                                                             <AvatarFallback>{ getInitials(user.name) }</AvatarFallback>
-                            //                                                         </Avatar>
-                            //                                                         <div className='flex flex-col'>
-
-                            //                                                         <h4 className="font-bold">{user.name}</h4>
-                            //                                                         <span className="relative -top-1 text-sm">{user.username}</span>
-                            //                                                         </div>
-                            //                                                     </div>
-                            //                                                     <Button type='button' variant="ghost" size="icon-sm">
-                            //                                                         <EllipsisVertical />
-                            //                                                     </Button>
-                            //                                                 </div>
-                                                                            
-                            //                                                 <h5 className='text-xs font-semibold mt-3'>Roles</h5>
-                            //                                                 <div className='flex flex-wrap text-xs my-3'>
-                            //                                                     {
-                            //                                                         user.pivot.roles.map((r) => <Badge variant="secondary">{r}</Badge>)
-                            //                                                     }
-                            //                                                 </div>
-
-                            //                                                 <h5 className='text-xs font-semibold mt-3'>Permissions</h5>
-                            //                                                 <div className='flex flex-wrap text-xs mt-3 gap-1.5'>
-                            //                                                     {
-                            //                                                         user.pivot.permissions.map((r) => <Badge variant="outline">{r}</Badge>)
-                            //                                                     }
-                            //                                                 </div>
-                                                                            
-                            //                                             </div>
-                            //                                         </HoverCardContent>
-                            //                                     </HoverCard>
-                                                                
-                            //                                 ))
-                            //                             }
-                                                        
-                            //                         </div> */}
-                            //                     </Field>
-                            //                 </FieldGroup>
-                            //             )
-                            //         }
-                            //     </FieldGroup>
-                            // </div>
-                        // )
+                        currentTab === 'members' && (
+                            <div className='w-full px-4 flex flex-col gap-5 items-start'>
+                                <FieldGroup className="">
+                                {
+                                    project.members?.map(m => (
+                                        <Avatar className='size-12'>
+                                            <AvatarImage src={m.avatar} />
+                                            <AvatarFallback>{ getInitials(m.name) }</AvatarFallback>
+                                        </Avatar>
+                                    ))
+                                }
+                                </FieldGroup>
+                            </div>
+                        )
                     }
                     {
                         // currentTab === 'jobs' && (

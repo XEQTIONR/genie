@@ -31,7 +31,7 @@ export default function PostsIndex({posts} : {posts: Post[]}) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Show posts" />
-            <div className="flex mx-auto max-w-9xl h-full flex-col justify-center gap-4 overflow-x-auto rounded-xl py-4">
+            <div className="flex mx-auto w-full max-w-9xl h-full flex-col justify-center gap-4 overflow-x-auto rounded-xl py-4">
                 {
                     posts.length > 0 && (
                         <>

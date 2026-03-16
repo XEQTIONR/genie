@@ -99,7 +99,7 @@
     --text-3xs: 0.60rem;
     --text-3xs--line-height: calc(1 / 0.60);
 
-    --aspect-grid: 16 / 11
+    --aspect-grid: 16 / 12.5
 }
 
 :root {

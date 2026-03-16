@@ -50,10 +50,8 @@ export default function GridCard({
                 {
                     post.cover_type.split("/")[0] == "video" && (
                         <video ref={video} muted playsInline loop className="min-h-full min-w-full object-cover"
-                            onMouseEnter={(e) => {
-                                video.current?.play()
-                            }}
-                            onMouseLeave={(e) => video.current?.pause()}
+                            onMouseEnter={() => video.current?.play()}
+                            onMouseLeave={() => video.current?.pause()}
                         >
                             <source src={post.cover} type={post.cover_type} />
                         </video>
@@ -61,7 +59,11 @@ export default function GridCard({
                 }
                 {
                     post.cover_type.split("/")[0] == "image" && (
-                        <img className="w-full" src={post.cover} />
+                        // <img className="w-full h-full" src={post.cover} />
+                        <div 
+                            className="size-full bg-cover bg-top"
+                            style={{ backgroundImage: `url('${post.cover}')`}}
+                        ></div>
                     )
                 }
                 <div
@@ -85,9 +87,9 @@ export default function GridCard({
                 <div className="flex items-center gap-1.5">
                     {
                         variant ? (
-                            <Avatar className='size-6' variant={variant}>
-                                <AvatarImage className='size-6' src={post.owner?.avatar} />
-                                <AvatarFallback variant={variant} className="text-xxs">{getInitials(post.owner?.name ?? "")}</AvatarFallback>
+                            <Avatar className='size-8' variant={variant}>
+                                <AvatarImage className='size-8' src={post.owner?.avatar} />
+                                <AvatarFallback variant={variant} className="text-xs font-medium">{getInitials(post.owner?.name ?? "")}</AvatarFallback>
                             </Avatar>
                         ) : (
                             <PencilRuler className='size-5' />
@@ -95,7 +97,7 @@ export default function GridCard({
                     }
                     
                     <div className="w-full flex justify-between">
-                        <span className="font-semibold text-sm">{post.owner?.name ?? post.owner?.title}</span>
+                        <span className="font-semibold">{post.owner?.name ?? post.owner?.title}</span>
                         <div className="flex gap-5">
                             <div className="flex items-center gap-1.5">
                                 <Heart 
