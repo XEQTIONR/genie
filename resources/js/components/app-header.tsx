@@ -322,8 +322,8 @@ export function AppHeader({ breadcrumbs = [], maxWidth, stickyAfter = 0, customM
                                         <Search size={16} className='absolute top-[13px] left-3' />
                                         <Input placeholder='Search for ideas, projects or opportunites' className="pl-9 pr-28 py-5 grow shrink-0" />
                                         <DropdownMenu>
-                                            <DropdownMenuTrigger size="sm" className='relative -translate-x-full -left-1 top-1' asChild>
-                                                <Button variant="outline">
+                                            <DropdownMenuTrigger className='relative -translate-x-full -left-1 top-1' asChild>
+                                                <Button size="xs" className='font-sans capitalize my-0.5 -ml-1' variant="outline">
                                                     {searchType}
                                                     <ChevronDown />
                                                 </Button>
@@ -372,10 +372,10 @@ export function AppHeader({ breadcrumbs = [], maxWidth, stickyAfter = 0, customM
                                 </Button> */}
                                 {
                                     auth.user ? (<>
-                                        <Button className="hidden lg:flex cursor-pointer" onClick={() => router.visit(createPost()) }>
+                                        {/* <Button className="hidden lg:flex cursor-pointer" onClick={() => router.visit(createPost()) }>
                                             <Plus />
                                             Share Work
-                                        </Button>
+                                        </Button> */}
                                         <DropdownMenu>
                                             <DropdownMenuTrigger asChild>
                                                 <Button
