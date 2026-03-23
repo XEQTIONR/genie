@@ -250,17 +250,11 @@ export function AppHeader({ breadcrumbs = [], maxWidth, stickyAfter = 0, customM
                             </Sheet>
                         </div>
                         
-                        <div className={cn(
-                            'flex items-center grow gap-2',
-                        )}>
+                        <div className="flex items-center grow gap-20">
                             <Link
                                 href={home()}
                                 prefetch
-                                className={cn(
-                                    "flex space-x-2 left-1/2 -translate-x-1/2 lg:-translate-x-0 lg:left-auto absolute lg:relative",
-                                    
-                                )}
-                            >
+                                className="flex space-x-2 left-1/2 -translate-x-1/2 lg:-translate-x-0 lg:left-auto absolute lg:relative">
                                 <AppLogo />
                             </Link>
                         

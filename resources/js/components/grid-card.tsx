@@ -60,26 +60,23 @@ export default function GridCard({
                 {
                     post.cover_type.split("/")[0] == "image" && (
                         // <img className="w-full h-full" src={post.cover} />
+                        <div className='size-full bg-gradient-to-t from-neutral-900/15 via-95% to-transparent'>
                         <div 
                             className="size-full bg-cover bg-top"
                             style={{ backgroundImage: `url('${post.cover}')`}}
-                        ></div>
+                            ></div>
+                        </div>
                     )
                 }
                 <div
                     className={
-                        cn("w-full h-14 flex gap-2 justify-between items-center px-5 absolute bottom-0 bg-neutral-900/50 transition-opacity duration-300",
+                        cn("w-full h-14 flex gap-2 justify-between items-center px-5 absolute bottom-0 bg-gradient-to-t from-black/90  to-black/5 transition-opacity duration-300",
                         hovered ? "opacity-100" : "opacity-0")
                     }
                 >
                     <div className="text-lg font-semibold text-ellipsis text-nowrap grow-0 overflow-hidden text-white">
                         { post.title }
                     </div>
-                    {/* <div className="flex shrink-0 justify-end">
-                        <div className="bg-neutral-50 dark:bg-neutral-950 p-3 rounded-full cursor-pointer">
-                            <Heart size={18} className="stroke-neutral-600 dark:stroke-neutral-50" />
-                        </div>
-                    </div> */}
                 </div>
             </div>
             {
@@ -97,7 +94,7 @@ export default function GridCard({
                     }
                     
                     <div className="w-full flex justify-between">
-                        <span className="font-semibold">{post.owner?.name ?? post.owner?.title}</span>
+                        <span className="font-semibold text-sm">{post.owner?.name ?? post.owner?.title}</span>
                         <div className="flex gap-5">
                             <div className="flex items-center gap-1.5">
                                 <Heart 
@@ -155,11 +152,11 @@ export default function GridCard({
                                         
                                     }}
                                 />
-                                <span className="text-sm font-semibold">{numLikes}</span>
+                                <span className="text-xs font-semibold">{numLikes}</span>
                             </div>
                             <div className="flex items-center gap-1.5">
                                 <Eye strokeWidth={2.5} className="size-4" />
-                                <span className="text-sm font-semibold">{post.views_count}</span>
+                                <span className="text-xs font-semibold">{post.views_count}</span>
                             </div>
                         </div>
                     </div>

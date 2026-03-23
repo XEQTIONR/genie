@@ -16,6 +16,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Button } from '@/components/ui/button'
+import PostFilterDropDown from '@/components/post-filter-dropdown'
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -34,7 +35,7 @@ export default function Dashboard({posts} : {posts: Post[]}) {
             <Head title="Dashboard" />
             <div className="flex h-full flex-1 flex-col justify-center gap-4 overflow-x-auto rounded-xl p-4">
                 
-                <div className="h-full md:h-[450px]  flex gap-4 justify-between rounded-xl border-sidebar-border/70 dark:border-sidebar-border">
+                <div className="h-full md:h-[450px] flex gap-4 justify-between rounded-xl border-sidebar-border/70 dark:border-sidebar-border">
                     <div className="w-full lg:w-1/2 flex gap-6 flex-col justify-center border-sidebar-border/70 dark:border-sidebar-border">
                         <p className="text-6xl md:text-6xl font-bold">Find passionate people <br className="hidden md:inline" /> to build games with <br className="hidden md:inline" /> in 3 clicks.</p>
                         
@@ -88,7 +89,8 @@ export default function Dashboard({posts} : {posts: Post[]}) {
                 {
                     posts.length > 0 && (
                         <>
-                            <h2 className="text-xl font-bold mt-10 mb-5">Discover</h2>
+                            <h2 className="text-3xl font-bold mt-10">Discover</h2>
+                            <PostFilterDropDown />
                             <div className="grid auto-rows-min gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                                 {
                                     posts.map((post) => (

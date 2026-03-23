@@ -7,15 +7,7 @@ import { Post, type BreadcrumbItem } from '@/types';
 import { Head, router } from '@inertiajs/react';
 import { useState } from 'react';
 import { show } from '@/routes/posts';
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
+import PostFilterDropDown from '@/components/post-filter-dropdown';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -35,17 +27,7 @@ export default function PostsIndex({posts} : {posts: Post[]}) {
                 {
                     posts.length > 0 && (
                         <>
-                            <Select defaultValue="popular">
-                                <SelectTrigger className="w-[180px] font-semibold">
-                                    <SelectValue placeholder="Select a fruit" />
-                                </SelectTrigger>
-                                <SelectContent className="font-semibold">
-                                    <SelectGroup>
-                                        <SelectItem value="popular">Popular</SelectItem>
-                                        <SelectItem value="new">New</SelectItem>
-                                    </SelectGroup>
-                                </SelectContent>
-                            </Select>
+                            <PostFilterDropDown />
                             <div className="grid auto-rows-min gap-8 md:grid-cols-4">
                                 {
                                     posts.map((post) => (
