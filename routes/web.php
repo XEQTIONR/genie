@@ -103,104 +103,11 @@ Route::put('/projects/invitations/{invitation}', [ProjectInvitationController::c
 Route::get('/teams/invitations/{invitation}', [TeamInvitationController::class, 'show'])->name('teamInvitation.show');
 Route::put('/teams/invitations/{invitation}', [TeamInvitationController::class, 'update'])->name('teamInvitation.update');
 
-Route::get('/profile/{user:username}', function(User $user) {
-    $me = false;
-    if (Auth::user()) {
-        $user->load([
-            'likes' => function($query) {
-                $query->where('user_id', Auth::id());
-            }
-        ]);
-        if (Auth::id() === $user->id) {
-            $me = true;
-        }
-    }
-    $user->load(['posts']);
-    return Inertia::render('users/show', [
-        'user' => $user,
-        'tab' => 'showcase',
-        'me' => $me,
-    ]);
-})->name('users.show');
-Route::get('/profile/{user:username}/about', function(User $user) {
-    $me = false;
-    if (Auth::user()) {
-        $user->load([
-            'likes' => function($query) {
-                $query->where('user_id', Auth::id());
-            }
-        ]);
-        if (Auth::id() === $user->id) {
-            $me = true;
-        }
-    }
-    $user->load(['ownedProjects']);
-    return Inertia::render('users/show', [
-        'user' => $user,
-        'tab' => 'about',
-        'me' => $me,
-    ]);
-})->name('users.about');
-Route::get('/profile/{user:username}/teams', function(User $user) {
-    $me = false;
-    if (Auth::user()) {
-        $user->load([
-            'likes' => function($query) {
-                $query->where('user_id', Auth::id());
-            }
-        ]);
-        if (Auth::id() === $user->id) {
-            $me = true;
-        }
-    }
-    $teams = $user->teams()->withCount(['users', 'projects'])->get();
-    return Inertia::render('users/show', [
-        'user' => $user,
-        'teams' => $teams,
-        'tab' => 'teams',
-        'me' => $me,
-    ]);
-})->name('users.teams.index');
-Route::get('/profile/{user:username}/projects', function(User $user) {
-    $me = false;
-    if (Auth::user()) {
-        $user->load([
-            'likes' => function($query) {
-                $query->where('user_id', Auth::id());
-            }
-        ]);
-        if (Auth::id() === $user->id) {
-            $me = true;
-        }
-    }
-    $projects = $user->ownedProjects()->with('owner')->get();
-    return Inertia::render('users/show', [
-        'user' => $user,
-        'projects' => $projects,
-        'tab' => 'projects',
-        'me' => $me,
-    ]);
-})->name('users.projects.index');
-Route::get('/profile/{user:username}/activities', function(User $user) {
-    $me = false;
-    if (Auth::user()) {
-        $user->load([
-            'likes' => function($query) {
-                $query->where('user_id', Auth::id());
-            }
-        ]);
-        if (Auth::id() === $user->id) {
-            $me = true;
-        }
-    }
-    $activities = $user->activities()->with('subject')->get();
-    return Inertia::render('users/show', [
-        'user' => $user,
-        'activities' => $activities,
-        'tab' => 'activities',
-        'me' => $me,
-    ]);
-})->name('users.activites.index');
+Route::get('/profile/{user:username}', [UserProfileController::class, 'show'])->name('users.show');
+Route::get('/profile/{user:username}/about', [UserProfileController::class, 'about'])->name('users.about');
+Route::get('/profile/{user:username}/teams', [UserProfileController::class, 'teams'])->name('users.teams.index');
+Route::get('/profile/{user:username}/projects', [UserProfileController::class, 'projects'])->name('users.projects.index');
+Route::get('/profile/{user:username}/activities', [UserProfileController::class, 'activities'])->name('users.activites.index');
 
 Route::get('/teams/{team:slug}/opportunities', function (Team $team) {
     return Inertia::render('teams/show', [

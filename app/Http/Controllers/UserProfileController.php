@@ -5,12 +5,31 @@ namespace App\Http\Controllers;
 use App\Models\Upload;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 
 class UserProfileController extends Controller
 {
+    private function loadLikesAndMe(User $user): bool
+    {
+        $me = false;
+
+        if (Auth::user()) {
+            // Load likes for the authenticated viewer only.
+            $user->load([
+                'likes' => function ($query) {
+                    $query->where('user_id', Auth::id());
+                },
+            ]);
+
+            $me = Auth::id() === $user->id;
+        }
+
+        return $me;
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -45,9 +64,67 @@ class UserProfileController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(User $user)
     {
-        //
+        $me = $this->loadLikesAndMe($user);
+        $user->load(['posts']);
+
+        return Inertia::render('users/show', [
+            'user' => $user,
+            'tab' => 'showcase',
+            'me' => $me,
+        ]);
+    }
+
+    public function about(User $user)
+    {
+        $me = $this->loadLikesAndMe($user);
+        $user->load(['ownedProjects']);
+
+        return Inertia::render('users/show', [
+            'user' => $user,
+            'tab' => 'about',
+            'me' => $me,
+        ]);
+    }
+
+    public function teams(User $user)
+    {
+        $me = $this->loadLikesAndMe($user);
+        $teams = $user->teams()->withCount(['users', 'projects'])->get();
+
+        return Inertia::render('users/show', [
+            'user' => $user,
+            'teams' => $teams,
+            'tab' => 'teams',
+            'me' => $me,
+        ]);
+    }
+
+    public function projects(User $user)
+    {
+        $me = $this->loadLikesAndMe($user);
+        $projects = $user->ownedProjects()->with('owner')->get();
+
+        return Inertia::render('users/show', [
+            'user' => $user,
+            'projects' => $projects,
+            'tab' => 'projects',
+            'me' => $me,
+        ]);
+    }
+
+    public function activities(User $user)
+    {
+        $me = $this->loadLikesAndMe($user);
+        $activities = $user->activities()->with('subject')->get();
+
+        return Inertia::render('users/show', [
+            'user' => $user,
+            'activities' => $activities,
+            'tab' => 'activities',
+            'me' => $me,
+        ]);
     }
 
     /**
