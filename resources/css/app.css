@@ -39,12 +39,27 @@
 
     --font-brand: 'Tiny5', ui-sans-serif, sans-serif;
 
+    --font-mono: 'IBM Plex Mono', serif;
+
+
+
     --radius-lg: var(--radius);
     --radius-md: calc(var(--radius) - 2px);
     --radius-sm: calc(var(--radius) - 4px);
 
     --color-background: var(--background);
     --color-foreground: var(--foreground);
+    --color-theme-100: oklch(0.9489 0.0603 201.31);
+    --color-theme-200: oklch(0.9002 0.1253 200.2);
+    --color-theme-300: oklch(0.813 0.1382 200.06);
+    --color-theme-400: oklch(0.7286 0.123867 200.1616);
+    --color-theme-500: oklch(0.6442 0.1095 199.48);
+    --color-theme-600: oklch(0.5577 0.0948 200.42);
+    --color-theme-700: oklch(0.4736 0.0805 200.55);
+    --color-theme-800: oklch(0.3889 0.0661 200.68);
+    --color-theme-900: oklch(0.3058 0.052 198.75);
+    --color-theme-950: oklch(0.221 0.0376 197.76);
+
 
     --color-card: var(--card);
     --color-card-foreground: var(--card-foreground);

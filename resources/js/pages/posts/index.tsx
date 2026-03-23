@@ -23,12 +23,12 @@ export default function PostsIndex({posts} : {posts: Post[]}) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Show posts" />
-            <div className="flex mx-auto w-full max-w-9xl h-full flex-col justify-center gap-4 overflow-x-auto rounded-xl py-4">
+            <div className="flex mx-auto w-full max-w-10xl h-full flex-col justify-center gap-4 overflow-x-auto rounded-xl p-4">
                 {
                     posts.length > 0 && (
                         <>
                             <PostFilterDropDown />
-                            <div className="grid auto-rows-min gap-8 md:grid-cols-4">
+                            <div className="grid auto-rows-min gap-10 md:grid-cols-4">
                                 {
                                     posts.map((post) => (
                                         <div className="relative overflow-hidden">

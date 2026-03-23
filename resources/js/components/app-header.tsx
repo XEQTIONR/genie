@@ -158,8 +158,6 @@ export function AppHeader({ breadcrumbs = [], maxWidth, stickyAfter = 0, customM
 
     return (
         <>
-            
-            
             <div className={cn(
                 "h-20 top-0 z-50 bg-background border-b", // -mb-20
                 customMargin,

@@ -81,7 +81,7 @@ export default function GridCard({
             </div>
             {
                 showAuthor &&
-                <div className="flex items-center gap-1.5">
+                <div className="flex items-center gap-2.5">
                     {
                         variant ? (
                             <Avatar className='size-8' variant={variant}>

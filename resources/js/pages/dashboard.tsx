@@ -91,7 +91,7 @@ export default function Dashboard({posts} : {posts: Post[]}) {
                         <>
                             <h2 className="text-3xl font-bold mt-10">Discover</h2>
                             <PostFilterDropDown />
-                            <div className="grid auto-rows-min gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                            <div className="grid auto-rows-min gap-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                                 {
                                     posts.map((post) => (
                                         <div className="relative overflow-hidden">

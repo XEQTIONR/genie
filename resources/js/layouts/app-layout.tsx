@@ -17,7 +17,7 @@ interface AppLayoutProps {
 export default ({ 
     children, 
     breadcrumbs, 
-    maxWidth='md:max-w-10xl',
+    maxWidth='md:max-w-11xl',
     maxHeaderWidth,
     maxBodyWidth,
     stickyAfter = 0,
