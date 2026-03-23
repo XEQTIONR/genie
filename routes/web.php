@@ -16,7 +16,6 @@ use App\Models\Post;
 use App\Models\Team;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
-use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 
 Route::middleware(['auth', 'verified'])->group(function () {
@@ -35,10 +34,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->name('projects.members.edit');
     Route::post('/projects/{project:slug}/members', [ProjectMembershipController::class, 'store'])
         ->name('projects.members.store');
-    Route::get('/projects', [ProjectController::class, 'index'])->name('projects.index');
-    Route::get('/projects/{project:slug}', [ProjectController::class, 'show'])->name('projects.show');
-    Route::get('/projects/{project:slug}/activities', [ProjectController::class, 'showActivity'])->name('projects.activites.index');
-    Route::get('/projects/{project:slug}/showcase', [ProjectController::class, 'showPosts'])->name('projects.posts.index');
 
     Route::get('/opportunities/create', [OpportunityController::class, 'create'])->name('opportunities.create');
     Route::post('/opportunities', [OpportunityController::class, 'store'])->name('opportunities.store');
@@ -67,6 +62,11 @@ Route::post('/opportunities/{opportunity}/inquiry', [OpportunityInquiryControlle
 
 Route::get('/posts', [PostController::class, 'index'])->name('posts.index');
 Route::get('/posts/{post}', [PostController::class, 'show'])->name('posts.show');
+
+Route::get('/projects', [ProjectController::class, 'index'])->name('projects.index');
+Route::get('/projects/{project:slug}', [ProjectController::class, 'show'])->name('projects.show');
+Route::get('/projects/{project:slug}/activities', [ProjectController::class, 'showActivity'])->name('projects.activites.index');
+Route::get('/projects/{project:slug}/showcase', [ProjectController::class, 'showPosts'])->name('projects.posts.index');
 
 Route::get('/teams', [TeamController::class, 'index'])->name('teams.index');
 Route::get('/teams/{team:slug}', [TeamController::class, 'show'])->name('teams.show');
