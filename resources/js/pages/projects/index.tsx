@@ -6,12 +6,12 @@ import ProjectGridCard from '@/components/project-grid-card'
 import { Button } from '@/components/ui/button'
 import { Plus } from 'lucide-react'
 import { create } from '@/routes/projects'
-import { cn } from '@/lib/utils'
 import { Field, FieldContent, FieldGroup, FieldLegend, FieldSet } from '@/components/ui/field'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Label } from '@/components/ui/label'
-import { ReactNode } from 'react'
+
 import { Badge } from '@/components/ui/badge'
+import { Chip } from '@/components/ui/chip'
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -20,42 +20,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ]
 
-export function Chip({ variant="theme", textSize="text-sm", children,  } : { variant?: "theme"|"default", textSize?: "text-sm"|"text-xs", children: ReactNode }) {
-    
-    let cN = cn(
-        textSize,
-        "text-theme-800 bg-theme-200/50 border-theme-800",
-        "dark:text-theme-200 dark:bg-theme-200/15 dark:border-theme-200",
-    )
 
-    if (variant == "default") {
-        cN = cn(
-            textSize,
-            "text-neutral-800 bg-neutral-200/50 border-neutral-800",
-            "dark:text-neutral-200 dark:bg-neutral-200/15 dark:border-neutral-200",
-        )
-    }
-
-    if (textSize == "text-sm") {
-        cN = cn(
-            cN,
-            "py-1 px-3"
-        )
-    } else {
-        cN = cn(
-            cN,
-            "py-0.5 px-2"
-        )
-    }
-
-    cN = cn(
-        cN,
-        "font-mono font-medium",
-        "whitespace-nowrap uppercase border"
-    )
-    
-    return <span className={cN}>{children}</span>
-}
 
 export default function ProjectsIndex({ projects } : { projects: Project[]}) {
 
@@ -128,7 +93,7 @@ export default function ProjectsIndex({ projects } : { projects: Project[]}) {
                                             <Field className='text-dim hover:bg-secondary py-2 -mx-2 px-2 cursor-pointer' key={k}>
                                                 <div className="w-full flex items-center justify-between">
                                                     <span className='text-sm'>{k}</span>
-                                                    <Badge variant="secondary">{devStatuses[k]}</Badge>
+                                                    <Badge className='font-mono' variant="secondary">{devStatuses[k]}</Badge>
                                                 </div>
                                             </Field>
                                         ))

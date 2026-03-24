@@ -58,7 +58,7 @@
     --color-theme-700: oklch(0.4736 0.0805 200.55);
     --color-theme-800: oklch(0.3889 0.0661 200.68);
     --color-theme-900: oklch(0.3058 0.052 198.75);
-    --color-theme-950: oklch(0.221 0.0376 197.76);
+    --color-theme-950: oklch(0.1898 0.0094 255.63);
 
 
     --color-card: var(--card);
