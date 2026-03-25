@@ -1,13 +1,22 @@
 import { cn } from "@/lib/utils"
 import { ReactNode } from 'react'
 
-export function Chip({ variant="theme", textSize="text-sm", children,  } : { variant?: "theme"|"default", textSize?: "text-sm"|"text-xs", children: ReactNode }) {
+export function Chip({ variant="theme", textSize="text-sm", children,  } : { variant?: "theme"|"default"|"theme-simple", textSize?: "text-sm"|"text-xs", children: ReactNode }) {
     
     let cN = cn(
         textSize,
         "text-theme-800 bg-theme-200/50 border-theme-800",
         "dark:text-theme-200 dark:bg-theme-200/15 dark:border-theme-200",
     )
+
+    if (variant == "theme-simple") {
+        cN = cn(
+            textSize,
+            "text-theme-800 border-theme-800",
+            "dark:text-theme-200/80 dark:border-theme-200/80",
+        )
+    }
+    
 
     if (variant == "default") {
         cN = cn(

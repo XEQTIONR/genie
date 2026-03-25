@@ -8,9 +8,9 @@ use App\Models\TeamInvitation;
 use App\Models\Upload;
 use App\Models\User;
 use App\Notifications\TeamInvitationNotification;
-
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Notification;
@@ -25,11 +25,15 @@ class TeamController extends Controller
      */
     public function index()
     {
+        $f = fn($query) => $query->where('expires_at', null)
+            ->orWhere('expires_at', '>', Carbon::now());
+
         return Inertia::render('teams/index', [
-            'teams' => Team::with(['posts' => function($query) {
-                $query->latest()->limit(5);
-            }])->withCount(['projects', 'opportunities', 'users'])
-            ->get(),
+            'teams' => Team::withCount([
+                'projects', 
+                'users',
+                'opportunities' => $f, 
+            ])->with(['opportunities' => $f])->get(),
         ]);
     }
 

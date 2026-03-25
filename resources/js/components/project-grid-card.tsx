@@ -151,7 +151,7 @@ export default function ProjectGridCard({project} : {project: Project}) {
                 {
                     project.excerpt && (
                         <Link className="z-50" href={show({project: project.slug})}>
-                            <p className="pb-4 px-4 text-sm text-dim">{project.excerpt}</p>
+                            <p className="pb-4 px-4 text-sm text-dim font-medium">{project.excerpt}</p>
                         </Link>
                     )
                 }

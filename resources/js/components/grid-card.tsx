@@ -43,7 +43,7 @@ export default function GridCard({
                 onMouseLeave={() => setHovered(false)} 
                 onMouseEnter={() => setHovered(true)} 
                 className={cn(
-                    "relative aspect-grid overflow-hidden border border-sidebar-border/70 dark:border-sidebar-border",
+                    "relative aspect-grid overflow-hidden rounded-md border border-sidebar-border/70 dark:border-sidebar-border",
                     className
                 )}
             >

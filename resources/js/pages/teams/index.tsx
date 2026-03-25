@@ -1,22 +1,66 @@
 import AppLayout from '@/layouts/app-layout'
-import { Post, Team, type BreadcrumbItem } from '@/types'
+import { Team, type BreadcrumbItem } from '@/types'
 import { Head, Link, router } from '@inertiajs/react'
 import { index, show } from '@/routes/teams'
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-// import { AvatarImage } from '@radix-ui/react-avatar';
 import { useInitials } from '@/hooks/use-initials';
-import { Bookmark, BriefcaseBusiness, GalleryHorizontalEnd, Heart, Lightbulb, Moon, PencilRuler, Users } from 'lucide-react';
+import { DraftingCompass } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import GridCard from '@/components/grid-card';
-import { cn } from '@/lib/utils';
-import { Empty, EmptyHeader, EmptyMedia, EmptyTitle } from '@/components/ui/empty';
-
+import { Group } from '@/components/icons/svgs';
+import { Separator } from '@/components/ui/separator';
+import { create } from '@/routes/teams';
+import { Chip } from '@/components/ui/chip';
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Teams',
         href: index().url,
     },
 ];
+
+function Card({team} : {team: Team}) {
+
+    const chipText = (team.opportunities_count ?? 0) > 0
+        ? (team.opportunities_count ?? 0) == 1
+            ? `Looking for ${team.opportunities?.[0].primary_role}`
+            : `${team.opportunities_count} opportunities`
+        : ''
+
+    return <Link 
+            href={show({team: team.slug})} 
+            className="flex flex-col w-full dark:bg-theme-950 px-6 py-6  dark:shadow-neutral-900 hover:shadow-lg duration-300"
+        >
+            <div className="w-full flex flex-col justify-between grow">
+                <div>
+                    <div className='flex justify-between items-start'>
+                        <div
+                            style={{ backgroundImage: `url(${team.avatar})`}}
+                            className="rounded size-12"
+                        />
+                        <span className="text-xs uppercase dark:text-neutral-700 font-medium">Since {(new Date(team.created_at)).getFullYear()}</span>
+                    </div>
+                    <h3 className="font-bold uppercase text-lg mt-5 mb-3">{team.name}</h3>
+                    <span className="text-sm text-dim font-medium line-clamp-3 text-ellipsis">{team.description}</span>
+                </div>
+                <div>
+                    <Separator className="mt-5 mb-4" />
+                    <div className='flex justify-between'>
+                        <div className='flex gap-5'>
+                            <div className='flex items-center gap-1'>
+                                <Group />
+                                <span className='text-sm font-medium font-mono'>{team.users_count}</span>
+                            </div>
+                            <div className='flex items-center gap-1'>
+                                <DraftingCompass size={14} />
+                                <span className='text-sm font-medium font-mono'>{team.projects_count}</span>
+                            </div>
+                        </div>
+                        {
+                            chipText.length > 0 && <Chip variant="theme-simple" textSize="text-xs">{chipText}</Chip>
+                        }
+                    </div>
+                </div>
+            </div>
+        </Link>
+}
 
 
 export default function TeamsIndex({ teams } : { teams: Team[]}) {
@@ -27,85 +71,34 @@ export default function TeamsIndex({ teams } : { teams: Team[]}) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Team" />
-            <h1 className="text-2xl font-bold mt-5 w-full max-w-9xl mx-auto">Teams</h1>
-            <span className="mb-5 text-sm w-full max-w-9xl mx-auto">Teams of great people.</span>
+            
+            {/* <span className="text-9xl font-bold relative left-2 -mb-36 opacity-10 max-w-[50vw]">Projects</span> */}
+            <span className="font-mono uppercase mt-6 mb-2 ml-5 text-sm text-theme-950 dark:text-theme-200 tracking-widest">Network Ecosystem</span>
+            <span className="text-6xl font-bold mt-2 mb-2 ml-5 mx-auto">Teams</span>
+            <span className="mb-2 ml-5 text-lg text-dim max-w-xl">
+                The void is vast, but you don't have to nagivate it alone.
+                Connect with studios, agile indie squads, and experimental collectives
+                building the next generate of digital worlds.
+            </span>
+            <div className="flex ml-5 mb-10">
+                <Button 
+                    onClick={() => router.visit(create())} 
+                    variant="theme"
+                    className="cursor-pointer"
+                >
+                    Form a team
+                </Button>
+            </div>
             <div className="flex flex-col items-center gap-4 overflow-x-auto rounded-xl p-4">
                 {
                     teams.length > 0 && (
-                        <>
-                            <div className="flex flex-col gap-10 w-full max-w-9xl">
-                                {
-                                    teams.map((team) => (
-                                        <Link href={show({team: team.slug})} className="flex flex-col gap-6 w-full border bg-background  rounded-xl px-6 py-5  dark:shadow-neutral-900 hover:shadow-lg duration-300 p-4">
-                                            <div className="w-full flex justify-between">
-                                                <div className="flex gap-3">
-                                                    <Avatar variant="square" className="size-16">
-                                                        <AvatarImage src={team.avatar} />
-                                                        <AvatarFallback variant="square">{getInitials(team.name)}</AvatarFallback>
-                                                    </Avatar>
-                                                    <div className="flex flex-col gap-2">
-                                                        <div className="flex items-center gap-2">
-                                                            <span className="font-bold text-xl">{team.name}</span>
-                                                            <span className="px-1 py-0.5 text-xs font-bold rounded bg-foreground text-background">STUDIO</span>
-                                                        </div>
-                                                        <div className="flex gap-5">
-                                                            <span className="flex items-center gap-1 font-semibold text-sm"><Users size={16} /> {team?.users_count} members</span>
-                                                            <span className="flex items-center gap-1 font-semibold text-sm"><PencilRuler size={16} /> {team?.projects_count} projects</span>
-                                                            <span className="flex items-center gap-1 font-semibold text-sm"><BriefcaseBusiness size={16} /> {team?.opportunities_count} opportunities</span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div className="flex gap-3">
-                                                    <Button variant="outline" className="rounded-full" size="icon-lg"><Bookmark /></Button>
-                                                    <Button variant="outline" className="rounded-full" size="icon-lg"><Heart /></Button>
-                                                    <Button className="rounded-3xl">Get in touch</Button>
-                                                </div>
-                                            </div>
-
-                                            <div className="grid grid-cols-5 w-full gap-5">
-                                            {
-                                                team.posts?.map((post) => <GridCard post={post} showAuthor={false} />)
-                                            }
-                                            {
-                                                ((5 - (team.posts?.length ?? 0)) < 5  && (5 - (team.posts?.length ?? 0)) > 0)?
-                                                <div 
-                                                    className={cn('w-full h-full flex justify-center items-center rounded bg-foreground/5 col-span-' + (5 - (team.posts?.length ?? 0)))}
-                                                >
-                                                    <Empty>
-                                                        <EmptyHeader>
-                                                            <EmptyMedia className="bg-background dark:bg-muted" variant="icon">
-                                                                <GalleryHorizontalEnd />
-                                                            </EmptyMedia>
-                                                            <EmptyTitle>No more posts to show</EmptyTitle>
-                                                        </EmptyHeader>
-                                                    </Empty>
-                                                </div>: null
-                                            }
-                                            {
-                                                team.posts?.length == 0 &&
-                                                <div 
-                                                    className={'w-full col-span-5 flex justify-center   rounded bg-foreground/5'}
-                                                >
-                                                    
-                                                    {/* <div className="absolute left-1/2 top-1/2">No more</div> */}
-                                                    <div className='h-full aspect-grid w-1/5 flex justify-center items-center'>
-                                                        <Empty>
-                                                            <EmptyHeader>
-                                                                <EmptyMedia className="bg-background dark:bg-muted" variant="icon">
-                                                                    <GalleryHorizontalEnd />
-                                                                </EmptyMedia>
-                                                                <EmptyTitle>This team has no posts</EmptyTitle>
-                                                            </EmptyHeader>
-                                                        </Empty>
-                                                    </div>
-                                                </div>
-                                            }
-                                            </div>
-                                        </Link>
-                                    ))
-                                }
-                            </div>
-                        </>
+                        <div className="grid grid-cols-4 gap-7 w-full">
+                            {
+                                teams.map((team) => (
+                                    <Card team={team} />
+                                ))
+                            }
+                        </div>
                     )
                 }
             </div>
